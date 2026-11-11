@@ -390,20 +390,42 @@ const AUTH = {
   },
 
   /* ─ login ────────────────────────────────────────────────── */
-  async login(phone, password) {
+  async login(identifier, password) {
+    // Sign-in is by email. Accounts created before email sign-in have no email on file,
+    // so a phone number typed in the same box still works for them.
+    const id      = String(identifier||"").trim();
+    const byEmail = id.includes("@");
+    const key     = byEmail ? id.toLowerCase() : id;
     try {
-      const rows = await supa.query(`/gp_users?phone=eq.${encodeURIComponent(phone)}&select=name,phone,password_hash`);
-      if (rows.length === 0) return { ok:false, msg:"No account found with this phone number." };
+      const rows = await supa.query(`/gp_users?${byEmail?"email":"phone"}=eq.${encodeURIComponent(key)}&select=name,phone,email,password_hash`);
+      if (rows.length === 0) return { ok:false, msg: byEmail ? "No account found with this email address." : "No account found. Sign in with your email address." };
 
       const user = rows[0];
       const hash = await hashPassword(password);
       if (hash !== user.password_hash) return { ok:false, msg:"Incorrect password. Try again." };
 
-      this.setSession({ name: user.name, phone: user.phone });
-      return { ok:true, name: user.name };
+      this.setSession({ name: user.name, phone: user.phone, email: user.email||"" });
+      return { ok:true, name: user.name, phone: user.phone, email: user.email||"" };
     } catch(e) {
-      if (SUPA_URL.includes("xyzxyzxyz")) return this._localLogin(phone, password);
+      if (SUPA_URL.includes("xyzxyzxyz")) return this._localLogin(key, password);
       return { ok:false, msg:"Network error. Check connection and try again." };
+    }
+  },
+
+  /* ─ is this phone / email already registered? (checked before a code is emailed) ─ */
+  async findTaken(phone, email) {
+    try {
+      const byPhone = await supa.query(`/gp_users?phone=eq.${encodeURIComponent(phone)}&select=phone`);
+      if (byPhone.length > 0) return "This phone number is already registered.";
+      const byEmail = await supa.query(`/gp_users?email=eq.${encodeURIComponent(email)}&select=email`);
+      if (byEmail.length > 0) return "This email address is already registered. Sign in instead.";
+      return "";
+    } catch(e) {
+      if (!IS_LOCAL) return "";
+      const a = this._localAccounts();
+      if (a[phone]) return "This phone number is already registered.";
+      if (Object.values(a).some(u => (u.email||"").toLowerCase() === email)) return "This email address is already registered. Sign in instead.";
+      return "";
     }
   },
 
@@ -517,53 +539,39 @@ const AUTH = {
   },
 
   /* ─ email verification ─────────────────────────────────── */
-  generateCode() {
-    return String(Math.floor(100000 + Math.random() * 900000));
-  },
-
+  // The server emails the code and returns only a signed token; the code itself never reaches the browser.
   async sendVerificationCode(email, name) {
-    const code    = this.generateCode();
-    const expires = Date.now() + 10 * 60 * 1000; // 10 minutes
-    // Store pending verification
-    localStorage.setItem("gp_pending_verify", JSON.stringify({ email, code, expires }));
-
-    if (IS_LOCAL) {
-      // Demo mode — return code to display on screen
-      return { ok:false, msg:"Could not send the verification email. Please try again." };
-    }
-
-    // Production — call a Supabase Edge Function or email API
-    // Example: deploy a Supabase edge function called "send-otp"
-    //   supabase functions deploy send-otp
-    // that calls Resend / SendGrid with the code.
     try {
-      await fetch(`${SUPA_URL}/functions/v1/send-otp`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${SUPA_KEY}`,
-        },
-        body: JSON.stringify({ email, name, code }),
+      const res = await fetch("/api/auth/code", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action:"send", email, name }),
       });
-      return { ok:true, demo:false };
+      const d = await res.json().catch(()=>({}));
+      if (!res.ok || !d.token) return { ok:false, msg: d.error || "Could not send the verification email. Please try again." };
+      localStorage.setItem("gp_pending_verify", JSON.stringify({ email, token:d.token, expires:d.expires }));
+      return { ok:true, devCode: d.devCode || null }; // devCode: local development only, when email is not set up
     } catch(e) {
-      // Fallback: show code on screen if edge function not deployed
-      return { ok:false, msg:"Could not send the verification email. Please try again." };
+      return { ok:false, msg:"Network error. Check your connection and try again." };
     }
   },
 
-  verifyCode(email, inputCode) {
-    const raw = localStorage.getItem("gp_pending_verify");
-    if (!raw) return { ok:false, msg:"No verification pending. Please register again." };
-    const { email:storedEmail, code, expires } = JSON.parse(raw);
-    if (storedEmail !== email)   return { ok:false, msg:"Email mismatch. Please try again." };
-    if (Date.now() > expires)    {
+  async verifyCode(email, inputCode) {
+    let pending = null;
+    try { pending = JSON.parse(localStorage.getItem("gp_pending_verify")||"null"); } catch(e) {}
+    if (!pending || !pending.token) return { ok:false, msg:"No verification pending. Please request a new code." };
+    if (pending.email !== email)   return { ok:false, msg:"Email mismatch. Please request a new code." };
+    try {
+      const res = await fetch("/api/auth/code", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action:"verify", email, code: inputCode.trim(), token: pending.token, expires: pending.expires }),
+      });
+      const d = await res.json().catch(()=>({}));
+      if (!res.ok || !d.ok) return { ok:false, msg: d.error || "Incorrect code. Try again." };
       localStorage.removeItem("gp_pending_verify");
-      return { ok:false, msg:"Code expired. Please request a new one." };
+      return { ok:true };
+    } catch(e) {
+      return { ok:false, msg:"Network error. Check your connection and try again." };
     }
-    if (inputCode.trim() !== code) return { ok:false, msg:"Incorrect code. Try again." };
-    localStorage.removeItem("gp_pending_verify");
-    return { ok:true };
   },
 
   clearPendingVerification() {
@@ -578,7 +586,7 @@ const AUTH = {
     const a = this._localAccounts();
     if (a[phone]) return { ok:false, msg:"This phone number is already registered." };
     if (email) {
-      const emailTaken = Object.values(a).some(u => u.email === email);
+      const emailTaken = Object.values(a).some(u => (u.email||"").toLowerCase() === email.toLowerCase());
       if (emailTaken) return { ok:false, msg:"This email address is already registered." };
     }
     a[phone] = { name, phone, email: email||"", password, school, avatar_color: avatarColor,
@@ -588,12 +596,13 @@ const AUTH = {
     this._saveLocal(a); this.setSession({ name, phone, email: email||"" });
     return { ok:true };
   },
-  _localLogin(phone, password) {
+  _localLogin(id, password) {
     const a = this._localAccounts();
-    if (!a[phone]) return { ok:false, msg:"No account found with this phone number." };
-    if (a[phone].password !== password) return { ok:false, msg:"Incorrect password." };
-    this.setSession({ name:a[phone].name, phone });
-    return { ok:true, name:a[phone].name };
+    const acc = id.includes("@") ? Object.values(a).find(u => (u.email||"").toLowerCase() === id) : a[id];
+    if (!acc) return { ok:false, msg: id.includes("@") ? "No account found with this email address." : "No account found. Sign in with your email address." };
+    if (acc.password !== password) return { ok:false, msg:"Incorrect password." };
+    this.setSession({ name:acc.name, phone:acc.phone, email:acc.email||"" });
+    return { ok:true, name:acc.name, phone:acc.phone, email:acc.email||"" };
   },
   _localGetUser(phone) { return this._localAccounts()[phone]||null; },
   _localUpdateStats(phone, score, topic, mode) {
@@ -1700,8 +1709,19 @@ function App() {
     <VerifyEmailScreen
       pending={pendingReg}
       onSuccess={() => {
+        const p = pendingReg;
+        if (p.role === "teacher") {
+          startTeacherSession({ fullName:p.name, email:p.email, phone:p.phone, school:p.school, region:p.region });
+          window.location.href = "/teacher/dashboard";
+          return;
+        }
+        if (p.role === "parent") {
+          startParentSession({ name:p.name, phone:p.phone });
+          window.location.href = "/parent";
+          return;
+        }
         setPendingReg(null);
-        setUser({ name:pendingReg.name, phone:pendingReg.phone, email:pendingReg.email });
+        setUser({ name:p.name, phone:p.phone, email:p.email });
         setScreen("levels");
       }}
       onBack={() => {
@@ -2319,6 +2339,7 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
   const [role,        setRoleChoice]  = useState("student"); // student | teacher | parent
   const [region,      setRegion]      = useState("");
   const [avatarColor, setAvatarColor] = useState("#22c55e");
+  const [loginId,     setLoginId]     = useState(""); // sign-in email
   const [errors,      setErrors]      = useState({});
   const [loading,     setLoading]     = useState(false);
   const [serverErr,   setServerErr]   = useState("");
@@ -2415,19 +2436,25 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
   async function submit() {
     setErrors({}); setServerErr("");
     const e = {};
-    if (!isLogin && !name.trim()) e.name = "Full name is required";
-    const digits = phone.replace(/\D/g,"");
-    if (!digits.length)            e.phone    = "Phone number is required";
-    else if (digits.length<10)     e.phone    = "Enter a valid 10-digit number";
-    if (!isLogin && email.trim()) {
-      // validate email format if provided
-      if (!/^[^@]+@[^@]+\.[^@]+$/.test(email.trim())) e.email = "Enter a valid email address";
+    const trimEmail  = email.trim().toLowerCase();
+    const validEmail = v => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v);
+    if (isLogin) {
+      // Sign in with email. A phone number is still accepted for accounts made before email sign-in.
+      const id = loginId.trim();
+      if (!id) e.loginId = "Email is required";
+      else if (id.includes("@") ? !validEmail(id) : id.replace(/\D/g,"").length<10) e.loginId = "Enter a valid email address";
+    } else {
+      if (!name.trim()) e.name = "Full name is required";
+      const digits = phone.replace(/\D/g,"");
+      if (!digits.length)            e.phone    = "Phone number is required";
+      else if (digits.length<10)     e.phone    = "Enter a valid 10-digit number";
+      if (!trimEmail)                e.email    = "Email is required";
+      else if (!validEmail(trimEmail)) e.email  = "Enter a valid email address";
     }
     if (!password)                 e.password = "Password is required";
     else if (!isLogin && password.length<6) e.password = "Minimum 6 characters";
     if (!isLogin && password!==confirm)     e.confirm  = "Passwords don't match";
     if (!isLogin && role==="teacher") {
-      if (!email.trim()) e.email = "Email is required for teachers";
       if (!school.trim()) e.school = "School name is required for teachers";
       if (!region) e.region = "Choose your region";
     }
@@ -2436,7 +2463,7 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
 
     if (isLogin) {
       // ── Login flow ────────────────────────────────────────────
-      const res = await AUTH.login(phone, password);
+      const res = await AUTH.login(loginId, password);
       setLoading(false);
       if (!res.ok) {
         setServerErr(res.msg);
@@ -2445,73 +2472,42 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
         if (gsap && el) gsap.fromTo(el, { x:-10 }, { x:0, duration:0.5, ease:"elastic.out(1,0.4)" });
         return;
       }
+      const acctPhone = res.phone; // accounts are still keyed by phone number internally
       // The button you picked must match the account type
-      const accountRole = getRole(phone);
+      const accountRole = getRole(acctPhone);
       if (accountRole !== role) {
         localStorage.removeItem("gp_session_v3");
         setServerErr(accountRole === "teacher" ? "This is a teacher account. Choose Teacher to sign in." : accountRole === "parent" ? "This is a parent account. Choose Parent to sign in." : "This is a student account. Choose Student to sign in.");
         return;
       }
       if (role === "teacher") {
-        const prof = teacherProfileByPhone(phone);
+        const prof = teacherProfileByPhone(acctPhone);
         if (!prof) { localStorage.removeItem("gp_session_v3"); setServerErr("Teacher profile not found on this device."); return; }
         startTeacherSession(prof);
         window.location.href = "/teacher/dashboard";
         return;
       }
       if (role === "parent") {
-        startParentSession({ name: res.name || "Parent", phone });
+        startParentSession({ name: res.name || "Parent", phone: acctPhone });
         window.location.href = "/parent";
         return;
       }
-      onSuccess({ name:res.name||name, phone });
+      onSuccess({ name:res.name||name, phone:acctPhone, email:res.email||"" });
 
     } else {
-      // ── Register flow — send verification code first ──────────
-      if (role === "teacher") {
-        // Teachers register directly (no email-code step) and land on the Teacher Dashboard
-        const tres = await AUTH.register(name.trim(), phone, email.trim(), password, school.trim(), avatarColor);
-        setLoading(false);
-        if (!tres.ok) { setServerErr(tres.msg); return; }
-        startTeacherSession({ fullName: name.trim(), email: email.trim(), phone, school: school.trim(), region });
-        window.location.href = "/teacher/dashboard";
-        return;
-      }
-      if (role === "parent") {
-        // Parents register with name, phone and password only, and land on the parent page
-        const pres = await AUTH.register(name.trim(), phone, "", password, "", avatarColor);
-        setLoading(false);
-        if (!pres.ok) { setServerErr(pres.msg); return; }
-        startParentSession({ name: name.trim(), phone });
-        window.location.href = "/parent";
-        return;
-      }
-      const trimEmail = email.trim();
-
-      if (trimEmail && !IS_LOCAL) {
-        // Email provided → send OTP then verify
-        const sendRes = await AUTH.sendVerificationCode(trimEmail, name.trim());
-        setLoading(false);
-        if (!sendRes.ok) { setServerErr(sendRes.msg||"Failed to send code."); return; }
-        // Store pending registration data and switch to verify screen
-        onPendingVerify({
-          name: name.trim(), phone, email: trimEmail, password,
-          school, avatarColor,
-          demoCode: null,
-        });
-      } else {
-        // No email → register directly (phone-only)
-        const res = await AUTH.register(name.trim(), phone, trimEmail, password, school, avatarColor);
-        setLoading(false);
-        if (!res.ok) {
-          setServerErr(res.msg);
-          const gsap = gsapRef.current;
-          const el = registerRef.current;
-          if (gsap && el) gsap.fromTo(el, { x:-10 }, { x:0, duration:0.5, ease:"elastic.out(1,0.4)" });
-          return;
-        }
-        onSuccess({ name:name.trim(), phone });
-      }
+      // ── Register flow: every new account (student, teacher, parent) verifies its email with a code ──
+      const taken = await AUTH.findTaken(phone, trimEmail);
+      if (taken) { setLoading(false); setServerErr(taken); return; }
+      const sendRes = await AUTH.sendVerificationCode(trimEmail, name.trim());
+      setLoading(false);
+      if (!sendRes.ok) { setServerErr(sendRes.msg||"Failed to send code."); return; }
+      // Keep the sign-up details and switch to the code screen. The account is created once the code is confirmed.
+      onPendingVerify({
+        role, region,
+        name: name.trim(), phone, email: trimEmail, password,
+        school: role==="parent" ? "" : school.trim(), avatarColor,
+        devCode: sendRes.devCode,
+      });
     }
   }
 
@@ -2711,9 +2707,9 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
 
         {/* ── LOGIN FORM ─────────────────────────────────────── */}
         <div ref={loginRef} className="login-form active">
-          <LivelyInput label="Phone Number" type="tel" value={phone}
-            onChange={e=>setPhone(e.target.value)} placeholder="024 XXX XXXX"
-            icon={<Ico n="phone" />} error={errors.phone}/>
+          <LivelyInput label="Email address" type="email" value={loginId}
+            onChange={e=>setLoginId(e.target.value)} placeholder="you@gmail.com"
+            icon={<Ico n="mail" />} error={errors.loginId}/>
           <LivelyInput label="Password" type="password" value={password}
             onChange={e=>setPassword(e.target.value)} placeholder="Enter your password"
             icon={<Ico n="lock" />} error={errors.password}/>
@@ -2727,14 +2723,14 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
           <LivelyInput label="Phone Number" type="tel" value={phone}
             onChange={e=>setPhone(e.target.value)} placeholder="024 XXX XXXX"
             icon={<Ico n="phone" />} error={errors.phone}/>
-          {role!=="parent" && (<>
+          <LivelyInput label="Email address (you will sign in with this)" type="email" value={email}
+            onChange={e=>setEmail(e.target.value)} placeholder="you@gmail.com"
+            icon={<Ico n="mail" />} error={errors.email}/>
+          {role!=="parent" && (
           <LivelyInput label={role==="teacher" ? "School name" : "School (optional, shows on leaderboard)"} value={school}
             onChange={e=>setSchool(e.target.value)} placeholder="e.g. Prempeh College"
             icon={<Ico n="school" />} error={errors.school}/>
-          <LivelyInput label={role==="teacher" ? "Email address" : "Email address (optional)"} type="email" value={email}
-            onChange={e=>setEmail(e.target.value)} placeholder="you@gmail.com"
-            icon={<Ico n="mail" />} error={errors.email}/>
-          </>)}
+          )}
           {role==="teacher" && (
             <div style={{marginBottom:14}}>
               <label style={{display:"block",fontSize:11,fontWeight:700,color:"var(--muted2)",textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:6}}>Region in Ghana</label>
@@ -4778,6 +4774,11 @@ function VerifyEmailScreen({ pending, onSuccess, onBack }) {
   const [resending, setResending] = useState(false);
   const [resent,    setResent]    = useState(false);
   const [cooldown,  setCooldown]  = useState(0);
+  const [devCode,   setDevCode]   = useState(pending.devCode || null); // local development only
+  const [verified,  setVerified]  = useState(false); // code accepted: show the logo briefly
+
+  // Load the logo ahead of time so it appears the instant the code is accepted
+  useEffect(() => { const img = new Image(); img.src = "/logo.webp"; }, []);
   const inputRefs = [useRef(),useRef(),useRef(),useRef(),useRef(),useRef()];
 
   // Auto-focus first input on mount
@@ -4826,7 +4827,7 @@ function VerifyEmailScreen({ pending, onSuccess, onBack }) {
     setLoading(true);
     setError("");
 
-    const vRes = AUTH.verifyCode(pending.email, fullCode);
+    const vRes = await AUTH.verifyCode(pending.email, fullCode);
     if (!vRes.ok) {
       setLoading(false);
       setError(vRes.msg);
@@ -4843,7 +4844,9 @@ function VerifyEmailScreen({ pending, onSuccess, onBack }) {
     setLoading(false);
 
     if (!regRes.ok) { setError(regRes.msg); return; }
-    onSuccess();
+    // Show the app logo for 2 seconds, then continue into the app
+    setVerified(true);
+    setTimeout(onSuccess, 2000);
   }
 
   async function resend() {
@@ -4854,20 +4857,29 @@ function VerifyEmailScreen({ pending, onSuccess, onBack }) {
     if (res.ok) {
       setResent(true);
       setCooldown(60);
-      // Update demo code if returned
-      if (res.demo && res.code) {
-        // pending is a prop so we can't mutate — store in state via error msg trick
-        setError(""); // cleared
-        // Show new demo code via a brief note — handled by re-render of demoCode
-        pending.demoCode = res.code;
-      }
+      setDevCode(res.devCode || null);
+      setCode(["","","","","",""]);
     } else {
-      setError("Failed to resend. Try again.");
+      setError(res.msg || "Failed to resend. Try again.");
     }
   }
 
   const maskedEmail = pending.email.replace(/(.{2})(.*)(@.*)/, (_, a, b, c) =>
     a + b.replace(/./g, "•") + c
+  );
+
+  if (verified) return (
+    <div role="status" aria-label="Email verified. Welcome to GhanaPrep." style={{
+      minHeight:"100vh", maxWidth:430, margin:"0 auto", background:"#0a0f0d",
+      display:"flex", alignItems:"center", justifyContent:"center", padding:24,
+    }}>
+      <style>{`
+        @keyframes logoIn { from{opacity:0;transform:scale(0.86)} to{opacity:1;transform:scale(1)} }
+        @media (prefers-reduced-motion: reduce) { .verified-logo { animation:none !important; } }
+      `}</style>
+      <img className="verified-logo" src="/logo.webp" alt="GhanaPrep" width={275} height={320}
+        style={{ width:"min(72vw, 275px)", height:"auto", animation:"logoIn 0.5s cubic-bezier(.22,.68,0,1.2) both" }}/>
+    </div>
   );
 
   return (
@@ -4944,7 +4956,13 @@ function VerifyEmailScreen({ pending, onSuccess, onBack }) {
       }}>
         We sent a 6-digit verification code to{" "}
         <strong style={{ color:"#22c55e" }}>{maskedEmail}</strong>
+        <br/>It can take a minute to arrive. Check your spam folder too.
       </p>
+      {devCode && (
+        <p role="status" style={{ fontSize:13, color:"#fbbf24", textAlign:"center", marginTop:-14, marginBottom:20 }}>
+          Development mode: email is not set up, so your code is <strong>{devCode}</strong>
+        </p>
+      )}
 
       {/* 6-digit code inputs */}
       <div style={{
