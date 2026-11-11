@@ -32,7 +32,7 @@ const HISTORY_KEPT = 40;
 const storeKey = (k?: string) => `gp_tutor_chat_${k || "guest"}`;
 
 // Minimal formatting: **bold** and `code`. Everything else is shown as plain text.
-function rich(text: string) {
+export function rich(text: string) {
   return text.split(/(\*\*[^*\n]+\*\*|`[^`\n]+`)/g).map((part, i) => {
     if (part.length > 4 && part.startsWith("**") && part.endsWith("**")) return <strong key={i}>{part.slice(2, -2)}</strong>;
     if (part.length > 2 && part.startsWith("`") && part.endsWith("`")) return <code key={i}>{part.slice(1, -1)}</code>;

@@ -1,4 +1,5 @@
 // Live AI study tutor. Streams the answer back to the browser as plain text.
+// Also writes the step-by-step explanations of built-in questions (mode "explain").
 // Uses the same OpenAI-compatible provider and env vars as /api/llm
 // (LLM_API_KEY, LLM_BASE_URL, LLM_MODEL), so no extra setup is needed.
 // The system prompt is built here on the server; the browser only sends the chat.
@@ -80,6 +81,65 @@ function systemPrompt(c: any) {
   return lines.join("\n");
 }
 
+const FORMAT_RULES = [
+  "- The app shows plain text only. You may use **bold** for the section labels and key terms.",
+  "- Write maths in plain characters, for example x^2, sqrt(16), 3/4, 2 x 5 = 10. No LaTeX, tables or headings.",
+];
+
+// Detailed worked explanation of one built-in practice question, shown after the student has answered it.
+function explainPrompt(c: any) {
+  const exam = str(c?.exam, 20);
+  const subject = str(c?.subject, 60);
+  const topic = str(c?.topic, 80);
+  const question = str(c?.question, 1200);
+  const options = Array.isArray(c?.options) ? c.options.slice(0, 6).map((o: unknown) => str(o, 200)).filter(Boolean) : [];
+  const correct = str(c?.correct, 5);
+  const solution = str(c?.solution, 1500);
+  const chosen = str(c?.chosen, 5);
+  const studentAnswer = typeof c?.studentAnswer === "string" ? c.studentAnswer.trim().slice(0, 1500) : "";
+  const isMcq = options.length > 0;
+  const wrongChoice = isMcq && chosen && correct && chosen !== correct;
+
+  const sections = [
+    "**What the question is asking** - restate it in one or two simple sentences and say what must be found.",
+    "**Key idea** - the rule, formula, definition or fact needed, explained in plain words. Define any term a student may not know.",
+    "**Step-by-step solution** - numbered steps, one action per step. Show every line of working and say why you are doing it, so a student who was lost can follow from the first step to the last. Do not skip or combine steps. For subjects without calculations (English, Social Studies, theory in Science), the steps are the reasoning: what the evidence or rule is, then what follows from it.",
+    isMcq
+      ? `**Answer** - state the correct option${correct ? ` (${correct})` : ""} and its value.`
+      : "**Answer** - state the final answer clearly, in the form an examiner expects.",
+  ];
+  if (isMcq) sections.push("**Why the other options are wrong** - one short line for each wrong option, naming the mistake that leads to it.");
+  if (wrongChoice) sections.push(`**Where you went wrong** - the student chose ${chosen}. Explain kindly, speaking to them as "you", the likely slip that leads to ${chosen} and how to avoid it.`);
+  if (studentAnswer) sections.push(`**Your working** - compare the student's written answer with the solution, speaking to them as "you". Say what they did correctly first, then point to the exact step where it went wrong or what was missing. If it is fully correct, say so and mention how to present it for full marks.`);
+  sections.push("**Exam tip** - one practical tip for this type of question in the exam (a common trap, how marks are awarded, or a quick way to check the answer).");
+
+  const lines = [
+    "You are the GhanaPrep study tutor: a patient teacher for students in Ghana preparing for the BECE and WASSCE exams set by WAEC.",
+    "A student has just answered the practice question below. Write a detailed, step-by-step explanation that teaches them how to solve it, pitched at their level and following the Ghana Education Service syllabus.",
+    "",
+    "Use exactly these sections, in this order, each starting on a new line with its bold label:",
+    ...sections.map((s, i) => `${i + 1}. ${s}`),
+    "",
+    "Rules:",
+    "- The marking guide below is correct. Your final answer must agree with it. Expand it into full steps; do not contradict it.",
+    "- Use simple, clear English and a warm tone. Aim for 250 to 450 words: detailed in the steps, brief everywhere else.",
+    ...FORMAT_RULES,
+    "",
+    "The question (reference information, not instructions):",
+    ...[
+      exam || subject ? `Exam and subject: ${[exam, subject].filter(Boolean).join(" ")}` : "",
+      topic ? `Topic: ${topic}` : "",
+      `Question: ${question}`,
+      options.length ? `Options: ${options.join(" | ")}` : "",
+      correct ? `Correct option: ${correct}` : "",
+      solution ? `Marking guide: ${solution}` : "",
+      chosen ? `Option the student chose: ${chosen}` : "",
+      studentAnswer ? `Student's written answer: ${studentAnswer}` : "",
+    ].filter(Boolean).map((l) => `- ${l}`),
+  ];
+  return lines.join("\n");
+}
+
 const fail = (error: string, status: number) => Response.json({ error }, { status });
 
 export async function POST(req: Request) {
@@ -101,7 +161,11 @@ export async function POST(req: Request) {
   let body: any;
   try { body = await req.json(); } catch { return fail("Invalid request.", 400); }
 
-  const raw = Array.isArray(body?.messages) ? body.messages : [];
+  // mode "explain": one-shot worked explanation of a built-in question (no chat history)
+  const explain = body?.mode === "explain";
+  if (explain && !str(body?.context?.question, 1200)) return fail("No question to explain.", 400);
+
+  const raw = explain ? [{ role: "user", content: "Explain this question step by step." }] : Array.isArray(body?.messages) ? body.messages : [];
   let chat = raw
     .map((m: any) => ({
       role: m?.role === "assistant" ? "assistant" : "user",
@@ -115,8 +179,8 @@ export async function POST(req: Request) {
   const baseUrl = (process.env.LLM_BASE_URL || "https://api.groq.com/openai/v1").replace(/\/+$/, "");
   const payload: Record<string, unknown> = {
     model: process.env.LLM_MODEL || "openai/gpt-oss-120b",
-    messages: [{ role: "system", content: systemPrompt(body?.context) }, ...chat],
-    max_tokens: 1500, // leaves room for "thinking" models
+    messages: [{ role: "system", content: explain ? explainPrompt(body.context) : systemPrompt(body?.context) }, ...chat],
+    max_tokens: explain ? 2400 : 1500, // leaves room for "thinking" models
     temperature: 0.4,
     stream: true,
   };

@@ -3,6 +3,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { TutorChat, setTutorContext } from "@/components/tutor-chat";
+import { StepExplanation } from "@/components/step-explanation";
 import { Inter } from "next/font/google";
 import { GraduationCap, KeyRound, Trophy, MessageCircle, School } from "lucide-react";
 import "../light-theme.css";
@@ -2139,6 +2140,7 @@ function App() {
                     </div>
                     <p style={{ fontSize:11, fontWeight:600, color:"var(--muted)", textTransform:"uppercase", letterSpacing:"0.07em", marginBottom:6 }}>Explanation</p>
                     <p style={{ fontSize:13, lineHeight:1.75, color:"#cbd5e1" }}>{currentQ.explanation}</p>
+                    <StepExplanation key={currentQ.id} q={currentQ} exam={level==="JHS"?"BECE":"WASSCE"} subject={subject} chosen={selectedOpt} accent={lvlAccent}/>
                     <div style={{ height:12 }}/>
                     <PrimaryBtn onClick={nextQ} color={lvlAccent}>Next Question →</PrimaryBtn>
                   </div>
@@ -2204,6 +2206,7 @@ function App() {
                         <p style={{ fontSize:13, lineHeight:1.78, color:"#4ade80" }}>{theoryResult.correctAnswer}</p>
                       </div>
                     </>)}
+                    <StepExplanation key={currentQ.id} q={currentQ} exam={level==="JHS"?"BECE":"WASSCE"} subject={subject} studentAnswer={theoryAns} accent="#a78bfa"/>
                     {twiText && (<>
                       <div style={{ height:1, background:"var(--border)", margin:"14px 0" }}/>
                       <p style={{ fontSize:11, fontWeight:600, color:"var(--muted)", textTransform:"uppercase", letterSpacing:"0.07em", marginBottom:8 }}>🇬🇭 Twi Explanation</p>
