@@ -1,0 +1,148 @@
+/* GhanaPrep premium theme.
+   One layer over the existing screens: ink-green surfaces, glass cards, emerald + gold only.
+   Scoped so the alternate /new and /dashboard designs are left alone.
+   To switch it off, remove the premium.css import in app/layout.tsx. */
+
+body:not(:has(.gp-light, .gp-ui)) *, body:not(:has(.gp-light, .gp-ui)) *::before, body:not(:has(.gp-light, .gp-ui)) *::after { box-sizing: border-box; }
+
+body:not(:has(.gp-light, .gp-ui)) {
+  --surface: #0a0f0e; --surface2: #101716; --surface3: #151e1c; --surface4: #1c2725;
+  --border: rgba(255,255,255,.07); --border2: rgba(255,255,255,.12);
+  --text: #f3f6f4; --muted: #71807a; --muted2: #9eaca6;
+  --gold: #e8c468; --blue: #e8c468; --purple: #e8c468;
+  --p-emerald: #34d399; --p-gold: #e8c468;
+  --p-glass: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.022));
+  --p-hair: rgba(255,255,255,.085);
+  --p-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 18px 40px -22px rgba(0,0,0,.85);
+  background:
+    radial-gradient(900px 520px at 12% -8%, rgba(16,185,129,.16), transparent 62%),
+    radial-gradient(760px 480px at 100% 4%, rgba(232,196,104,.09), transparent 60%),
+    radial-gradient(900px 700px at 50% 115%, rgba(16,185,129,.07), transparent 60%),
+    #060a09 !important;
+  background-attachment: fixed !important;
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: dark;
+}
+body:not(:has(.gp-light, .gp-ui)) ::selection { background: rgba(232,196,104,.35); color: #fff; }
+body:not(:has(.gp-light, .gp-ui)) ::-webkit-scrollbar { width: 6px; height: 6px; }
+body:not(:has(.gp-light, .gp-ui)) ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 99px; }
+
+/* type: one display face, one text face */
+body:not(:has(.gp-light, .gp-ui)) [style*="DM Sans"] { font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif !important; }
+body:not(:has(.gp-light, .gp-ui)) [style*="Syne"], body:not(:has(.gp-light, .gp-ui)) h1, body:not(:has(.gp-light, .gp-ui)) h2, body:not(:has(.gp-light, .gp-ui)) h3 { font-family: 'Sora', 'Syne', sans-serif !important; letter-spacing: -.022em; }
+body:not(:has(.gp-light, .gp-ui)) [style*="text-transform: uppercase"] { letter-spacing: .11em !important; }
+
+/* page shells let the ambient background through */
+body:not(:has(.gp-light, .gp-ui)) [style*="min-height: 100vh"] { background: transparent !important; background-color: transparent !important; }
+
+/* cards */
+body:not(:has(.gp-light, .gp-ui)) [style*="background: var(--surface2)"],
+body:not(:has(.gp-light, .gp-ui)) [style*="background: rgb(22, 29, 24)"] {
+  background: var(--p-glass) !important;
+  border-color: var(--p-hair) !important;
+  box-shadow: var(--p-shadow); /* no backdrop-filter here: it would trap position:fixed dialogs inside the card */
+}
+body:not(:has(.gp-light, .gp-ui)) [style*="border-radius: 14px"] { border-radius: 18px !important; }
+body:not(:has(.gp-light, .gp-ui)) button[style*="background: var(--surface2)"], body:not(:has(.gp-light, .gp-ui)) button[data-assignment] { transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+body:not(:has(.gp-light, .gp-ui)) button[style*="background: var(--surface2)"]:hover, body:not(:has(.gp-light, .gp-ui)) button[data-assignment]:hover { transform: translateY(-2px); border-color: rgba(52,211,153,.35) !important; }
+
+/* sheets and dialogs */
+body:not(:has(.gp-light, .gp-ui)) [style*="border-radius: 24px 24px 0px 0px"],
+body:not(:has(.gp-light, .gp-ui)) [role="dialog"] {
+  background: linear-gradient(180deg, #111a18, #0a100f) !important;
+  border-color: rgba(255,255,255,.1) !important;
+  box-shadow: 0 -24px 70px -10px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+body:not(:has(.gp-light, .gp-ui)) [style*="position: fixed"][style*="inset: 0px"][style*="rgba(0, 0, 0"] { background: rgba(3,6,5,.72) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+
+/* fields */
+body:not(:has(.gp-light, .gp-ui)) input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]), body:not(:has(.gp-light, .gp-ui)) textarea, body:not(:has(.gp-light, .gp-ui)) select {
+  background: rgba(255,255,255,.04) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  border-radius: 13px !important;
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+  animation: none !important;
+}
+body:not(:has(.gp-light, .gp-ui)) input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):focus, body:not(:has(.gp-light, .gp-ui)) textarea:focus, body:not(:has(.gp-light, .gp-ui)) select:focus {
+  border-color: rgba(52,211,153,.7) !important;
+  background: rgba(52,211,153,.05) !important;
+  box-shadow: 0 0 0 4px rgba(52,211,153,.13) !important;
+  outline: none;
+}
+body:not(:has(.gp-light, .gp-ui)) input::placeholder, body:not(:has(.gp-light, .gp-ui)) textarea::placeholder { color: #5c6a65; }
+body:not(:has(.gp-light, .gp-ui)) input[type=checkbox], body:not(:has(.gp-light, .gp-ui)) input[type=radio], body:not(:has(.gp-light, .gp-ui)) input[type=range] { accent-color: #34d399; }
+body:not(:has(.gp-light, .gp-ui)) select option { background: #101716; }
+
+/* buttons */
+body:not(:has(.gp-light, .gp-ui)) button, body:not(:has(.gp-light, .gp-ui)) a { transition: transform .15s ease, filter .15s ease, background .2s ease, border-color .2s ease, color .2s ease; -webkit-tap-highlight-color: transparent; }
+body:not(:has(.gp-light, .gp-ui)) button:not(:disabled):active { transform: scale(.975); }
+body:not(:has(.gp-light, .gp-ui)) button:focus-visible, body:not(:has(.gp-light, .gp-ui)) a:focus-visible { outline: 2px solid var(--p-gold); outline-offset: 3px; }
+body:not(:has(.gp-light, .gp-ui)) .btn-shine,
+body:not(:has(.gp-light, .gp-ui)) button[style*="background: rgb(34, 197, 94)"],
+body:not(:has(.gp-light, .gp-ui)) a[style*="background: rgb(34, 197, 94)"],
+body:not(:has(.gp-light, .gp-ui)) button[style*="linear-gradient(135deg, rgb(34, 197, 94)"] {
+  background: linear-gradient(180deg, #4ae3a3 0%, #17b872 100%) !important;
+  color: #03130c !important;
+  border: none !important;
+  animation: none !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.42), inset 0 -1px 0 rgba(0,0,0,.14), 0 12px 28px -12px rgba(16,185,129,.75) !important;
+}
+body:not(:has(.gp-light, .gp-ui)) .btn-shine:hover:not(:disabled), body:not(:has(.gp-light, .gp-ui)) button[style*="background: rgb(34, 197, 94)"]:hover:not(:disabled) { filter: brightness(1.07); transform: translateY(-1px); }
+body:not(:has(.gp-light, .gp-ui)) .btn-shine:disabled { background: rgba(255,255,255,.06) !important; color: #5c6a65 !important; box-shadow: none !important; }
+body:not(:has(.gp-light, .gp-ui)) button[style*="background: rgb(30, 39, 31)"], body:not(:has(.gp-light, .gp-ui)) a[style*="background: rgb(30, 39, 31)"], body:not(:has(.gp-light, .gp-ui)) button[style*="background: var(--surface3)"] {
+  background: rgba(255,255,255,.05) !important; border-color: rgba(255,255,255,.11) !important;
+}
+body:not(:has(.gp-light, .gp-ui)) button[style*="background: rgb(30, 39, 31)"]:hover, body:not(:has(.gp-light, .gp-ui)) a[style*="background: rgb(30, 39, 31)"]:hover { background: rgba(255,255,255,.09) !important; }
+body:not(:has(.gp-light, .gp-ui)) [role="tablist"], body:not(:has(.gp-light, .gp-ui)) [style*="background: rgb(30, 39, 31)"][style*="padding: 4px"] { background: rgba(255,255,255,.045) !important; border: 1px solid rgba(255,255,255,.07); }
+body:not(:has(.gp-light, .gp-ui)) .auth-tab-slider { background: linear-gradient(180deg, #4ae3a3, #17b872) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 8px 20px -8px rgba(16,185,129,.7) !important; }
+
+/* two accents only: emerald and gold (was purple + blue + green + gold) */
+body:not(:has(.gp-light, .gp-ui)) [style*="color: rgb(167, 139, 250)"], body:not(:has(.gp-light, .gp-ui)) [style*="color: rgb(56, 189, 248)"] { color: var(--p-gold) !important; }
+body:not(:has(.gp-light, .gp-ui)) [style*="background: rgba(167, 139, 250"], body:not(:has(.gp-light, .gp-ui)) [style*="background: rgba(56, 189, 248"] { background: rgba(232,196,104,.07) !important; }
+body:not(:has(.gp-light, .gp-ui)) [style*="solid rgba(167, 139, 250"], body:not(:has(.gp-light, .gp-ui)) [style*="solid rgba(56, 189, 248"] { border-color: rgba(232,196,104,.24) !important; }
+body:not(:has(.gp-light, .gp-ui)) [style*="solid rgb(167, 139, 250)"], body:not(:has(.gp-light, .gp-ui)) [style*="solid rgb(56, 189, 248)"] { border-color: rgba(232,196,104,.7) !important; }
+body:not(:has(.gp-light, .gp-ui)) [style*="background: rgb(167, 139, 250)"], body:not(:has(.gp-light, .gp-ui)) [style*="background: rgb(56, 189, 248)"],
+body:not(:has(.gp-light, .gp-ui)) [style*="linear-gradient(135deg, rgb(167, 139, 250)"] { background: linear-gradient(180deg, #f1d58a, #d4a843) !important; color: #1a1304 !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.45), 0 10px 24px -12px rgba(232,196,104,.7) !important; }
+body:not(:has(.gp-light, .gp-ui)) [style*="rgb(13, 38, 24)"], body:not(:has(.gp-light, .gp-ui)) [style*="rgb(10, 30, 46)"] {
+  background: var(--p-glass) !important; border-color: var(--p-hair) !important; box-shadow: var(--p-shadow) !important;
+}
+body:not(:has(.gp-light, .gp-ui)) [style*="color: rgb(251, 191, 36)"] { color: var(--p-gold) !important; }
+body:not(:has(.gp-light, .gp-ui)) button[style*="background: rgb(251, 191, 36)"], body:not(:has(.gp-light, .gp-ui)) button[style*="linear-gradient(135deg, rgb(251, 191, 36)"] {
+  background: linear-gradient(180deg, #f1d58a, #d4a843) !important; color: #1a1304 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.45), 0 10px 24px -12px rgba(232,196,104,.7) !important;
+}
+
+/* sign-in hero: calm, no waving flag or particles */
+body:not(:has(.gp-light, .gp-ui)) [style*="waveRed"], body:not(:has(.gp-light, .gp-ui)) [style*="waveGold"], body:not(:has(.gp-light, .gp-ui)) [style*="waveGreen"] { background: transparent !important; animation: none !important; }
+body:not(:has(.gp-light, .gp-ui)) [style*="shimmerSweep"], body:not(:has(.gp-light, .gp-ui)) [style*="repeating-linear-gradient"],
+body:not(:has(.gp-light, .gp-ui)) [style*="floatA"], body:not(:has(.gp-light, .gp-ui)) [style*="floatB"], body:not(:has(.gp-light, .gp-ui)) [style*="floatC"], body:not(:has(.gp-light, .gp-ui)) [style*="floatD"],
+body:not(:has(.gp-light, .gp-ui)) [style*="orbitA"], body:not(:has(.gp-light, .gp-ui)) [style*="orbitB"], body:not(:has(.gp-light, .gp-ui)) [style*="orbitC"] { display: none !important; }
+body:not(:has(.gp-light, .gp-ui)) [style*="background: rgba(0, 0, 0, 0.6)"] { background: radial-gradient(420px 260px at 50% 0%, rgba(232,196,104,.14), transparent 70%) !important; }
+body:not(:has(.gp-light, .gp-ui)) [style*="glowPulse"] { animation: none !important; border-color: rgba(232,196,104,.3) !important; box-shadow: 0 0 60px 6px rgba(232,196,104,.2) !important; }
+body:not(:has(.gp-light, .gp-ui)) [style*="color: rgba(252, 209, 22"] { color: var(--p-gold) !important; text-shadow: none !important; letter-spacing: .34em !important; }
+body:not(:has(.gp-light, .gp-ui)) .auth-card-enter {
+  background: linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.02)) !important;
+  border-color: rgba(255,255,255,.1) !important; border-radius: 30px 30px 0 0 !important;
+  box-shadow: 0 -30px 80px -20px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.1) !important;
+  backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+}
+body:not(:has(.gp-light, .gp-ui)) .auth-card-enter [role="group"] button[aria-pressed="true"] { background: rgba(52,211,153,.12) !important; border-color: rgba(52,211,153,.6) !important; color: #6ee7b7 !important; }
+body:not(:has(.gp-light, .gp-ui)) [class^="pill-"] { background: rgba(255,255,255,.045) !important; border-color: rgba(255,255,255,.09) !important; color: var(--muted2) !important; }
+
+/* status chips keep their meaning colours but sit quieter */
+body:not(:has(.gp-light, .gp-ui)) [data-status] { letter-spacing: .04em; }
+
+@media (prefers-reduced-motion: reduce) { body:not(:has(.gp-light, .gp-ui)) *, body:not(:has(.gp-light, .gp-ui)) *::before, body:not(:has(.gp-light, .gp-ui)) *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+
+/* remaining blue/purple accents: underlines, accent lines, glows */
+body:not(:has(.gp-light, .gp-ui)) [style*="solid rgb(56, 189, 248)"], body:not(:has(.gp-light, .gp-ui)) [style*="solid rgb(167, 139, 250)"] { border-bottom-color: rgba(232,196,104,.85) !important; }
+body:not(:has(.gp-light, .gp-ui)) [style*="linear-gradient(90deg, rgb(56, 189, 248)"], body:not(:has(.gp-light, .gp-ui)) [style*="linear-gradient(90deg, rgb(167, 139, 250)"] { background: linear-gradient(90deg, #e8c468, transparent) !important; }
+body:not(:has(.gp-light, .gp-ui)) [style*="radial-gradient(circle, rgba(56, 189, 248"], body:not(:has(.gp-light, .gp-ui)) [style*="radial-gradient(circle, rgba(167, 139, 250"] { background: radial-gradient(circle, rgba(232,196,104,.13) 0%, transparent 70%) !important; }
+body:not(:has(.gp-light, .gp-ui)) [style*="rgba(56, 189, 248"][style*="box-shadow"], body:not(:has(.gp-light, .gp-ui)) [style*="rgba(167, 139, 250"][style*="box-shadow"] { box-shadow: none !important; }
+body:not(:has(.gp-light, .gp-ui)) button[style*="rgb(56, 189, 248)"][style*="border"], body:not(:has(.gp-light, .gp-ui)) button[style*="rgb(167, 139, 250)"][style*="border"] { border-bottom-color: rgba(232,196,104,.85) !important; } /* tab underline */
+
+/* sliders follow the gold accent, not the old purple */
+body:not(:has(.gp-light, .gp-ui)) input[type="range"] { accent-color: #e8c468 !important; }

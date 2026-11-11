@@ -1,0 +1,14 @@
+/* Tailwind: base (preflight) is skipped on purpose so the existing
+   GhanaPrep styling stays exactly as built. Utilities remain available. */
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: #0a0f0d;
+  color: #f0f4f8;
+  color-scheme: dark;
+}

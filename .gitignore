@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# local settings and secrets (never commit these)
+.env
+.env.local
+.env*.local
+
+# Vercel
+.vercel
+
+# misc
+.DS_Store
+*.log
+next-env.d.ts

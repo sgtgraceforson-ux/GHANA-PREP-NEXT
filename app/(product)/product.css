@@ -1,0 +1,16 @@
+/* shadcn-style tokens, scoped to the product UI so the existing app is untouched */
+.gp-ui {
+  --background: 0 0% 100%; --foreground: 0 0% 9%; --card: 0 0% 100%;
+  --border: 0 0% 90%; --muted: 0 0% 96%; --muted-foreground: 0 0% 42%;
+  --primary: 142 76% 36%; --primary-foreground: 0 0% 100%;  /* #16A34A */
+  --streak: 45 93% 47%;                                       /* #EAB308 */
+  color: hsl(var(--foreground));
+}
+/* tiny scoped reset (Tailwind preflight is off globally) */
+.gp-ui *, .gp-ui *::before, .gp-ui *::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: hsl(var(--border)); }
+.gp-ui h1, .gp-ui h2, .gp-ui h3, .gp-ui p, .gp-ui ul { margin: 0; padding: 0; font-size: inherit; font-weight: inherit; }
+.gp-ui ul { list-style: none; }
+.gp-ui a { color: inherit; text-decoration: none; }
+.gp-ui button, .gp-ui input { font: inherit; color: inherit; background: transparent; }
+.gp-ui button { cursor: pointer; }
+.gp-ui input:focus-visible, .gp-ui a:focus-visible, .gp-ui button:focus-visible { outline: 2px solid hsl(var(--primary)); outline-offset: 2px; }
