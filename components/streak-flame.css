@@ -1,0 +1,71 @@
+/* Animated streak flame. Sized in em, so it follows the font size of whatever it sits in.
+   data-tier: 0 = no streak (unlit), 1 = 1-2 days, 2 = 3-6 days, 3 = 7+ days (biggest fire). */
+.gsf {
+  --gsf-speed: 1.5s;
+  --gsf-glow: 0.5;
+  position: relative; display: inline-flex; flex-shrink: 0; width: 1.35em; height: 1.35em;
+  vertical-align: middle; line-height: 1;
+}
+.gsf[data-tier="2"] { --gsf-speed: 1.2s; --gsf-glow: 0.75; }
+.gsf[data-tier="3"] { --gsf-speed: 0.95s; --gsf-glow: 1; }
+
+.gsf svg { position: relative; width: 100%; height: 100%; overflow: visible; }
+.gsf-outer, .gsf-inner { transform-box: fill-box; transform-origin: 50% 100%; }
+
+/* unlit: a quiet grey flame, no movement */
+.gsf[data-tier="0"] .gsf-outer { fill: currentColor; opacity: 0.35; }
+.gsf[data-tier="0"] .gsf-inner, .gsf[data-tier="0"] .gsf-glow, .gsf[data-tier="0"] .gsf-ember { display: none; }
+
+/* lit: the whole flame blooms open once, then keeps flickering */
+.gsf:not([data-tier="0"]) svg { transform-origin: 50% 100%; animation: gsf-bloom 0.9s cubic-bezier(0.22, 0.68, 0, 1.4) both; }
+.gsf:not([data-tier="0"]) .gsf-outer { animation: gsf-flicker var(--gsf-speed) ease-in-out infinite; }
+.gsf:not([data-tier="0"]) .gsf-inner { animation: gsf-flicker-inner calc(var(--gsf-speed) * 0.62) ease-in-out infinite; }
+
+.gsf-glow {
+  position: absolute; inset: -45%; border-radius: 50% !important; pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 140, 20, 0.55) 0%, rgba(255, 90, 0, 0.22) 38%, transparent 68%);
+  opacity: var(--gsf-glow); animation: gsf-glow var(--gsf-speed) ease-in-out infinite;
+}
+
+.gsf-ember {
+  position: absolute; bottom: 55%; left: 50%; width: 0.16em; height: 0.16em; border-radius: 50% !important;
+  background: #ffd166; box-shadow: 0 0 0.3em #ff9f1c; opacity: 0; pointer-events: none;
+  animation: gsf-ember calc(var(--gsf-speed) * 1.6) ease-out infinite;
+}
+.gsf-ember:nth-of-type(2) { left: 28%; animation-delay: calc(var(--gsf-speed) * 0.55); --gsf-drift: -0.35em; }
+.gsf-ember:nth-of-type(3) { left: 70%; animation-delay: calc(var(--gsf-speed) * 1.05); --gsf-drift: 0.4em; }
+.gsf[data-tier="1"] .gsf-ember:nth-of-type(n + 2) { display: none; } /* small fire: one ember */
+.gsf[data-tier="2"] .gsf-ember:nth-of-type(3) { display: none; }     /* medium fire: two */
+
+@keyframes gsf-bloom {
+  0%   { transform: scale(0.1); opacity: 0; filter: brightness(2.2); }
+  55%  { transform: scale(1.45); opacity: 1; filter: brightness(1.5); }
+  100% { transform: scale(1); opacity: 1; filter: brightness(1); }
+}
+@keyframes gsf-flicker {
+  0%, 100% { transform: scale(1, 1) skewX(0deg); }
+  20%      { transform: scale(0.96, 1.07) skewX(-2.5deg); }
+  45%      { transform: scale(1.04, 0.95) skewX(2deg); }
+  70%      { transform: scale(0.97, 1.1) skewX(-1.5deg); }
+  85%      { transform: scale(1.03, 0.98) skewX(2.5deg); }
+}
+@keyframes gsf-flicker-inner {
+  0%, 100% { transform: scale(1, 1); opacity: 1; }
+  35%      { transform: scale(0.9, 1.14); opacity: 0.9; }
+  65%      { transform: scale(1.08, 0.9); opacity: 1; }
+}
+@keyframes gsf-glow {
+  0%, 100% { transform: scale(0.9); opacity: calc(var(--gsf-glow) * 0.7); }
+  50%      { transform: scale(1.12); opacity: var(--gsf-glow); }
+}
+@keyframes gsf-ember {
+  0%   { transform: translate(-50%, 0) scale(1); opacity: 0; }
+  15%  { opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--gsf-drift, 0.15em)), -1.5em) scale(0.2); opacity: 0; }
+}
+
+/* People who ask their device for less motion get a still, lit flame */
+@media (prefers-reduced-motion: reduce) {
+  .gsf svg, .gsf-outer, .gsf-inner, .gsf-glow { animation: none !important; }
+  .gsf-ember { display: none; }
+}

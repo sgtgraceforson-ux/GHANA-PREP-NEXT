@@ -4,6 +4,7 @@
 import { useState, useRef, useEffect } from "react";
 import { TutorChat, setTutorContext } from "@/components/tutor-chat";
 import { StepExplanation } from "@/components/step-explanation";
+import { StreakFlame } from "@/components/streak-flame";
 import { HomeSkeleton, LeaderboardSkeleton, BootSkeleton } from "@/components/skeletons";
 import { AnnouncementBell } from "@/components/announcements";
 import { ParentAccessRow } from "@/components/parent-access";
@@ -232,7 +233,10 @@ const GLOBAL_CSS = `
   .avatar-swatch svg { opacity:0; transition:opacity .15s ease; }
   .avatar-swatch[aria-checked="true"] { outline-color:var(--text) !important; transform:scale(1.1); }
   .avatar-swatch[aria-checked="true"] svg { opacity:1; }
-  .avatar-preview { width:36px; height:36px; border-radius:50% !important; border:2px solid; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-weight:800; font-size:15px; transition:all .15s ease; }
+  /* The colour is passed as the --av variable, not as an inline colour, because the dark theme
+     recolours inline purple and blue to gold and would otherwise change the student's choice. */
+  .avatar-tint { background-color:color-mix(in srgb, var(--av) 16%, transparent); border:1.5px solid var(--av); color:var(--av); }
+  .avatar-preview { width:36px; height:36px; border-radius:50% !important; border-width:2px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-weight:800; font-size:15px; transition:all .15s ease; }
 
   /* ── Legal / Compliance styles ──────────────────────────── */
   .cookie-banner {
@@ -1803,12 +1807,12 @@ function App() {
       <style>{GLOBAL_CSS}</style>
       {/* ── Top bar: who is signed in, streak, support, sign out ── */}
       <div className="fadeUp" style={{ padding:"20px 20px 0", display:"flex", alignItems:"center", gap:12 }}>
-        <div aria-hidden="true" style={{ width:44, height:44, borderRadius:"50%", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", backgroundColor:`${homeColor}26`, border:`1.5px solid ${homeColor}`, color:homeColor, fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:17 }}>{homeName.charAt(0).toUpperCase()}</div>
+        <div aria-hidden="true" className="avatar-tint" style={{ "--av":homeColor, width:44, height:44, borderRadius:"50%", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:17 }}>{homeName.charAt(0).toUpperCase()}</div>
         <div style={{ flex:1, minWidth:0 }}>
           <p style={{ color:"var(--muted)", fontSize:12, fontWeight:500 }}>{homeGreeting},</p>
           <h2 style={{ fontFamily:"'Syne',sans-serif", fontSize:19, fontWeight:800, lineHeight:1.2, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{homeName}</h2>
         </div>
-        <div title="Daily streak" style={{ display:"flex", alignItems:"center", gap:5, height:38, padding:"0 11px", borderRadius:12, background:"rgba(232,196,104,0.1)", border:"1px solid rgba(232,196,104,0.28)", color:"#e8c468", fontSize:13, fontWeight:800, flexShrink:0 }}><Ico n="flame" /><span aria-label={`${stats.streak||0} day streak`}>{stats.streak||0}</span></div>
+        <div title="Daily streak" style={{ display:"flex", alignItems:"center", gap:5, height:38, padding:"0 11px", borderRadius:12, background:"rgba(232,196,104,0.1)", border:"1px solid rgba(232,196,104,0.28)", color:"#e8c468", fontSize:13, fontWeight:800, flexShrink:0 }}><StreakFlame days={stats.streak||0} /><span aria-label={`${stats.streak||0} day streak`}>{stats.streak||0}</span></div>
         <AnnouncementBell phone={user?.phone} />
         <button onClick={()=>setShowSupport(true)} aria-label="Support" title="Support" style={{ width:38, height:38, borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", color:"#cbd5d1", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, cursor:"pointer" }}><Ico n="message" /></button>
         <button onClick={logout} aria-label="Sign out" title="Sign out" style={{ width:38, height:38, borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.1)", color:"#cbd5d1", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, cursor:"pointer" }}><Ico n="logout" /></button>
@@ -2763,7 +2767,7 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
               ))}
             </div>
             <div style={{display:"flex",alignItems:"center",gap:10,marginTop:12}}>
-              <div aria-hidden="true" className="avatar-preview" style={{ backgroundColor:`${avatarColor}22`, borderColor:avatarColor, color:avatarColor }}>{(name.trim().charAt(0) || "A").toUpperCase()}</div>
+              <div aria-hidden="true" className="avatar-preview avatar-tint" style={{ "--av":avatarColor }}>{(name.trim().charAt(0) || "A").toUpperCase()}</div>
               <span style={{fontSize:12,color:"var(--muted2)"}}>This is how you will appear on the home screen and leaderboard.</span>
             </div>
           </div>

@@ -1,11 +1,12 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, BookOpen, ClipboardCheck, FileText, Trophy, User, Search, Flame, GraduationCap } from "lucide-react";
+import { LayoutDashboard, BookOpen, ClipboardCheck, FileText, Trophy, User, Search, GraduationCap } from "lucide-react";
 import { cn } from "@/components/ui";
 import { useEffect } from "react";
 import { useGhanaUser } from "@/components/use-user";
 import { setTutorContext } from "@/components/tutor-chat";
+import { StreakFlame } from "@/components/streak-flame";
 
 const NAV = [
   { label: "Dashboard", short: "Home", href: "/dashboard", Icon: LayoutDashboard },
@@ -66,7 +67,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               onKeyDown={(e) => { if (e.key === "Enter") window.location.href = "/subjects?q=" + encodeURIComponent((e.target as HTMLInputElement).value); }} />
           </div>
           <div className="ml-auto flex h-9 items-center gap-1.5 rounded-lg border px-3 text-sm font-semibold" title="Day streak">
-            <Flame className="h-4 w-4 text-streak" />
+            <StreakFlame days={u.stats.streak} />
             <span>{u.stats.streak}</span>
             <span className="hidden text-xs font-normal text-muted-foreground sm:inline">day streak</span>
           </div>
