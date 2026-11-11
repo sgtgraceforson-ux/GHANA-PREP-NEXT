@@ -209,6 +209,13 @@ const GLOBAL_CSS = `
     /* Tap highlight remove */
   button,input,textarea { -webkit-tap-highlight-color:transparent; }
 
+  /* Sign-up colour picker */
+  .avatar-swatch { width:36px; height:36px; border-radius:50% !important; border:none; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#04130c; outline:3px solid transparent; outline-offset:2px; transition:transform .15s ease, outline-color .15s ease; }
+  .avatar-swatch svg { opacity:0; transition:opacity .15s ease; }
+  .avatar-swatch[aria-checked="true"] { outline-color:var(--text) !important; transform:scale(1.1); }
+  .avatar-swatch[aria-checked="true"] svg { opacity:1; }
+  .avatar-preview { width:36px; height:36px; border-radius:50% !important; border:2px solid; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-weight:800; font-size:15px; transition:all .15s ease; }
+
   /* ── Legal / Compliance styles ──────────────────────────── */
   .cookie-banner {
     position:fixed; bottom:0; left:50%; transform:translateX(-50%);
@@ -2251,6 +2258,7 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
 
   // Avatar colour options
   const AVATAR_COLORS = ["#22c55e","#38bdf8","#f59e0b","#f87171","#a78bfa","#fb923c","#34d399","#e879f9"];
+  const AVATAR_COLOR_NAMES = {"#22c55e":"Green","#38bdf8":"Blue","#f59e0b":"Gold","#f87171":"Red","#a78bfa":"Purple","#fb923c":"Orange","#34d399":"Mint","#e879f9":"Pink"};
 
   const bodyRef     = useRef(null);
   const loginRef    = useRef(null);
@@ -2615,14 +2623,18 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
             <label style={{display:"block",fontSize:11,fontWeight:700,color:"var(--muted2)",
               textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:8,
               fontFamily:"'DM Sans',sans-serif"}}>Pick Your Colour</label>
-            <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            {/* Styled by the .avatar-swatch class (not inline styles) so the theme stylesheets cannot override the selected state */}
+            <div role="radiogroup" aria-label="Pick your colour" style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
               {AVATAR_COLORS.map(c=>(
-                <button key={c} onClick={()=>setAvatarColor(c)} style={{
-                  width:32,height:32,borderRadius:"50%",background:c,border:"none",
-                  cursor:"pointer",outline:avatarColor===c?`3px solid #fff`:"3px solid transparent",
-                  outlineOffset:2,boxShadow:avatarColor===c?`0 0 12px ${c}`:"none",
-                  transition:"all .15s"}}/>
+                <button key={c} type="button" role="radio" aria-checked={avatarColor===c} aria-label={AVATAR_COLOR_NAMES[c]}
+                  title={AVATAR_COLOR_NAMES[c]} className="avatar-swatch" onClick={()=>setAvatarColor(c)} style={{ backgroundColor:c }}>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+                </button>
               ))}
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginTop:12}}>
+              <div aria-hidden="true" className="avatar-preview" style={{ backgroundColor:`${avatarColor}22`, borderColor:avatarColor, color:avatarColor }}>{(name.trim().charAt(0) || "A").toUpperCase()}</div>
+              <span style={{fontSize:12,color:"var(--muted2)"}}>This is how you will appear on the home screen and leaderboard.</span>
             </div>
           </div>
         </div>
