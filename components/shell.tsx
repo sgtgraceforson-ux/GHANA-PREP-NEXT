@@ -3,7 +3,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, BookOpen, ClipboardCheck, FileText, Trophy, User, Search, Flame, GraduationCap } from "lucide-react";
 import { cn } from "@/components/ui";
+import { useEffect } from "react";
 import { useGhanaUser } from "@/components/use-user";
+import { setTutorContext } from "@/components/tutor-chat";
 
 const NAV = [
   { label: "Dashboard", short: "Home", href: "/dashboard", Icon: LayoutDashboard },
@@ -18,6 +20,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const u = useGhanaUser();
   const on = (href: string) => path === href;
+
+  // AI tutor: shown to signed-in students on every page that uses this shell
+  useEffect(() => {
+    setTutorContext(u.session ? { layout: "page", userKey: u.phone, name: (u.name || "").split(" ")[0] } : null);
+    return () => setTutorContext(null);
+  }, [u.session, u.phone, u.name]);
 
   return (
     <div className="min-h-screen bg-muted/40">

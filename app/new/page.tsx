@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { TutorChat, setTutorContext } from "@/components/tutor-chat";
 import { Inter } from "next/font/google";
 import { GraduationCap, KeyRound, Trophy, MessageCircle, School } from "lucide-react";
 import "../light-theme.css";
@@ -1524,6 +1525,27 @@ function App() {
   const allModeQs  = level && subject && mode ? (DB[level].subjects[subject]?.[mode] || []) : [];
   const qs         = topic ? allModeQs.filter(q => q.topic === topic) : allModeQs;
   const currentQ   = qs[qIndex];
+
+  /* Tell the AI tutor what the student is looking at. null hides it (signed out, teacher quiz...). */
+  const tutorOn       = !!user && !pendingReg && !activeQuiz && !showTeacherHub && !showJoinQuiz && ["levels","subjects","modeSelect","topicSelect","practice"].includes(screen);
+  const tutorQ        = screen==="practice" && tab==="practice" ? currentQ : null;
+  const tutorAnswered = revealed || !!theoryResult;
+  useEffect(() => {
+    setTutorContext(tutorOn ? {
+      layout: "column",
+      userKey: user.phone,
+      name: homeName,
+      exam: level ? (level==="JHS" ? "BECE" : "WASSCE") : undefined,
+      subject: subject || undefined,
+      topic: tutorQ?.topic || topic || undefined,
+      question: tutorQ?.question,
+      options: tutorQ?.options,
+      answered: tutorQ ? tutorAnswered : undefined,
+      // the marking guide is only shared with the tutor after the student has answered
+      solution: tutorQ && tutorAnswered ? [tutorQ.correct && `Correct option: ${tutorQ.correct}`, tutorQ.answer, tutorQ.solution || tutorQ.explanation].filter(Boolean).join(". ") : undefined,
+    } : null);
+  }, [tutorOn, user?.phone, homeName, level, subject, topic, tutorQ?.id, tutorAnswered]);
+  useEffect(() => () => setTutorContext(null), []);
 
   function logout() {
     AUTH.clearSession();
@@ -5370,5 +5392,5 @@ export default function Page() {
   }, [mounted]);
 
   if (!mounted) return null;
-  return <div ref={ref} className={`gp-light ${inter.className}`}><App /></div>;
+  return <div ref={ref} className={`gp-light ${inter.className}`}><App /><TutorChat /></div>;
 }

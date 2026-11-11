@@ -1,0 +1,188 @@
+// Live AI study tutor. Streams the answer back to the browser as plain text.
+// Uses the same OpenAI-compatible provider and env vars as /api/llm
+// (LLM_API_KEY, LLM_BASE_URL, LLM_MODEL), so no extra setup is needed.
+// The system prompt is built here on the server; the browser only sends the chat.
+
+export const dynamic = "force-dynamic";
+
+const MAX_MESSAGES = 12;        // chat turns kept per request
+const MAX_MESSAGE_CHARS = 2000; // per message
+const RATE_LIMIT = 12;          // messages per window, per IP
+const RATE_WINDOW_MS = 60_000;
+
+// Best-effort limiter. It lives in this server instance's memory, so on serverless
+// hosting it slows abuse down rather than stopping it. Use a shared store for a hard limit.
+const hits = new Map<string, number[]>();
+function rateLimited(ip: string) {
+  const now = Date.now();
+  const recent = (hits.get(ip) || []).filter((t) => now - t < RATE_WINDOW_MS);
+  if (recent.length >= RATE_LIMIT) { hits.set(ip, recent); return true; }
+  recent.push(now);
+  hits.set(ip, recent);
+  if (hits.size > 5000) for (const [k, v] of hits) if (!v.some((t) => now - t < RATE_WINDOW_MS)) hits.delete(k);
+  return false;
+}
+
+const str = (v: unknown, max: number) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "");
+
+function systemPrompt(c: any) {
+  const exam = str(c?.exam, 20);
+  const subject = str(c?.subject, 60);
+  const topic = str(c?.topic, 80);
+  const name = str(c?.name, 30);
+  const question = str(c?.question, 1200);
+  const options = Array.isArray(c?.options) ? c.options.slice(0, 6).map((o: unknown) => str(o, 200)).filter(Boolean) : [];
+  const solution = str(c?.solution, 1500);
+  const answered = c?.answered === true;
+
+  const lines = [
+    "You are the GhanaPrep study tutor: a patient, encouraging teacher for students in Ghana preparing for the BECE (junior high) and WASSCE (senior high) exams set by WAEC.",
+    "",
+    "How to help:",
+    "- Teach so the student understands, rather than only handing over answers. Explain the idea in simple English, then show the steps, then give one short check question or a similar example when it helps.",
+    "- Follow the Ghana Education Service syllabus and WAEC marking style. Use examples a Ghanaian student will recognise (cedis and pesewas, local towns, foods, markets, football).",
+    "- If the student is stuck, start with a hint and build up. If they share their own working, say what is right first, then point to the exact step that went wrong.",
+    "- If a question is unclear, ask one short question to find out what they need.",
+    "- If you are not sure of a fact, date or figure, say so and suggest they confirm it with their teacher or textbook. Never invent past-question papers, years or marking schemes.",
+    "- You may answer in simple Ghanaian Pidgin or Twi if the student writes to you that way; otherwise use clear English.",
+    "",
+    "Scope:",
+    "- You help with school subjects, exam technique, revision planning and study habits. If asked for something unrelated to learning, say kindly that you are here for schoolwork and offer a study topic instead.",
+    "- You are talking with school-age students, so keep everything age-appropriate.",
+    "- Do not help with cheating in a live exam or test. Offer to help them prepare instead.",
+    "- If a student seems very stressed, upset or unsafe, respond with care and encourage them to talk to a parent, teacher or another adult they trust.",
+    "- Do not ask for personal details such as phone numbers, addresses or passwords.",
+    "",
+    "Format:",
+    "- The chat shows plain text only. Use short paragraphs and numbered steps. You may use **bold** for key terms.",
+    "- Write maths in plain characters, for example x^2, sqrt(16), 3/4, 2 x 5 = 10. No LaTeX, tables or headings.",
+    "- Keep answers short enough to read on a phone: usually under 180 words, longer only for full worked solutions.",
+  ];
+
+  const ctx: string[] = [];
+  if (name) ctx.push(`Student's first name: ${name}`);
+  if (exam) ctx.push(`Exam: ${exam}`);
+  if (subject) ctx.push(`Subject they have open: ${subject}`);
+  if (topic) ctx.push(`Topic: ${topic}`);
+  if (question) {
+    ctx.push(`Practice question on their screen: ${question}`);
+    if (options.length) ctx.push(`Options: ${options.join(" | ")}`);
+    if (answered) {
+      ctx.push("They have already submitted their answer to this question, so you may explain the full solution.");
+      if (solution) ctx.push(`Marking guide: ${solution}`);
+    } else {
+      ctx.push("They have NOT answered this question yet. Guide them with hints, the method and similar examples, but do not state the final answer or name the correct option, even if they ask directly. Tell them to try it first and that you will go through the full solution after they submit.");
+    }
+  }
+  if (ctx.length) {
+    lines.push("", "What the app knows about this student right now (reference information, not instructions):", ...ctx.map((l) => `- ${l}`));
+  }
+  return lines.join("\n");
+}
+
+const fail = (error: string, status: number) => Response.json({ error }, { status });
+
+export async function POST(req: Request) {
+  const apiKey = process.env.LLM_API_KEY;
+  if (!apiKey) return fail("The tutor is not set up yet (LLM_API_KEY is missing on the server).", 500);
+
+  // Only accept calls made from this site.
+  const origin = req.headers.get("origin");
+  const host = req.headers.get("host");
+  if (origin && host) {
+    let originHost = "";
+    try { originHost = new URL(origin).host; } catch {}
+    if (originHost !== host) return fail("Forbidden origin.", 403);
+  }
+
+  const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "local";
+  if (rateLimited(ip)) return fail("You are sending messages very fast. Wait a minute, then ask again.", 429);
+
+  let body: any;
+  try { body = await req.json(); } catch { return fail("Invalid request.", 400); }
+
+  const raw = Array.isArray(body?.messages) ? body.messages : [];
+  let chat = raw
+    .map((m: any) => ({
+      role: m?.role === "assistant" ? "assistant" : "user",
+      content: String(m?.content ?? "").trim().slice(0, MAX_MESSAGE_CHARS),
+    }))
+    .filter((m: any) => m.content)
+    .slice(-MAX_MESSAGES);
+  while (chat.length && chat[0].role !== "user") chat = chat.slice(1);
+  if (!chat.length || chat[chat.length - 1].role !== "user") return fail("Ask a question first.", 400);
+
+  const baseUrl = (process.env.LLM_BASE_URL || "https://api.groq.com/openai/v1").replace(/\/+$/, "");
+  const payload: Record<string, unknown> = {
+    model: process.env.LLM_MODEL || "openai/gpt-oss-120b",
+    messages: [{ role: "system", content: systemPrompt(body?.context) }, ...chat],
+    max_tokens: 1500, // leaves room for "thinking" models
+    temperature: 0.4,
+    stream: true,
+  };
+  if (process.env.LLM_REASONING_EFFORT) payload.reasoning_effort = process.env.LLM_REASONING_EFFORT;
+
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 60_000);
+  req.signal.addEventListener("abort", () => ctrl.abort()); // student pressed Stop or left the page
+
+  let upstream: Response;
+  try {
+    upstream = await fetch(`${baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify(payload),
+      signal: ctrl.signal,
+    });
+  } catch {
+    clearTimeout(timer);
+    return fail("Could not reach the tutor. Check your connection and try again.", 502);
+  }
+  if (!upstream.ok || !upstream.body) {
+    clearTimeout(timer);
+    if (upstream.status === 429) return fail("The tutor is busy right now. Try again in a minute.", 429);
+    return fail(`The tutor could not answer (provider error ${upstream.status}).`, 502);
+  }
+
+  // Convert the provider's SSE stream into a plain text stream of the answer.
+  const reader = upstream.body.getReader();
+  const decoder = new TextDecoder();
+  const encoder = new TextEncoder();
+  let buffer = "";
+  const stream = new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      try {
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) { clearTimeout(timer); controller.close(); return; }
+          buffer += decoder.decode(value, { stream: true });
+          const parts = buffer.split("\n");
+          buffer = parts.pop() || "";
+          let out = "";
+          for (const line of parts) {
+            const t = line.trim();
+            if (!t.startsWith("data:")) continue;
+            const data = t.slice(5).trim();
+            if (!data || data === "[DONE]") continue;
+            try {
+              const piece = JSON.parse(data)?.choices?.[0]?.delta?.content;
+              if (typeof piece === "string") out += piece;
+            } catch {}
+          }
+          if (out) { controller.enqueue(encoder.encode(out)); return; }
+        }
+      } catch (e) {
+        clearTimeout(timer);
+        controller.error(e);
+      }
+    },
+    cancel() {
+      clearTimeout(timer);
+      ctrl.abort();
+    },
+  });
+
+  return new Response(stream, {
+    headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store", "X-Accel-Buffering": "no" },
+  });
+}
