@@ -4,25 +4,17 @@
 // (LLM_API_KEY, LLM_BASE_URL, LLM_MODEL), so no extra setup is needed.
 // The system prompt is built here on the server; the browser only sends the chat.
 
+import { sameOrigin, clientIp, tooLarge, limited, MINUTE, HOUR, DAY } from "@/lib/api-guard";
+
 export const dynamic = "force-dynamic";
 
 const MAX_MESSAGES = 12;        // chat turns kept per request
 const MAX_MESSAGE_CHARS = 2000; // per message
-const RATE_LIMIT = 12;          // messages per window, per IP
-const RATE_WINDOW_MS = 60_000;
 
-// Best-effort limiter. It lives in this server instance's memory, so on serverless
-// hosting it slows abuse down rather than stopping it. Use a shared store for a hard limit.
-const hits = new Map<string, number[]>();
-function rateLimited(ip: string) {
-  const now = Date.now();
-  const recent = (hits.get(ip) || []).filter((t) => now - t < RATE_WINDOW_MS);
-  if (recent.length >= RATE_LIMIT) { hits.set(ip, recent); return true; }
-  recent.push(now);
-  hits.set(ip, recent);
-  if (hits.size > 5000) for (const [k, v] of hits) if (!v.some((t) => now - t < RATE_WINDOW_MS)) hits.delete(k);
-  return false;
-}
+// Limits (best-effort, see lib/api-guard.ts)
+const PER_IP_PER_MINUTE = 12;
+const PER_IP_PER_DAY = 300;
+const ALL_USERS_PER_HOUR = 1500; // circuit breaker so a flood cannot drain the LLM quota
 
 const str = (v: unknown, max: number) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "");
 
@@ -146,17 +138,14 @@ export async function POST(req: Request) {
   const apiKey = process.env.LLM_API_KEY;
   if (!apiKey) return fail("The tutor is not set up yet (LLM_API_KEY is missing on the server).", 500);
 
-  // Only accept calls made from this site.
-  const origin = req.headers.get("origin");
-  const host = req.headers.get("host");
-  if (origin && host) {
-    let originHost = "";
-    try { originHost = new URL(origin).host; } catch {}
-    if (originHost !== host) return fail("Forbidden origin.", 403);
-  }
+  // Only accept calls made by this site's own pages (blocks other websites and plain scripts).
+  if (!sameOrigin(req)) return fail("Forbidden origin.", 403);
+  if (tooLarge(req, 40_000)) return fail("Request too large.", 413);
 
-  const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "local";
-  if (rateLimited(ip)) return fail("You are sending messages very fast. Wait a minute, then ask again.", 429);
+  const ip = clientIp(req);
+  if (limited(`tutor:min:${ip}`, PER_IP_PER_MINUTE, MINUTE)) return fail("You are sending messages very fast. Wait a minute, then ask again.", 429);
+  if (limited(`tutor:day:${ip}`, PER_IP_PER_DAY, DAY)) return fail("You have reached today's limit for the tutor. Come back tomorrow.", 429);
+  if (limited("tutor:all", ALL_USERS_PER_HOUR, HOUR)) return fail("The tutor is very busy right now. Try again in a little while.", 429);
 
   let body: any;
   try { body = await req.json(); } catch { return fail("Invalid request.", 400); }

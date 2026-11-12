@@ -4,6 +4,8 @@
 // The app sends the same body it used to send to Anthropic ({ messages, max_tokens })
 // and gets back { content: [{ type: "text", text }] }, so the UI code barely changes.
 
+import { sameOrigin, clientIp, tooLarge, limited, MINUTE, HOUR, DAY } from "@/lib/api-guard";
+
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
@@ -12,15 +14,13 @@ export async function POST(req: Request) {
     return Response.json({ error: "LLM_API_KEY is not set on the server." }, { status: 500 });
   }
 
-  // Only accept calls made from this site (blocks other websites using your free quota).
-  const origin = req.headers.get("origin");
-  const host = req.headers.get("host");
-  if (origin && host) {
-    let originHost = "";
-    try { originHost = new URL(origin).host; } catch {}
-    if (originHost !== host) {
-      return Response.json({ error: "Forbidden origin." }, { status: 403 });
-    }
+  // Only accept calls made by this site's own pages (blocks other websites and plain scripts).
+  if (!sameOrigin(req)) return Response.json({ error: "Forbidden origin." }, { status: 403 });
+  if (tooLarge(req, 40_000)) return Response.json({ error: "Request too large." }, { status: 413 });
+
+  const ip = clientIp(req);
+  if (limited(`llm:min:${ip}`, 10, MINUTE) || limited(`llm:day:${ip}`, 200, DAY) || limited("llm:all", 1500, HOUR)) {
+    return Response.json({ error: "Too many requests. Wait a minute, then try again." }, { status: 429 });
   }
 
   let body: any;

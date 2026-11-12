@@ -10,6 +10,7 @@
 
 import nodemailer from "nodemailer";
 import { createHmac, randomInt, timingSafeEqual } from "crypto";
+import { sameOrigin, clientIp, tooLarge, limited, HOUR, DAY } from "@/lib/api-guard";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -22,18 +23,8 @@ const secret = () => process.env.AUTH_SECRET || process.env.SMTP_PASS || "test-m
 const sign = (email: string, code: string, expires: number) =>
   createHmac("sha256", secret()).update(`${email}|${code}|${expires}`).digest("hex");
 
-// Best-effort limits, held in this server instance's memory.
-const sends = new Map<string, number[]>();
+// Wrong guesses per code (best-effort, held in this server instance's memory).
 const tries = new Map<string, number>();
-function tooMany(key: string, max: number, windowMs: number) {
-  const now = Date.now();
-  const recent = (sends.get(key) || []).filter((t) => now - t < windowMs);
-  if (recent.length >= max) { sends.set(key, recent); return true; }
-  recent.push(now);
-  sends.set(key, recent);
-  if (sends.size > 5000) sends.clear();
-  return false;
-}
 
 const fail = (error: string, status: number) => Response.json({ error }, { status });
 const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] as string));
@@ -61,14 +52,9 @@ async function sendMail(to: string, name: string, code: string) {
 }
 
 export async function POST(req: Request) {
-  // Only accept calls made from this site.
-  const origin = req.headers.get("origin");
-  const host = req.headers.get("host");
-  if (origin && host) {
-    let originHost = "";
-    try { originHost = new URL(origin).host; } catch {}
-    if (originHost !== host) return fail("Forbidden origin.", 403);
-  }
+  // Only accept calls made by this site's own pages (blocks other websites and plain scripts).
+  if (!sameOrigin(req)) return fail("Forbidden origin.", 403);
+  if (tooLarge(req, 10_000)) return fail("Request too large.", 413);
 
   let body: any;
   try { body = await req.json(); } catch { return fail("Invalid request.", 400); }
@@ -77,10 +63,15 @@ export async function POST(req: Request) {
   if (email.length > 254 || !EMAIL_RE.test(email)) return fail("Enter a valid email address.", 400);
 
   if (body?.action === "send") {
-    const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "local";
-    if (tooMany(`ip:${ip}`, 6, TTL_MS) || tooMany(`to:${email}`, 4, TTL_MS)) {
+    // Stops the route being used to flood someone's inbox or burn the sending account's daily allowance.
+    const ip = clientIp(req);
+    if (limited(`code:ip:${ip}`, 4, TTL_MS) || limited(`code:to:${email}`, 3, TTL_MS)) {
       return fail("Too many codes requested. Wait a few minutes, then try again.", 429);
     }
+    if (limited(`code:ipday:${ip}`, 15, DAY) || limited(`code:today:${email}`, 8, DAY)) {
+      return fail("Too many codes requested today. Try again tomorrow.", 429);
+    }
+    if (limited("code:all", 150, HOUR)) return fail("Sign-ups are very busy right now. Try again in a little while.", 429);
     const code = String(randomInt(100000, 1000000));
     const expires = Date.now() + TTL_MS;
     const token = sign(email, code, expires);
@@ -103,6 +94,7 @@ export async function POST(req: Request) {
   }
 
   if (body?.action === "verify") {
+    if (limited(`verify:${clientIp(req)}`, 20, TTL_MS)) return fail("Too many tries. Wait a few minutes, then try again.", 429);
     const code = String(body?.code ?? "").trim();
     const token = String(body?.token ?? "");
     const expires = Number(body?.expires);

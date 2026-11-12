@@ -5,6 +5,8 @@
 // Needs NEXT_PUBLIC_GOOGLE_CLIENT_ID (the OAuth "Web application" client ID, see README).
 // No client secret is used: this flow only proves who the person is.
 
+import { sameOrigin, clientIp, tooLarge, limited, MINUTE } from "@/lib/api-guard";
+
 export const dynamic = "force-dynamic";
 
 const fail = (error: string, status: number) => Response.json({ error }, { status });
@@ -13,14 +15,10 @@ export async function POST(req: Request) {
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   if (!clientId) return fail("Google sign-in is not set up yet.", 500);
 
-  // Only accept calls made from this site.
-  const origin = req.headers.get("origin");
-  const host = req.headers.get("host");
-  if (origin && host) {
-    let originHost = "";
-    try { originHost = new URL(origin).host; } catch {}
-    if (originHost !== host) return fail("Forbidden origin.", 403);
-  }
+  // Only accept calls made by this site's own pages (blocks other websites and plain scripts).
+  if (!sameOrigin(req)) return fail("Forbidden origin.", 403);
+  if (tooLarge(req, 10_000)) return fail("Request too large.", 413);
+  if (limited(`google:${clientIp(req)}`, 20, 10 * MINUTE)) return fail("Too many sign-in attempts. Wait a few minutes, then try again.", 429);
 
   let body: any;
   try { body = await req.json(); } catch { return fail("Invalid request.", 400); }
