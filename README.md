@@ -42,4 +42,16 @@ Sending uses a normal Gmail account, so no domain is needed:
 
 Gmail allows about 500 emails a day. To use another provider later, set `SMTP_HOST`, `SMTP_PORT` and `MAIL_FROM` as well.
 
-When `SMTP_USER` is not set and the app runs locally (`npm run dev`), the code is shown on the verification screen instead of being emailed, so sign-up can be tested without email.
+Test mode: while `SMTP_USER` and `SMTP_PASS` are not set (locally or on the live site), the code is shown on the verification screen instead of being emailed, so sign-up can be tested without email. In this mode email addresses are not really verified, so set both values before real students sign up.
+
+## Continue with Google
+
+The sign-in screen shows a "Continue with Google" button once `NEXT_PUBLIC_GOOGLE_CLIENT_ID` is set. It is free and needs no domain of your own.
+
+1. Go to https://console.cloud.google.com and create a project (for example "GhanaPrep").
+2. Open "APIs & Services" → "OAuth consent screen". Choose "External", enter the app name and your email, and save. Then publish the app so anyone with a Google account can sign in.
+3. Open "APIs & Services" → "Credentials" → "Create credentials" → "OAuth client ID". Choose "Web application".
+4. Under "Authorized JavaScript origins" add every address the app runs on, for example `https://your-app.vercel.app` and, for testing on your computer, `http://localhost:3000` and `http://localhost`.
+5. Copy the client ID (it ends in `.apps.googleusercontent.com`) into `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in `.env.local` and in Vercel → Settings → Environment Variables, then redeploy. No client secret is needed.
+
+How it behaves: someone whose Google email already has an account is signed straight in. A new person is asked for their phone number, role and school once, with no password and no email code, because Google has already verified the email.

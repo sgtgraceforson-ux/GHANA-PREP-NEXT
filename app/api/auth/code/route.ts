@@ -17,9 +17,8 @@ export const runtime = "nodejs";
 const TTL_MS = 10 * 60 * 1000; // codes last 10 minutes
 const MAX_TRIES = 5;           // wrong guesses allowed per code
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-const isProd = process.env.NODE_ENV === "production";
 
-const secret = () => process.env.AUTH_SECRET || process.env.SMTP_PASS || (isProd ? "" : "dev-only-secret");
+const secret = () => process.env.AUTH_SECRET || process.env.SMTP_PASS || "test-mode-secret";
 const sign = (email: string, code: string, expires: number) =>
   createHmac("sha256", secret()).update(`${email}|${code}|${expires}`).digest("hex");
 
@@ -76,7 +75,6 @@ export async function POST(req: Request) {
 
   const email = String(body?.email ?? "").trim().toLowerCase();
   if (email.length > 254 || !EMAIL_RE.test(email)) return fail("Enter a valid email address.", 400);
-  if (!secret()) return fail("Email verification is not set up yet. Please contact support.", 500);
 
   if (body?.action === "send") {
     const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "local";
@@ -89,9 +87,11 @@ export async function POST(req: Request) {
     const configured = !!process.env.SMTP_USER && !!process.env.SMTP_PASS;
 
     if (!configured) {
-      // Local development without email set up: show the code on screen instead of emailing it.
-      if (!isProd) return Response.json({ token, expires, devCode: code });
-      return fail("Email sending is not set up yet. Please contact support.", 500);
+      // TEST MODE: email is not set up (no SMTP_USER / SMTP_PASS), so the code is shown on the
+      // verification screen instead of being emailed. This also applies on the live site, which means
+      // emails are NOT really verified until SMTP is configured. Setting SMTP_USER and SMTP_PASS
+      // switches real emails on automatically.
+      return Response.json({ token, expires, devCode: code });
     }
     try {
       await sendMail(email, String(body?.name ?? "").replace(/[\r\n]/g, " ").trim().slice(0, 60), code);

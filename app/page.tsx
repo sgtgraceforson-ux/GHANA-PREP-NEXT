@@ -406,13 +406,31 @@ const AUTH = {
 
       const user = rows[0];
       const hash = await hashPassword(password);
-      if (hash !== user.password_hash) return { ok:false, msg:"Incorrect password. Try again." };
+      if (hash !== user.password_hash) return { ok:false, msg:"Incorrect password. If you signed up with Google, use Continue with Google." };
 
       this.setSession({ name: user.name, phone: user.phone, email: user.email||"" });
       return { ok:true, name: user.name, phone: user.phone, email: user.email||"" };
     } catch(e) {
       if (SUPA_URL.includes("xyzxyzxyz")) return this._localLogin(key, password);
       return { ok:false, msg:"Network error. Check connection and try again." };
+    }
+  },
+
+  /* ─ Google sign-in: the server has already checked the Google token, so no password is needed ─ */
+  async loginWithGoogle(email) {
+    const key = String(email||"").trim().toLowerCase();
+    try {
+      const rows = await supa.query(`/gp_users?email=eq.${encodeURIComponent(key)}&select=name,phone,email`);
+      if (rows.length === 0) return { ok:false, notFound:true };
+      const user = rows[0];
+      this.setSession({ name: user.name, phone: user.phone, email: user.email||key });
+      return { ok:true, name: user.name, phone: user.phone, email: user.email||key };
+    } catch(e) {
+      if (!IS_LOCAL) return { ok:false, msg:"Network error. Check connection and try again." };
+      const acc = Object.values(this._localAccounts()).find(u => (u.email||"").toLowerCase() === key);
+      if (!acc) return { ok:false, notFound:true };
+      this.setSession({ name:acc.name, phone:acc.phone, email:key });
+      return { ok:true, name:acc.name, phone:acc.phone, email:key };
     }
   },
 
@@ -604,7 +622,7 @@ const AUTH = {
     const a = this._localAccounts();
     const acc = id.includes("@") ? Object.values(a).find(u => (u.email||"").toLowerCase() === id) : a[id];
     if (!acc) return { ok:false, msg: id.includes("@") ? "No account found with this email address." : "No account found. Sign in with your email address." };
-    if (acc.password !== password) return { ok:false, msg:"Incorrect password." };
+    if (acc.password !== password) return { ok:false, msg:"Incorrect password. If you signed up with Google, use Continue with Google." };
     this.setSession({ name:acc.name, phone:acc.phone, email:acc.email||"" });
     return { ok:true, name:acc.name, phone:acc.phone, email:acc.email||"" };
   },
@@ -2333,6 +2351,9 @@ function App() {
 /* ═══════════════════════════════════════════════════════════════
    AUTH SCREEN  — Lively: particles, waves, orbiting star, GSAP
 ═══════════════════════════════════════════════════════════════ */
+// Public OAuth client ID for "Continue with Google". The button is hidden until this is set.
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
+
 function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
   const [name,        setName]        = useState("");
   const [phone,       setPhone]       = useState("");
@@ -2344,6 +2365,9 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
   const [region,      setRegion]      = useState("");
   const [avatarColor, setAvatarColor] = useState("#22c55e");
   const [loginId,     setLoginId]     = useState(""); // sign-in email
+  const [googleUser,  setGoogleUser]  = useState(null); // {email,name}: new person who came in with Google and still has to finish their profile
+  const googleBtnRef = useRef(null);
+  const googleCb     = useRef(null);
   const [errors,      setErrors]      = useState({});
   const [loading,     setLoading]     = useState(false);
   const [serverErr,   setServerErr]   = useState("");
@@ -2437,10 +2461,94 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
 
   function switchMode(m) { setMode(m); setErrors({}); setServerErr(""); }
 
+  // Send a signed-in person to the right place for their account type.
+  // anyRole: Google sign-in goes by the account's own role; password sign-in must match the role button picked.
+  function routeSignedIn(res, anyRole) {
+    const acctPhone = res.phone; // accounts are still keyed by phone number internally
+    const accountRole = getRole(acctPhone);
+    if (!anyRole && accountRole !== role) {
+      localStorage.removeItem("gp_session_v3");
+      setServerErr(accountRole === "teacher" ? "This is a teacher account. Choose Teacher to sign in." : accountRole === "parent" ? "This is a parent account. Choose Parent to sign in." : "This is a student account. Choose Student to sign in.");
+      return;
+    }
+    if (accountRole === "teacher") {
+      const prof = teacherProfileByPhone(acctPhone);
+      if (!prof) { localStorage.removeItem("gp_session_v3"); setServerErr("Teacher profile not found on this device."); return; }
+      startTeacherSession(prof);
+      window.location.href = "/teacher/dashboard";
+      return;
+    }
+    if (accountRole === "parent") {
+      startParentSession({ name: res.name || "Parent", phone: acctPhone });
+      window.location.href = "/parent";
+      return;
+    }
+    onSuccess({ name:res.name||name, phone:acctPhone, email:res.email||"" });
+  }
+
+  // Called by Google's button with a signed ID token. The server checks it and tells us whose it is.
+  async function handleGoogle(resp) {
+    if (!resp || !resp.credential) return;
+    setErrors({}); setServerErr(""); setLoading(true);
+    let g = null;
+    try {
+      const r = await fetch("/api/auth/google", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ credential: resp.credential }),
+      });
+      const d = await r.json().catch(()=>({}));
+      if (!r.ok || !d.email) { setLoading(false); setServerErr(d.error || "Google sign-in failed. Try again."); return; }
+      g = d;
+    } catch(err) {
+      setLoading(false); setServerErr("Network error. Check your connection and try again."); return;
+    }
+    const res = await AUTH.loginWithGoogle(g.email);
+    setLoading(false);
+    if (res.ok) { routeSignedIn(res, true); return; }
+    if (!res.notFound) { setServerErr(res.msg || "Google sign-in failed. Try again."); return; }
+    // First time here: the email is confirmed by Google, so only the profile details are left.
+    setGoogleUser({ email: g.email, name: g.name || "" });
+    setName(n => n.trim() ? n : (g.name || ""));
+    setEmail(g.email); setPassword(""); setConfirm("");
+    switchMode("register");
+  }
+  googleCb.current = handleGoogle;
+
+  function cancelGoogle() { setGoogleUser(null); setEmail(""); setErrors({}); setServerErr(""); }
+
+  // Load Google's sign-in script once and draw its button (only when a client ID is configured).
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID || googleUser) return;
+    let cancelled = false;
+    const draw = () => {
+      const gsi = window.google && window.google.accounts && window.google.accounts.id;
+      const el = googleBtnRef.current;
+      if (cancelled || !gsi || !el) return;
+      if (!window.__gsiReady) {
+        gsi.initialize({ client_id: GOOGLE_CLIENT_ID, callback: r => googleCb.current && googleCb.current(r) });
+        window.__gsiReady = true;
+      }
+      el.innerHTML = "";
+      gsi.renderButton(el, { type:"standard", theme:"outline", size:"large", shape:"pill", text:"continue_with", logo_alignment:"center", width: Math.max(200, Math.min(400, el.offsetWidth || 320)) });
+    };
+    let script = document.getElementById("gsi-script");
+    if (window.google && window.google.accounts) draw();
+    else {
+      if (!script) {
+        script = document.createElement("script");
+        script.id = "gsi-script"; script.src = "https://accounts.google.com/gsi/client"; script.async = true;
+        document.head.appendChild(script);
+      }
+      script.addEventListener("load", draw);
+    }
+    return () => { cancelled = true; if (script) script.removeEventListener("load", draw); };
+  }, [googleUser, isLogin]);
+
   async function submit() {
     setErrors({}); setServerErr("");
     const e = {};
-    const trimEmail  = email.trim().toLowerCase();
+    const viaGoogle  = !isLogin && !!googleUser; // finishing a sign-up that started with Google
+    const trimEmail  = viaGoogle ? googleUser.email : email.trim().toLowerCase();
     const validEmail = v => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v);
     if (isLogin) {
       // Sign in with email. A phone number is still accepted for accounts made before email sign-in.
@@ -2452,12 +2560,16 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
       const digits = phone.replace(/\D/g,"");
       if (!digits.length)            e.phone    = "Phone number is required";
       else if (digits.length<10)     e.phone    = "Enter a valid 10-digit number";
-      if (!trimEmail)                e.email    = "Email is required";
-      else if (!validEmail(trimEmail)) e.email  = "Enter a valid email address";
+      if (!viaGoogle) {
+        if (!trimEmail)                e.email    = "Email is required";
+        else if (!validEmail(trimEmail)) e.email  = "Enter a valid email address";
+      }
     }
-    if (!password)                 e.password = "Password is required";
-    else if (!isLogin && password.length<6) e.password = "Minimum 6 characters";
-    if (!isLogin && password!==confirm)     e.confirm  = "Passwords don't match";
+    if (!viaGoogle) { // Google accounts have no password
+      if (!password)                 e.password = "Password is required";
+      else if (!isLogin && password.length<6) e.password = "Minimum 6 characters";
+      if (!isLogin && password!==confirm)     e.confirm  = "Passwords don't match";
+    }
     if (!isLogin && role==="teacher") {
       if (!school.trim()) e.school = "School name is required for teachers";
       if (!region) e.region = "Choose your region";
@@ -2476,32 +2588,33 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
         if (gsap && el) gsap.fromTo(el, { x:-10 }, { x:0, duration:0.5, ease:"elastic.out(1,0.4)" });
         return;
       }
-      const acctPhone = res.phone; // accounts are still keyed by phone number internally
-      // The button you picked must match the account type
-      const accountRole = getRole(acctPhone);
-      if (accountRole !== role) {
-        localStorage.removeItem("gp_session_v3");
-        setServerErr(accountRole === "teacher" ? "This is a teacher account. Choose Teacher to sign in." : accountRole === "parent" ? "This is a parent account. Choose Parent to sign in." : "This is a student account. Choose Student to sign in.");
-        return;
-      }
-      if (role === "teacher") {
-        const prof = teacherProfileByPhone(acctPhone);
-        if (!prof) { localStorage.removeItem("gp_session_v3"); setServerErr("Teacher profile not found on this device."); return; }
-        startTeacherSession(prof);
-        window.location.href = "/teacher/dashboard";
-        return;
-      }
-      if (role === "parent") {
-        startParentSession({ name: res.name || "Parent", phone: acctPhone });
-        window.location.href = "/parent";
-        return;
-      }
-      onSuccess({ name:res.name||name, phone:acctPhone, email:res.email||"" });
+      routeSignedIn(res, false);
 
     } else {
       // ── Register flow: every new account (student, teacher, parent) verifies its email with a code ──
       const taken = await AUTH.findTaken(phone, trimEmail);
       if (taken) { setLoading(false); setServerErr(taken); return; }
+      if (viaGoogle) {
+        // Google has already confirmed this email, so there is no code step: create the account now.
+        // The account gets a random password nobody knows; these users always come in through Google.
+        const randomPw = crypto.randomUUID() + crypto.randomUUID();
+        const cleanSchool = role==="parent" ? "" : school.trim();
+        const gres = await AUTH.register(name.trim(), phone, trimEmail, randomPw, cleanSchool, avatarColor);
+        setLoading(false);
+        if (!gres.ok) { setServerErr(gres.msg); return; }
+        if (role === "teacher") {
+          startTeacherSession({ fullName: name.trim(), email: trimEmail, phone, school: cleanSchool, region });
+          window.location.href = "/teacher/dashboard";
+          return;
+        }
+        if (role === "parent") {
+          startParentSession({ name: name.trim(), phone });
+          window.location.href = "/parent";
+          return;
+        }
+        onSuccess({ name:name.trim(), phone, email:trimEmail });
+        return;
+      }
       const sendRes = await AUTH.sendVerificationCode(trimEmail, name.trim());
       setLoading(false);
       if (!sendRes.ok) { setServerErr(sendRes.msg||"Failed to send code."); return; }
@@ -2721,15 +2834,24 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
 
         {/* ── REGISTER FORM ──────────────────────────────────── */}
         <div ref={registerRef} className="register-form" style={{display:isLogin?"none":"block"}}>
+          {googleUser && (
+            <div role="status" style={{ background:"rgba(52,211,153,0.08)", border:"1px solid rgba(52,211,153,0.3)", borderRadius:12, padding:"11px 14px", marginBottom:14 }}>
+              <p style={{ fontSize:13, fontWeight:700, color:"var(--text)" }}>Signed in with Google</p>
+              <p style={{ fontSize:12, color:"var(--muted2)", marginTop:3, overflowWrap:"anywhere" }}>{googleUser.email}. Add the details below to finish creating your account.</p>
+              <button type="button" onClick={cancelGoogle} style={{ background:"none", border:"none", padding:0, marginTop:6, color:"#22c55e", fontSize:12, fontWeight:700, fontFamily:"inherit", cursor:"pointer", textDecoration:"underline", textUnderlineOffset:2 }}>Use a different account</button>
+            </div>
+          )}
           <LivelyInput label="Full Name" value={name}
             onChange={e=>setName(e.target.value)} placeholder="Kwame Mensah"
             icon={<Ico n="user" />} error={errors.name}/>
           <LivelyInput label="Phone Number" type="tel" value={phone}
             onChange={e=>setPhone(e.target.value)} placeholder="024 XXX XXXX"
             icon={<Ico n="phone" />} error={errors.phone}/>
+          {!googleUser && (
           <LivelyInput label="Email address (you will sign in with this)" type="email" value={email}
             onChange={e=>setEmail(e.target.value)} placeholder="you@gmail.com"
             icon={<Ico n="mail" />} error={errors.email}/>
+          )}
           {role!=="parent" && (
           <LivelyInput label={role==="teacher" ? "School name" : "School (optional, shows on leaderboard)"} value={school}
             onChange={e=>setSchool(e.target.value)} placeholder="e.g. Prempeh College"
@@ -2746,12 +2868,14 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
               {errors.region && <p style={{fontSize:11,color:"var(--danger)",marginTop:5}}>{errors.region}</p>}
             </div>
           )}
+          {!googleUser && (<>
           <LivelyInput label="Password" type="password" value={password}
             onChange={e=>setPassword(e.target.value)} placeholder="Minimum 6 characters"
             icon={<Ico n="lock" />} error={errors.password}/>
           <LivelyInput label="Confirm Password" type="password" value={confirm}
             onChange={e=>setConfirm(e.target.value)} placeholder="Repeat password"
             icon={<Ico n="lock" />} error={errors.confirm}/>
+          </>)}
           {/* Avatar colour picker */}
           <div style={{marginBottom:14}}>
             <label style={{display:"block",fontSize:11,fontWeight:700,color:"var(--muted2)",
@@ -2780,8 +2904,21 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
             ? <span style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
                 <Spinner color="#000"/> Processing…
               </span>
-            : (isLogin ? "Sign In →" : "Create Account →")}
+            : (isLogin ? "Sign In →" : googleUser ? "Finish Sign-up →" : "Create Account →")}
         </button>
+
+        {/* ── Continue with Google (shown once NEXT_PUBLIC_GOOGLE_CLIENT_ID is set) ── */}
+        {GOOGLE_CLIENT_ID && !googleUser && (
+          <div style={{ marginTop:16 }}>
+            <div aria-hidden="true" style={{ display:"flex", alignItems:"center", gap:10, marginBottom:14 }}>
+              <span style={{ flex:1, height:1, background:"var(--border2)" }}/>
+              <span style={{ fontSize:11, fontWeight:700, color:"var(--muted)", textTransform:"uppercase", letterSpacing:"0.08em" }}>or</span>
+              <span style={{ flex:1, height:1, background:"var(--border2)" }}/>
+            </div>
+            {/* Google draws its own button in here; colorScheme stops a white box behind it in dark mode */}
+            <div ref={googleBtnRef} style={{ display:"flex", justifyContent:"center", minHeight:44, colorScheme:"light" }}/>
+          </div>
+        )}
 
         {/* Switch mode link */}
         <p style={{ textAlign:"center", fontSize:12, color:"var(--muted)", marginTop:14 }}>
@@ -4964,7 +5101,7 @@ function VerifyEmailScreen({ pending, onSuccess, onBack }) {
       </p>
       {devCode && (
         <p role="status" style={{ fontSize:13, color:"#fbbf24", textAlign:"center", marginTop:-14, marginBottom:20 }}>
-          Development mode: email is not set up, so your code is <strong>{devCode}</strong>
+          Test mode: emails are not switched on yet, so your code is <strong>{devCode}</strong>
         </p>
       )}
 
