@@ -228,6 +228,29 @@ const GLOBAL_CSS = `
     /* Tap highlight remove */
   button,input,textarea { -webkit-tap-highlight-color:transparent; }
 
+  /* Simple sign-in / sign-up chooser (first auth screen) */
+  .authx { min-height:100vh; max-width:430px; margin:0 auto; padding:16px 16px 28px; display:flex; flex-direction:column; background:#0a0f0d; color:var(--text); font-family:'DM Sans',sans-serif; }
+  .authx-top { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .authx-brand { display:flex; align-items:center; gap:9px; font-family:'Syne',sans-serif; font-weight:800; font-size:17px; }
+  .authx-brand img { width:30px; height:auto; }
+  .authx-switch { height:36px; padding:0 14px; border-radius:8px; border:1px solid var(--border2); background:var(--surface2); color:var(--text); font:600 13px 'DM Sans',sans-serif; cursor:pointer; }
+  .authx-card { margin:auto 0; padding:40px 22px 30px; border:1px solid var(--border2); border-radius:16px; background:var(--surface2); text-align:center; animation:fadeUp .4s ease both; }
+  .authx-title { font-family:'Syne',sans-serif; font-size:25px; font-weight:800; line-height:1.25; margin:0 0 28px; }
+  .authx-options { display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .authx-google { display:flex; justify-content:center; width:100%; min-height:40px; color-scheme:light; }
+  /* sized and coloured to sit beside Google's own button */
+  .authx-btn { width:100%; max-width:400px; height:40px; display:flex; align-items:center; justify-content:center; gap:9px; border-radius:20px; border:1px solid #dadce0; background:#ffffff; color:#1f1f1f; font:500 14px 'DM Sans',sans-serif; cursor:pointer; }
+  .authx-btn:hover:not(:disabled) { background:#f3f4f6; }
+  .authx-btn:disabled { opacity:.55; cursor:default; }
+  .authx-error { margin:0 0 16px; padding:10px 12px; border-radius:10px; background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.3); color:#f87171; font-size:13px; font-weight:600; text-align:left; }
+  .authx-note { margin:14px 0 0; font-size:13px; color:var(--muted2); }
+  .authx-alt { margin:24px 0 0; font-size:13.5px; color:var(--muted2); }
+  .authx-legal { margin:26px 0 0; font-size:11.5px; line-height:1.6; color:var(--muted); }
+  .authx-link { background:none; border:none; padding:0; font:inherit; font-weight:700; color:#34d399; cursor:pointer; text-decoration:underline; text-underline-offset:2px; }
+  .authx-legal .authx-link { font-weight:600; color:var(--muted2); }
+  .authx-help { align-self:center; margin-top:18px; background:none; border:none; color:var(--muted); font:500 12px 'DM Sans',sans-serif; text-decoration:underline; cursor:pointer; }
+  .authx-back { display:inline-flex; align-items:center; gap:6px; margin:0 0 14px; padding:0; background:none; border:none; color:var(--muted2); font:600 13px 'DM Sans',sans-serif; cursor:pointer; }
+
   /* Sign-up colour picker */
   .avatar-swatch { width:36px; height:36px; border-radius:50% !important; border:none; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#04130c; outline:3px solid transparent; outline-offset:2px; transition:transform .15s ease, outline-color .15s ease; }
   .avatar-swatch svg { opacity:0; transition:opacity .15s ease; }
@@ -1805,6 +1828,7 @@ function App() {
       mode={authMode}
       setMode={setAuthMode}
       onSupport={()=>setShowSupport(true)}
+      onLegal={(t)=>setLegalModal(t)}
       onPendingVerify={(pending) => setPendingReg(pending)}
       onSuccess={(u) => {
         setUser(u);
@@ -1813,6 +1837,7 @@ function App() {
       }}
     />
     {showSupport && <SupportModal onClose={()=>setShowSupport(false)}/>}
+    {legalModal && <LegalModal type={legalModal} onClose={()=>setLegalModal(null)}/>}
     </>
   );
 
@@ -2354,7 +2379,7 @@ function App() {
 // Public OAuth client ID for "Continue with Google". The button is hidden until this is set.
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 
-function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
+function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport, onLegal }) {
   const [name,        setName]        = useState("");
   const [phone,       setPhone]       = useState("");
   const [email,       setEmail]       = useState("");
@@ -2365,6 +2390,7 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
   const [region,      setRegion]      = useState("");
   const [avatarColor, setAvatarColor] = useState("#22c55e");
   const [loginId,     setLoginId]     = useState(""); // sign-in email
+  const [step,        setStep]        = useState("choose"); // "choose" = pick Google or Email, "form" = the email form
   const [googleUser,  setGoogleUser]  = useState(null); // {email,name}: new person who came in with Google and still has to finish their profile
   const googleBtnRef = useRef(null);
   const googleCb     = useRef(null);
@@ -2434,7 +2460,14 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
     const login = loginRef.current;
     const reg   = registerRef.current;
     const head  = headingRef.current;
-    if (!gsap || !body || !login) return;
+    if (!body || !login) return; // the chooser screen is showing: the forms are not on the page
+    if (!gsap) {
+      // Animation library not loaded yet (slow connection): switch the forms without animation,
+      // otherwise the sign-up form would stay invisible.
+      login.classList.toggle("active", isLogin); login.style.opacity = isLogin ? "1" : "0";
+      if (reg) { reg.style.display = isLogin ? "none" : "block"; reg.classList.toggle("active", !isLogin); reg.style.opacity = isLogin ? "0" : "1"; reg.style.transform = "none"; }
+      return;
+    }
 
     if (isLogin) {
       gsap.to(body, { backgroundColor:"#0a0f0d", duration:0.6, ease:"power2.inOut" });
@@ -2457,7 +2490,7 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
       }
     }
     if (head) gsap.fromTo(head, { opacity:0, y:10 }, { opacity:1, y:0, duration:0.38, ease:"power2.out", delay:0.12 });
-  }, [isLogin]);
+  }, [isLogin, step]);
 
   function switchMode(m) { setMode(m); setErrors({}); setServerErr(""); }
 
@@ -2511,6 +2544,7 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
     setName(n => n.trim() ? n : (g.name || ""));
     setEmail(g.email); setPassword(""); setConfirm("");
     switchMode("register");
+    setStep("form");
   }
   googleCb.current = handleGoogle;
 
@@ -2518,7 +2552,7 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
 
   // Load Google's sign-in script once and draw its button (only when a client ID is configured).
   useEffect(() => {
-    if (!GOOGLE_CLIENT_ID || googleUser) return;
+    if (!GOOGLE_CLIENT_ID || googleUser || step !== "choose") return;
     let cancelled = false;
     const draw = () => {
       const gsi = window.google && window.google.accounts && window.google.accounts.id;
@@ -2542,7 +2576,7 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
       script.addEventListener("load", draw);
     }
     return () => { cancelled = true; if (script) script.removeEventListener("load", draw); };
-  }, [googleUser, isLogin]);
+  }, [googleUser, step]); // not redrawn when switching between log in and sign up, so it does not flicker
 
   async function submit() {
     setErrors({}); setServerErr("");
@@ -2588,7 +2622,7 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
         if (gsap && el) gsap.fromTo(el, { x:-10 }, { x:0, duration:0.5, ease:"elastic.out(1,0.4)" });
         return;
       }
-      routeSignedIn(res, false);
+      routeSignedIn(res, true);
 
     } else {
       // ── Register flow: every new account (student, teacher, parent) verifies its email with a code ──
@@ -2627,6 +2661,39 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
       });
     }
   }
+
+  // ── Step 1: choose how to continue (Google or Email) ──
+  if (step === "choose") return (
+    <div className="authx">
+      <header className="authx-top">
+        <span className="authx-brand"><img src="/logo.webp" alt="" width={30} height={35}/> GhanaPrep</span>
+        <button type="button" className="authx-switch" onClick={()=>switchMode(isLogin?"register":"login")}>{isLogin ? "Sign Up" : "Log In"}</button>
+      </header>
+
+      <main className="authx-card">
+        <h1 className="authx-title">{isLogin ? <>Log in to<br/>GhanaPrep</> : <>Your exam practice<br/>is just a sign-up away.</>}</h1>
+        {serverErr && <p role="alert" className="authx-error">{serverErr}</p>}
+        <div className="authx-options" aria-busy={loading}>
+          {/* Google draws its own button in here (only when a client ID is configured) */}
+          {GOOGLE_CLIENT_ID && <div ref={googleBtnRef} className="authx-google"/>}
+          <button type="button" className="authx-btn" disabled={loading}
+            onClick={()=>{ setErrors({}); setServerErr(""); setStep("form"); }}>
+            <Ico n="mail" /> Continue with Email
+          </button>
+        </div>
+        {loading && <p className="authx-note" role="status">Signing you in…</p>}
+        <p className="authx-alt">
+          {isLogin ? "New to GhanaPrep? " : "Already have an account? "}
+          <button type="button" className="authx-link" onClick={()=>switchMode(isLogin?"register":"login")}>{isLogin ? "Create a free account" : "Log in"}</button>
+        </p>
+        <p className="authx-legal">
+          By joining, you agree to our <button type="button" className="authx-link" onClick={()=>onLegal && onLegal("terms")}>Terms of Service</button> and <button type="button" className="authx-link" onClick={()=>onLegal && onLegal("privacy")}>Privacy Policy</button>
+        </p>
+      </main>
+
+      <button type="button" className="authx-help" onClick={() => { if (!openWhatsApp("I need help signing in to GhanaPrep.")) onSupport(); }}>Need help? Contact support</button>
+    </div>
+  );
 
   // Floating particles data
   const particles = [
@@ -2775,7 +2842,9 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
           borderRadius:99, animation:"shimmer 2s ease-in-out infinite" }}/>
 
         {/* ── Tab toggle ──────────────────────────────────────── */}
-        <div role="group" aria-label="I am joining as" style={{ display:"flex", gap:8, marginBottom:14 }}>
+        <button type="button" className="authx-back" onClick={()=>{ if (googleUser) cancelGoogle(); setStep("choose"); }}><span aria-hidden="true">←</span> All sign-in options</button>
+        {/* Role is only asked when creating an account; signing in goes by the account's own role */}
+        <div role="group" aria-label="I am joining as" style={{ display:isLogin?"none":"flex", gap:8, marginBottom:14 }}>
           {[["student","I'm a Student"],["teacher","I'm a Teacher"],["parent","I'm a Parent"]].map(([r,l])=>(
             <button key={r} type="button" aria-pressed={role===r}
               onClick={()=>{ setRoleChoice(r); setErrors({}); setServerErr(""); }}
@@ -2823,7 +2892,7 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
         )}
 
         {/* ── LOGIN FORM ─────────────────────────────────────── */}
-        <div ref={loginRef} className="login-form active">
+        <div ref={loginRef} className="login-form active" style={{display:isLogin?"block":"none"}}>{/* hidden completely in sign-up mode so it leaves no empty gap */}
           <LivelyInput label="Email address" type="email" value={loginId}
             onChange={e=>setLoginId(e.target.value)} placeholder="you@gmail.com"
             icon={<Ico n="mail" />} error={errors.loginId}/>
@@ -2906,19 +2975,6 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport }) {
               </span>
             : (isLogin ? "Sign In →" : googleUser ? "Finish Sign-up →" : "Create Account →")}
         </button>
-
-        {/* ── Continue with Google (shown once NEXT_PUBLIC_GOOGLE_CLIENT_ID is set) ── */}
-        {GOOGLE_CLIENT_ID && !googleUser && (
-          <div style={{ marginTop:16 }}>
-            <div aria-hidden="true" style={{ display:"flex", alignItems:"center", gap:10, marginBottom:14 }}>
-              <span style={{ flex:1, height:1, background:"var(--border2)" }}/>
-              <span style={{ fontSize:11, fontWeight:700, color:"var(--muted)", textTransform:"uppercase", letterSpacing:"0.08em" }}>or</span>
-              <span style={{ flex:1, height:1, background:"var(--border2)" }}/>
-            </div>
-            {/* Google draws its own button in here; colorScheme stops a white box behind it in dark mode */}
-            <div ref={googleBtnRef} style={{ display:"flex", justifyContent:"center", minHeight:44, colorScheme:"light" }}/>
-          </div>
-        )}
 
         {/* Switch mode link */}
         <p style={{ textAlign:"center", fontSize:12, color:"var(--muted)", marginTop:14 }}>
