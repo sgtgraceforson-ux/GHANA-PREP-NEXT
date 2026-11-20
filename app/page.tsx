@@ -241,6 +241,7 @@ const GLOBAL_CSS = `
   .authx-google { display:flex; justify-content:center; width:100%; min-height:40px; color-scheme:light; }
   /* sized and coloured to sit beside Google's own button */
   .authx-btn { width:100%; max-width:400px; height:40px; display:flex; align-items:center; justify-content:center; gap:9px; border-radius:20px; border:1px solid #dadce0; background:#ffffff; color:#1f1f1f; font:500 14px 'DM Sans',sans-serif; cursor:pointer; }
+  a.authx-btn { text-decoration:none; }
   .authx-btn:hover:not(:disabled) { background:#f3f4f6; }
   .authx-btn:disabled { opacity:.55; cursor:default; }
   .authx-error { margin:0 0 16px; padding:10px 12px; border-radius:10px; background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.3); color:#f87171; font-size:13px; font-weight:600; text-align:left; }
@@ -2680,14 +2681,13 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport, onLe
             onClick={()=>{ setErrors({}); setServerErr(""); setStep("form"); }}>
             <Ico n="mail" /> Continue with Email
           </button>
+          {/* Headmasters sign in with their school's code on their own page */}
+          <a className="authx-btn" href="/headmaster"><Ico n="school" /> Continue as Headmaster</a>
         </div>
         {loading && <p className="authx-note" role="status">Signing you in…</p>}
         <p className="authx-alt">
           {isLogin ? "New to GhanaPrep? " : "Already have an account? "}
           <button type="button" className="authx-link" onClick={()=>switchMode(isLogin?"register":"login")}>{isLogin ? "Create a free account" : "Log in"}</button>
-        </p>
-        <p className="authx-alt" style={{ marginTop:10 }}>
-          Headmaster? <a className="authx-link" href="/headmaster">Sign in with your school code</a>
         </p>
         <p className="authx-legal">
           By joining, you agree to our <button type="button" className="authx-link" onClick={()=>onLegal && onLegal("terms")}>Terms of Service</button> and <button type="button" className="authx-link" onClick={()=>onLegal && onLegal("privacy")}>Privacy Policy</button>
