@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import { checkHeadCode, getHeadSession, logoutHead, savedHeadName, schoolOverview, startHeadSession,
   type HeadSchool, type HeadSession, type SchoolOverview } from "@/lib/headmaster";
-import { formatCode, timeAgo } from "@/lib/classrooms";
+import { formatCode, type Classroom, type Member } from "@/lib/classrooms";
+import { ClassRegister, ReportSheet } from "@/components/headmaster-register";
 
 const font = "'DM Sans',system-ui,sans-serif", display = "'Syne','DM Sans',sans-serif";
 const page = { minHeight: "100vh", background: "#0a0f0d", color: "#f0f4f8", fontFamily: font, display: "flex", justifyContent: "center", padding: "24px 18px 48px" } as const;
@@ -94,6 +95,7 @@ function SignIn({ onDone }: { onDone: (s: HeadSession) => void }) {
 function Dashboard({ session, onSignOut }: { session: HeadSession; onSignOut: () => void }) {
   const [data, setData] = useState<SchoolOverview | null>(null);
   const [openRoom, setOpenRoom] = useState("");
+  const [report, setReport] = useState<{ member: Member; room: Classroom } | null>(null);
   useEffect(() => {
     const load = () => setData(schoolOverview(session.schoolId));
     load();
@@ -158,17 +160,7 @@ function Dashboard({ session, onSignOut }: { session: HeadSession; onSignOut: ()
                       {r.activeWeek} active this week {open ? "▴" : "▾"}
                     </span>
                   </button>
-                  {open && (
-                    <div style={{ marginTop: 8, padding: "4px 12px", borderRadius: 10, background: "#111814" }}>
-                      {r.members.length === 0 ? <p style={{ fontSize: 13, color: muted, padding: "8px 0" }}>No students have joined yet.</p> :
-                        r.members.map((m) => (
-                          <div key={m.phone} style={{ display: "flex", justifyContent: "space-between", gap: 10, padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,.05)", fontSize: 13 }}>
-                            <span>{m.name}</span>
-                            <span style={{ color: muted }}>{m.lastActive ? "Active " + timeAgo(m.lastActive).toLowerCase() : "Not active yet"}</span>
-                          </div>
-                        ))}
-                    </div>
-                  )}
+                  {open && <ClassRegister members={r.members} onStudent={(m) => setReport({ member: m, room: r })} />}
                 </div>
               );
             })}
@@ -178,6 +170,7 @@ function Dashboard({ session, onSignOut }: { session: HeadSession; onSignOut: ()
         <p style={{ fontSize: 11.5, color: muted, lineHeight: 1.6, marginTop: 16 }}>
           Showing teachers and classrooms saved on this device. Once GhanaPrep's online database is connected, classrooms from every teacher's phone will appear here automatically.
         </p>
+        {report && <ReportSheet member={report.member} room={report.room} onClose={() => setReport(null)} />}
       </div>
     </div>
   );

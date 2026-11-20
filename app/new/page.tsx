@@ -305,6 +305,15 @@ const SUPA_URL = "https://xyzxyzxyz.supabase.co";  // ← paste your URL
 const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder"; // ← anon key
 const IS_LOCAL = SUPA_URL.includes("xyzxyzxyz");   // true = demo mode
 
+/* Questions answered per calendar day ("YYYY-MM-DD" -> count), for the weekly activity
+   register on the headmaster dashboard. Keeps about 4 months. */
+function logDay(days) {
+  const d = new Date(), key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  const out = { ...(days || {}) }; out[key] = (out[key] || 0) + 1;
+  const keys = Object.keys(out).sort(); while (keys.length > 120) delete out[keys.shift()];
+  return out;
+}
+
 /* Simple deterministic hash — good enough for a demo app.
    In production use bcrypt on a server. */
 async function hashPassword(password) {
@@ -425,6 +434,8 @@ const AUTH = {
       s.totalScore = (s.totalScore||0) + score;
       s.weekScore  = (s.weekScore||0)  + score;
       s.doneToday++;
+      s.days = logDay(s.days);
+      s.lastActiveAt = Date.now();
       if (mode==="objectives") { s.objDone=(s.objDone||0)+1; s.objScore=(s.objScore||0)+score; }
       else { s.theoryDone=(s.theoryDone||0)+1; s.theoryScore=(s.theoryScore||0)+score; }
       if (!s.weak) s.weak={};
@@ -584,7 +595,7 @@ const AUTH = {
     const today = new Date().toDateString();
     const s = a[phone].stats;
     if (s.lastDay!==today){const y=new Date(Date.now()-86400000).toDateString();s.streak=(s.lastDay===y)?(s.streak||0)+1:1;s.doneToday=0;s.lastDay=today;}
-    s.done++;s.totalScore+=score;s.doneToday++;
+    s.done++;s.totalScore+=score;s.doneToday++;s.days=logDay(s.days);
     if(mode==="objectives"){s.objDone++;s.objScore+=score;}else{s.theoryDone++;s.theoryScore+=score;}
     if(score<6)s.weak[topic]=(s.weak[topic]||0)+1;
     a[phone].stats=s; this._saveLocal(a);
