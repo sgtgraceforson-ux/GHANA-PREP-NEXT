@@ -15,7 +15,7 @@ const CLS = "gp_classrooms_v1";          // { [id]: Classroom }
 const MEM = "gp_classroom_members_v1";   // { [classroomId]: [{ phone, name, joinedAt }] }
 const ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // 32 chars, no 0/O/1/I
 
-export type Classroom = { id: string; teacherEmail: string; teacherName: string; name: string; subject: string; level: string; term: string; code: string; createdAt: number };
+export type Classroom = { id: string; schoolId?: string; teacherEmail: string; teacherName: string; name: string; subject: string; level: string; term: string; code: string; createdAt: number };
 export type Student = { phone: string; name: string };
 
 const read = (k: string, d: any) => { try { return JSON.parse(localStorage.getItem(k) || "null") ?? d; } catch { return d; } };
@@ -38,10 +38,10 @@ function uniqueCode(taken: Set<string>) {
 }
 const takenCodes = (all: Record<string, Classroom>) => new Set(Object.values(all).map((c) => c.code));
 
-export function createClassroom(t: { email: string; fullName: string }, d: { name: string; subject: string; level: string; term: string }): Classroom {
+export function createClassroom(t: { email: string; fullName: string; schoolId?: string }, d: { name: string; subject: string; level: string; term: string }): Classroom {
   const all = read(CLS, {});
   const id = Array.from(crypto.getRandomValues(new Uint8Array(8)), (b) => b.toString(16).padStart(2, "0")).join("");
-  const room: Classroom = { id, teacherEmail: t.email.toLowerCase(), teacherName: t.fullName, name: d.name.trim(), subject: d.subject, level: d.level, term: d.term, code: uniqueCode(takenCodes(all)), createdAt: Date.now() };
+  const room: Classroom = { id, schoolId: t.schoolId || "", teacherEmail: t.email.toLowerCase(), teacherName: t.fullName, name: d.name.trim(), subject: d.subject, level: d.level, term: d.term, code: uniqueCode(takenCodes(all)), createdAt: Date.now() };
   all[id] = room; write(CLS, all);
   return room;
 }

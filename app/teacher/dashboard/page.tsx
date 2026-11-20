@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getTeacher, logoutTeacher, clearRoleCookie, type Teacher } from "@/lib/teacher-auth";
+import { getTeacher, logoutTeacher, clearRoleCookie, setTeacherSchool, type Teacher } from "@/lib/teacher-auth";
+import { SchoolPicker } from "@/components/school-picker";
+import type { School } from "@/lib/schools";
 import { ClassroomsPanel } from "../classrooms";
 import { TeacherDashboardSkeleton } from "@/components/skeletons";
 
@@ -11,6 +13,8 @@ export default function TeacherDashboard() {
   const router = useRouter();
   const [t, setT] = useState<Teacher | null>(null);
   const [quizzes, setQuizzes] = useState<any[]>([]);
+  const [pick, setPick] = useState<School | null>(null);
+  const [pickErr, setPickErr] = useState("");
 
   useEffect(() => {
     const me = getTeacher();
@@ -46,7 +50,17 @@ export default function TeacherDashboard() {
           ))}
         </div>
 
-        <ClassroomsPanel teacher={t} />
+        {t.schoolId ? <ClassroomsPanel teacher={t} /> : (
+          // Teachers who signed up before schools were compulsory must choose one before creating classrooms
+          <div style={{ ...card, marginBottom: 16, border: "1.5px solid rgba(232,196,104,.5)" }}>
+            <p style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 15 }}>Choose your school</p>
+            <p style={{ fontSize: 13, color: "#8899aa", lineHeight: 1.6, margin: "6px 0 14px" }}>Pick your school from the list to create classrooms. Your classrooms will then appear on your headmaster's dashboard.</p>
+            <SchoolPicker label="Your school" value={pick} error={pickErr} onChange={(s) => { setPick(s); setPickErr(""); }}
+              onMissing={() => setPickErr("Your school is not on our list yet. Contact GhanaPrep support with your school's name and town, and we will add it.")} />
+            <button onClick={() => { if (!pick) { setPickErr("Choose your school from the list"); return; } setTeacherSchool(t.email, pick); setT(getTeacher()); }}
+              style={{ padding: "11px 16px", border: "none", borderRadius: 10, background: "#22c55e", color: "#000", fontWeight: 800, fontSize: 14, cursor: "pointer" }}>Save my school</button>
+          </div>
+        )}
 
         <div style={card}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, marginBottom: 10 }}>

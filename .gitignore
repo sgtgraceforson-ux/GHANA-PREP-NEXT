@@ -17,3 +17,6 @@ out/
 .DS_Store
 *.log
 next-env.d.ts
+
+# headmaster codes for the app owner only (never commit)
+private/

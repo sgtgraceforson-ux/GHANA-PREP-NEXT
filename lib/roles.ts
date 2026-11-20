@@ -9,7 +9,7 @@ const TSESSION = "gp_teacher_session";  // { email }
 const STUDENT_SESSION = "gp_session_v3";
 
 export type Role = "student" | "teacher" | "parent";
-export type TeacherProfile = { fullName: string; email: string; phone: string; school: string; region: string };
+export type TeacherProfile = { fullName: string; email: string; phone: string; school: string; region: string; schoolId?: string };
 
 const read = (k: string, d: any) => { try { return JSON.parse(localStorage.getItem(k) || "null") ?? d; } catch { return d; } };
 const digits = (p: string) => String(p || "").replace(/\D/g, "");
@@ -18,7 +18,7 @@ export const getRole = (phone: string): Role => { const r = read(ROLES, {})[digi
 
 export function teacherProfileByPhone(phone: string): TeacherProfile | null {
   const a = Object.values(read(TEACHERS, {})).find((t: any) => t.phone === digits(phone)) as any;
-  return a ? { fullName: a.fullName, email: a.email, phone: a.phone, school: a.school, region: a.region } : null;
+  return a ? { fullName: a.fullName, email: a.email, phone: a.phone, school: a.school, region: a.region, schoolId: a.schoolId } : null;
 }
 
 // Marks the phone as a teacher, signs them in as a teacher and signs them out of the student app.
@@ -26,7 +26,9 @@ export function startTeacherSession(p: TeacherProfile) {
   const phone = digits(p.phone), email = p.email.trim().toLowerCase();
   const roles = read(ROLES, {}); roles[phone] = "teacher"; localStorage.setItem(ROLES, JSON.stringify(roles));
   const accounts = read(TEACHERS, {});
-  accounts[email] = { fullName: p.fullName, email, phone, school: p.school, region: p.region, createdAt: Date.now() };
+  const prev = accounts[email] || {};
+  // schoolId links the teacher (and their classrooms) to the school's headmaster dashboard
+  accounts[email] = { fullName: p.fullName, email, phone, school: p.school, region: p.region, schoolId: p.schoolId || prev.schoolId || "", createdAt: prev.createdAt || Date.now() };
   localStorage.setItem(TEACHERS, JSON.stringify(accounts));
   localStorage.setItem(TSESSION, JSON.stringify({ email }));
   localStorage.removeItem(STUDENT_SESSION);

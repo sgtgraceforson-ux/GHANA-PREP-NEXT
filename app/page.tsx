@@ -27,7 +27,8 @@ function Ico({ n, size = "1.08em" }) {
   return <C className="gp-ico" size={size} strokeWidth={2.1} color={ICON_COLOR[n] || "currentColor"} fill={n === "star" ? "#e8c468" : "none"} style={base} aria-hidden="true" />;
 }
 import { getRole, startTeacherSession, teacherProfileByPhone } from "@/lib/roles";
-import { REGIONS, getTeacher } from "@/lib/teacher-auth";
+import { getTeacher } from "@/lib/teacher-auth";
+import { SchoolPicker } from "@/components/school-picker";
 
 // ── Your real business details ───────────────────────────────────
 // Fill these in. Anything left empty is simply hidden in the app.
@@ -1756,7 +1757,7 @@ function App() {
       onSuccess={() => {
         const p = pendingReg;
         if (p.role === "teacher") {
-          startTeacherSession({ fullName:p.name, email:p.email, phone:p.phone, school:p.school, region:p.region });
+          startTeacherSession({ fullName:p.name, email:p.email, phone:p.phone, school:p.school, region:p.region, schoolId:p.schoolId });
           window.location.href = "/teacher/dashboard";
           return;
         }
@@ -2387,7 +2388,7 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport, onLe
   const [confirm,     setConfirm]     = useState("");
   const [school,      setSchool]      = useState("");
   const [role,        setRoleChoice]  = useState("student"); // student | teacher | parent
-  const [region,      setRegion]      = useState("");
+  const [schoolPick,  setSchoolPick]  = useState(null); // teachers must choose their school from the list
   const [avatarColor, setAvatarColor] = useState("#22c55e");
   const [loginId,     setLoginId]     = useState(""); // sign-in email
   const [step,        setStep]        = useState("choose"); // "choose" = pick Google or Email, "form" = the email form
@@ -2605,8 +2606,7 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport, onLe
       if (!isLogin && password!==confirm)     e.confirm  = "Passwords don't match";
     }
     if (!isLogin && role==="teacher") {
-      if (!school.trim()) e.school = "School name is required for teachers";
-      if (!region) e.region = "Choose your region";
+      if (!schoolPick) e.school = "Choose your school from the list";
     }
     if (Object.keys(e).length) { setErrors(e); return; }
     setLoading(true);
@@ -2632,12 +2632,12 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport, onLe
         // Google has already confirmed this email, so there is no code step: create the account now.
         // The account gets a random password nobody knows; these users always come in through Google.
         const randomPw = crypto.randomUUID() + crypto.randomUUID();
-        const cleanSchool = role==="parent" ? "" : school.trim();
+        const cleanSchool = role==="parent" ? "" : role==="teacher" ? schoolPick.name : school.trim();
         const gres = await AUTH.register(name.trim(), phone, trimEmail, randomPw, cleanSchool, avatarColor);
         setLoading(false);
         if (!gres.ok) { setServerErr(gres.msg); return; }
         if (role === "teacher") {
-          startTeacherSession({ fullName: name.trim(), email: trimEmail, phone, school: cleanSchool, region });
+          startTeacherSession({ fullName: name.trim(), email: trimEmail, phone, school: schoolPick.name, region: schoolPick.region, schoolId: schoolPick.id });
           window.location.href = "/teacher/dashboard";
           return;
         }
@@ -2654,9 +2654,9 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport, onLe
       if (!sendRes.ok) { setServerErr(sendRes.msg||"Failed to send code."); return; }
       // Keep the sign-up details and switch to the code screen. The account is created once the code is confirmed.
       onPendingVerify({
-        role, region,
+        role, region: role==="teacher" ? schoolPick.region : "", schoolId: role==="teacher" ? schoolPick.id : "",
         name: name.trim(), phone, email: trimEmail, password,
-        school: role==="parent" ? "" : school.trim(), avatarColor,
+        school: role==="parent" ? "" : role==="teacher" ? schoolPick.name : school.trim(), avatarColor,
         devCode: sendRes.devCode,
       });
     }
@@ -2685,6 +2685,9 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport, onLe
         <p className="authx-alt">
           {isLogin ? "New to GhanaPrep? " : "Already have an account? "}
           <button type="button" className="authx-link" onClick={()=>switchMode(isLogin?"register":"login")}>{isLogin ? "Create a free account" : "Log in"}</button>
+        </p>
+        <p className="authx-alt" style={{ marginTop:10 }}>
+          Headmaster? <a className="authx-link" href="/headmaster">Sign in with your school code</a>
         </p>
         <p className="authx-legal">
           By joining, you agree to our <button type="button" className="authx-link" onClick={()=>onLegal && onLegal("terms")}>Terms of Service</button> and <button type="button" className="authx-link" onClick={()=>onLegal && onLegal("privacy")}>Privacy Policy</button>
@@ -2921,21 +2924,16 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport, onLe
             onChange={e=>setEmail(e.target.value)} placeholder="you@gmail.com"
             icon={<Ico n="mail" />} error={errors.email}/>
           )}
-          {role!=="parent" && (
-          <LivelyInput label={role==="teacher" ? "School name" : "School (optional, shows on leaderboard)"} value={school}
+          {role==="student" && (
+          <LivelyInput label="School (optional, shows on leaderboard)" value={school}
             onChange={e=>setSchool(e.target.value)} placeholder="e.g. Prempeh College"
             icon={<Ico n="school" />} error={errors.school}/>
           )}
           {role==="teacher" && (
-            <div style={{marginBottom:14}}>
-              <label style={{display:"block",fontSize:11,fontWeight:700,color:"var(--muted2)",textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:6}}>Region in Ghana</label>
-              <select value={region} aria-label="Region in Ghana" onChange={e=>{ setRegion(e.target.value); setErrors({...errors, region:""}); }}
-                style={{width:"100%",padding:"13px 14px",background:"rgba(30,39,31,0.9)",border:`1.5px solid ${errors.region?"var(--danger)":"rgba(255,255,255,0.1)"}`,borderRadius:12,color:"var(--text)",fontSize:14,fontFamily:"'DM Sans',sans-serif"}}>
-                <option value="">Select your region</option>
-                {REGIONS.map(r=><option key={r} value={r}>{r}</option>)}
-              </select>
-              {errors.region && <p style={{fontSize:11,color:"var(--danger)",marginTop:5}}>{errors.region}</p>}
-            </div>
+            // Compulsory: links the teacher's classrooms to their headmaster's dashboard
+            <SchoolPicker label="Your school (required)" value={schoolPick} error={errors.school}
+              onChange={s=>{ setSchoolPick(s); setErrors({...errors, school:""}); }}
+              onMissing={() => { if (!openWhatsApp("My school is not on the GhanaPrep school list. School name and town: ")) onSupport(); }}/>
           )}
           {!googleUser && (<>
           <LivelyInput label="Password" type="password" value={password}

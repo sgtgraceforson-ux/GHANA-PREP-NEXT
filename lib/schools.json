@@ -1,0 +1,3296 @@
+[
+ {
+  "id": "achinakrom-senior-high-school-ashanti",
+  "name": "Achinakrom Senior High School",
+  "region": "Ashanti",
+  "town": "Achinakrom"
+ },
+ {
+  "id": "adanwomase-senior-high-school-ashanti",
+  "name": "Adanwomase Senior High School",
+  "region": "Ashanti",
+  "town": "Adanwomase"
+ },
+ {
+  "id": "adu-gyamfi-senior-high-school-ashanti",
+  "name": "Adu Gyamfi Senior High School",
+  "region": "Ashanti",
+  "town": "Jamasi"
+ },
+ {
+  "id": "aduman-senior-high-school-ashanti",
+  "name": "Aduman Senior High School",
+  "region": "Ashanti",
+  "town": "Aduman"
+ },
+ {
+  "id": "adventist-girls-high-school-ashanti",
+  "name": "Adventist Girls High School",
+  "region": "Ashanti",
+  "town": "Aduman"
+ },
+ {
+  "id": "adventist-senior-high-school-ashanti",
+  "name": "Adventist Senior High School",
+  "region": "Ashanti",
+  "town": "Bantama-Kumasi"
+ },
+ {
+  "id": "afia-kobi-ampem-girls-senior-high-school-ashanti",
+  "name": "Afia Kobi Ampem Girls Senior High School",
+  "region": "Ashanti",
+  "town": "Trabuom"
+ },
+ {
+  "id": "agogo-collins-senior-high-school-ashanti",
+  "name": "Agogo Collins Senior High School",
+  "region": "Ashanti",
+  "town": "Agogo"
+ },
+ {
+  "id": "agogo-state-college-ashanti",
+  "name": "Agogo State College",
+  "region": "Ashanti",
+  "town": "Agogo"
+ },
+ {
+  "id": "agona-senior-high-technical-school-ashanti",
+  "name": "Agona Senior High Technical School",
+  "region": "Ashanti",
+  "town": "Agona"
+ },
+ {
+  "id": "akrofuom-senior-high-technical-school-ashanti",
+  "name": "Akrofuom Senior High Technical School",
+  "region": "Ashanti",
+  "town": "Akrofuom"
+ },
+ {
+  "id": "akumadan-senior-high-school-ashanti",
+  "name": "Akumadan Senior High School",
+  "region": "Ashanti",
+  "town": "Akumadan"
+ },
+ {
+  "id": "amaniampong-senior-high-school-ashanti",
+  "name": "Amaniampong Senior High School",
+  "region": "Ashanti",
+  "town": "Mampong"
+ },
+ {
+  "id": "angel-educational-complex-kronom-ashanti",
+  "name": "Angel Educational Complex - Kronom",
+  "region": "Ashanti",
+  "town": "Kronom"
+ },
+ {
+  "id": "anglican-senior-high-school-ashanti",
+  "name": "Anglican Senior High School",
+  "region": "Ashanti",
+  "town": "Asem-Kumasi"
+ },
+ {
+  "id": "antoa-senior-high-school-ashanti",
+  "name": "Antoa Senior High School",
+  "region": "Ashanti",
+  "town": "Antoa"
+ },
+ {
+  "id": "asanteman-senior-high-school-ashanti",
+  "name": "Asanteman Senior High School",
+  "region": "Ashanti",
+  "town": "Bantama"
+ },
+ {
+  "id": "asare-bediako-senior-high-school-ashanti",
+  "name": "Asare Bediako Senior High School",
+  "region": "Ashanti",
+  "town": "Akrokerri"
+ },
+ {
+  "id": "ashanti-kingdom-senior-high-school-ashanti",
+  "name": "Ashanti Kingdom Senior High School",
+  "region": "Ashanti",
+  "town": "Ahodwo Daban-Kumasi"
+ },
+ {
+  "id": "bankoman-senior-high-school-ashanti",
+  "name": "Bankoman Senior High School",
+  "region": "Ashanti",
+  "town": "Banko"
+ },
+ {
+  "id": "barekese-senior-high-school-ashanti",
+  "name": "Barekese Senior High School",
+  "region": "Ashanti",
+  "town": "Barekese"
+ },
+ {
+  "id": "beposo-senior-high-school-ashanti",
+  "name": "Beposo Senior High School",
+  "region": "Ashanti",
+  "town": "Beposo"
+ },
+ {
+  "id": "bodomase-senior-high-school-ashanti",
+  "name": "Bodomase Senior High School",
+  "region": "Ashanti",
+  "town": "Bodomase"
+ },
+ {
+  "id": "bodwesango-senior-high-school-ashanti",
+  "name": "Bodwesango Senior High School",
+  "region": "Ashanti",
+  "town": "Bodwesango"
+ },
+ {
+  "id": "bompata-presby-senior-high-school-ashanti",
+  "name": "Bompata Presby Senior High School",
+  "region": "Ashanti",
+  "town": "Bompata"
+ },
+ {
+  "id": "bonwire-senior-high-technical-school-ashanti",
+  "name": "Bonwire Senior High Technical School",
+  "region": "Ashanti",
+  "town": "Bonwire"
+ },
+ {
+  "id": "bosome-senior-high-technical-school-ashanti",
+  "name": "Bosome Senior High Technical School",
+  "region": "Ashanti",
+  "town": "Asiwa"
+ },
+ {
+  "id": "christ-the-king-catholic-senior-high-school-ashanti",
+  "name": "Christ the King Catholic Senior High School",
+  "region": "Ashanti",
+  "town": "Obuasi"
+ },
+ {
+  "id": "church-of-christ-senior-high-school-ashanti",
+  "name": "Church of Christ Senior High School",
+  "region": "Ashanti",
+  "town": "Adadeentem"
+ },
+ {
+  "id": "dadease-agriculture-senior-high-school-ashanti",
+  "name": "Dadease Agriculture Senior High School",
+  "region": "Ashanti",
+  "town": "Dadease"
+ },
+ {
+  "id": "danyaseman-catholic-senior-high-school-ashanti",
+  "name": "Danyaseman Catholic Senior High School",
+  "region": "Ashanti",
+  "town": "Huntado"
+ },
+ {
+  "id": "dompoase-senior-high-school-ashanti",
+  "name": "Dompoase Senior High School",
+  "region": "Ashanti",
+  "town": "Dompoase"
+ },
+ {
+  "id": "dwamena-akenten-senior-high-school-ashanti",
+  "name": "Dwamena Akenten Senior High School",
+  "region": "Ashanti",
+  "town": "Newtown"
+ },
+ {
+  "id": "effiduase-senior-high-school-ashanti",
+  "name": "Effiduase Senior High School",
+  "region": "Ashanti",
+  "town": "Effiduase"
+ },
+ {
+  "id": "ejisu-senior-high-technical-school-ashanti",
+  "name": "Ejisu Senior High Technical School",
+  "region": "Ashanti",
+  "town": "Ejisu"
+ },
+ {
+  "id": "ejisuman-senior-high-school-ashanti",
+  "name": "Ejisuman Senior High School",
+  "region": "Ashanti",
+  "town": "Ejisu"
+ },
+ {
+  "id": "ejuraman-senior-high-school-ashanti",
+  "name": "Ejuraman Senior High School",
+  "region": "Ashanti",
+  "town": "Ejura"
+ },
+ {
+  "id": "esase-bontefufuo-senior-high-school-ashanti",
+  "name": "Esase Bontefufuo Senior High School",
+  "region": "Ashanti",
+  "town": "Esase Bontefufuo"
+ },
+ {
+  "id": "father-augustine-murphy-commercial-school-ashanti",
+  "name": "Father Augustine Murphy Commercial School",
+  "region": "Ashanti",
+  "town": "Obuasi"
+ },
+ {
+  "id": "ghana-armed-forces-senior-high-school-ashanti",
+  "name": "Ghana Armed Forces Senior High School",
+  "region": "Ashanti",
+  "town": "Bantama-Kumasi"
+ },
+ {
+  "id": "gyeama-penson-senior-high-school-ashanti",
+  "name": "Gyeama Penson Senior High School",
+  "region": "Ashanti",
+  "town": "Aboaso"
+ },
+ {
+  "id": "ideal-college-ashanti",
+  "name": "Ideal College",
+  "region": "Ashanti",
+  "town": "Boadi"
+ },
+ {
+  "id": "islamic-senior-high-school-ashanti",
+  "name": "Islamic Senior High School",
+  "region": "Ashanti",
+  "town": "Abrepo"
+ },
+ {
+  "id": "jachie-pramso-secondary-school-ashanti",
+  "name": "Jachie-Pramso Secondary School",
+  "region": "Ashanti",
+  "town": "Jachie-Pramso"
+ },
+ {
+  "id": "jacobu-senior-high-school-ashanti",
+  "name": "Jacobu Senior High School",
+  "region": "Ashanti",
+  "town": "Jacobu"
+ },
+ {
+  "id": "juaben-senior-high-school-ashanti",
+  "name": "Juaben Senior High School",
+  "region": "Ashanti",
+  "town": "Juaben"
+ },
+ {
+  "id": "juaso-senior-high-school-ashanti",
+  "name": "Juaso Senior High School",
+  "region": "Ashanti",
+  "town": "Juaso"
+ },
+ {
+  "id": "jubile-senior-high-school-ashanti",
+  "name": "Jubile Senior High School",
+  "region": "Ashanti",
+  "town": "Dampong"
+ },
+ {
+  "id": "knust-senior-high-school-ashanti",
+  "name": "KNUST Senior High School",
+  "region": "Ashanti",
+  "town": "Kumasi"
+ },
+ {
+  "id": "kofi-adjei-senior-high-school-ashanti",
+  "name": "Kofi Adjei Senior High School",
+  "region": "Ashanti",
+  "town": "Bampanase"
+ },
+ {
+  "id": "konadu-yiadom-senior-high-school-ashanti",
+  "name": "Konadu Yiadom Senior High School",
+  "region": "Ashanti",
+  "town": "Asaman"
+ },
+ {
+  "id": "konongo-odumase-senior-high-school-ashanti",
+  "name": "Konongo Odumase Senior High School",
+  "region": "Ashanti",
+  "town": "Konongo-Odumase"
+ },
+ {
+  "id": "krobea-asante-vocational-technical-institute-ashanti",
+  "name": "Krobea Asante Vocational/Technical Institute",
+  "region": "Ashanti",
+  "town": "Asokore"
+ },
+ {
+  "id": "kumasi-academy-ashanti",
+  "name": "Kumasi Academy",
+  "region": "Ashanti",
+  "town": "Asokore Mampong"
+ },
+ {
+  "id": "kumasi-girls-senior-high-school-ashanti",
+  "name": "Kumasi Girls Senior High School",
+  "region": "Ashanti",
+  "town": "Abrepo-Kumasi"
+ },
+ {
+  "id": "kumasi-high-school-ashanti",
+  "name": "Kumasi High School",
+  "region": "Ashanti",
+  "town": "Atonsu Gyenase"
+ },
+ {
+  "id": "kumasi-senior-high-technical-school-ashanti",
+  "name": "Kumasi Senior High Technical School",
+  "region": "Ashanti",
+  "town": "Patasi-Kumasi"
+ },
+ {
+  "id": "kumasi-technical-institute-ashanti",
+  "name": "Kumasi Technical Institute",
+  "region": "Ashanti",
+  "town": "Kumasi"
+ },
+ {
+  "id": "maabang-senior-high-school-ashanti",
+  "name": "Maabang Senior High School",
+  "region": "Ashanti",
+  "town": "Maabang"
+ },
+ {
+  "id": "mankranso-senior-high-school-ashanti",
+  "name": "Mankranso Senior High School",
+  "region": "Ashanti",
+  "town": "Mankranso"
+ },
+ {
+  "id": "manso-adubia-senior-high-school-ashanti",
+  "name": "Manso-Adubia Senior High School",
+  "region": "Ashanti",
+  "town": "Adubia"
+ },
+ {
+  "id": "mansoman-senior-high-school-ashanti",
+  "name": "Mansoman Senior High School",
+  "region": "Ashanti",
+  "town": "Manso Atwere"
+ },
+ {
+  "id": "mmofraturo-girls-secondary-school-ashanti",
+  "name": "Mmofraturo Girls Secondary School",
+  "region": "Ashanti",
+  "town": "Kumasi"
+ },
+ {
+  "id": "mpasatia-senior-high-school-ashanti",
+  "name": "Mpasatia Senior High School",
+  "region": "Ashanti",
+  "town": "Mpasatia"
+ },
+ {
+  "id": "namong-senior-high-school-ashanti",
+  "name": "Namong Senior High School",
+  "region": "Ashanti",
+  "town": "Namong"
+ },
+ {
+  "id": "new-edubiase-senior-high-school-ashanti",
+  "name": "New Edubiase Senior High School",
+  "region": "Ashanti",
+  "town": "New Edubiase"
+ },
+ {
+  "id": "nkawie-senior-high-technical-school-ashanti",
+  "name": "Nkawie Senior High Technical School",
+  "region": "Ashanti",
+  "town": "Nkawie"
+ },
+ {
+  "id": "nsutaman-catholic-senior-high-school-ashanti",
+  "name": "Nsutaman Catholic Senior High School",
+  "region": "Ashanti",
+  "town": "Nsuta"
+ },
+ {
+  "id": "nyinahin-catholic-senior-high-school-ashanti",
+  "name": "Nyinahin Catholic Senior High School",
+  "region": "Ashanti",
+  "town": "Nyinahin"
+ },
+ {
+  "id": "obuasi-senior-high-technical-school-ashanti",
+  "name": "Obuasi Senior High Technical School",
+  "region": "Ashanti",
+  "town": "Obuasi"
+ },
+ {
+  "id": "ofoase-senior-high-school-ashanti",
+  "name": "Ofoase Senior High School",
+  "region": "Ashanti",
+  "town": "Ofoase"
+ },
+ {
+  "id": "okomfo-anokye-senior-high-school-ashanti",
+  "name": "Okomfo Anokye Senior High School",
+  "region": "Ashanti",
+  "town": "Wiamoase"
+ },
+ {
+  "id": "opoku-ware-school-ashanti",
+  "name": "Opoku Ware School",
+  "region": "Ashanti",
+  "town": "Santasi"
+ },
+ {
+  "id": "oppong-memorial-senior-high-school-ashanti",
+  "name": "Oppong Memorial Senior High School",
+  "region": "Ashanti",
+  "town": "Kokofu"
+ },
+ {
+  "id": "osei-kyeretwie-senior-high-school-ashanti",
+  "name": "Osei Kyeretwie Senior High School",
+  "region": "Ashanti",
+  "town": "Old Tafo"
+ },
+ {
+  "id": "osei-tutu-ii-college-ashanti",
+  "name": "Osei Tutu II College",
+  "region": "Ashanti",
+  "town": "Tetrem"
+ },
+ {
+  "id": "osei-tutu-senior-high-school-ashanti",
+  "name": "Osei Tutu Senior High School",
+  "region": "Ashanti",
+  "town": "Akropong"
+ },
+ {
+  "id": "owerriman-senior-high-school-ashanti",
+  "name": "Owerriman Senior High School",
+  "region": "Ashanti",
+  "town": "Domeabra"
+ },
+ {
+  "id": "pentecost-senior-high-school-ashanti",
+  "name": "Pentecost Senior High School",
+  "region": "Ashanti",
+  "town": "Breman-kumasi"
+ },
+ {
+  "id": "prempeh-college-ashanti",
+  "name": "Prempeh College",
+  "region": "Ashanti",
+  "town": "Kumasi"
+ },
+ {
+  "id": "s-d-a-senior-high-school-ashanti",
+  "name": "S.D.A. Senior High School",
+  "region": "Ashanti",
+  "town": "Agona"
+ },
+ {
+  "id": "saint-hubert-minor-seminary-senior-high-school-ashanti",
+  "name": "Saint Hubert Minor Seminary Senior High School",
+  "region": "Ashanti",
+  "town": "Kumasi"
+ },
+ {
+  "id": "saint-joseph-senior-high-school-ashanti",
+  "name": "Saint Joseph Senior High School",
+  "region": "Ashanti",
+  "town": "Ahwiren"
+ },
+ {
+  "id": "sakafia-islamic-senior-high-school-ashanti",
+  "name": "Sakafia Islamic Senior High School",
+  "region": "Ashanti",
+  "town": "Ayigya"
+ },
+ {
+  "id": "sekyedumase-senior-high-school-ashanti",
+  "name": "Sekyedumase Senior High School",
+  "region": "Ashanti",
+  "town": "Seko"
+ },
+ {
+  "id": "serwaa-nyarko-girls-senior-high-school-ashanti",
+  "name": "Serwaa Nyarko Girls' Senior High School",
+  "region": "Ashanti",
+  "town": "New Tafo"
+ },
+ {
+  "id": "seventh-day-adventist-senior-high-school-ashanti",
+  "name": "Seventh Day Adventist Senior High School",
+  "region": "Ashanti",
+  "town": "Bekwai"
+ },
+ {
+  "id": "simms-senior-high-school-ashanti",
+  "name": "Simms Senior High School",
+  "region": "Ashanti",
+  "town": "Fawoade"
+ },
+ {
+  "id": "st-jerome-senior-high-school-ashanti",
+  "name": "St. Jerome Senior High School",
+  "region": "Ashanti",
+  "town": "Abofour"
+ },
+ {
+  "id": "st-louis-senior-high-school-ashanti",
+  "name": "St. Louis Senior High School",
+  "region": "Ashanti",
+  "town": "Oduom"
+ },
+ {
+  "id": "st-margaret-high-school-ashanti",
+  "name": "St. Margaret High School",
+  "region": "Ashanti",
+  "town": "Feyiase"
+ },
+ {
+  "id": "st-monica-s-senior-high-school-ashanti",
+  "name": "St. Monica's Senior High School",
+  "region": "Ashanti",
+  "town": "Mampong"
+ },
+ {
+  "id": "t-i-ahmadiyya-girls-senior-high-school-ashanti",
+  "name": "T.I. Ahmadiyya Girls Senior High School",
+  "region": "Ashanti",
+  "town": "Asokore"
+ },
+ {
+  "id": "t-i-ahmadiyya-senior-high-school-ashanti",
+  "name": "T.I. Ahmadiyya Senior High School",
+  "region": "Ashanti",
+  "town": "Kumasi"
+ },
+ {
+  "id": "tepa-senior-high-school-ashanti",
+  "name": "Tepa Senior High School",
+  "region": "Ashanti",
+  "town": "Tepa"
+ },
+ {
+  "id": "toase-senior-high-school-ashanti",
+  "name": "Toase Senior High School",
+  "region": "Ashanti",
+  "town": "Toase"
+ },
+ {
+  "id": "tweneboa-kodua-senior-high-school-ashanti",
+  "name": "Tweneboa Kodua Senior High School",
+  "region": "Ashanti",
+  "town": "Kumawu"
+ },
+ {
+  "id": "wesley-high-school-ashanti",
+  "name": "Wesley High School",
+  "region": "Ashanti",
+  "town": "Bekwai"
+ },
+ {
+  "id": "yaa-asantewaa-girls-senior-high-school-ashanti",
+  "name": "Yaa Asantewaa Girls' Senior High School",
+  "region": "Ashanti",
+  "town": "Tanoso"
+ },
+ {
+  "id": "abeaseman-community-day-senior-high-school-bono",
+  "name": "Abeaseman Community Day Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Abease"
+ },
+ {
+  "id": "abesim-senior-high-school-bono",
+  "name": "Abesim Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Abesim"
+ },
+ {
+  "id": "acherensua-senior-high-school-bono",
+  "name": "Acherensua Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Acherensua"
+ },
+ {
+  "id": "ahafoman-senior-high-school-bono",
+  "name": "Ahafoman Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Goaso"
+ },
+ {
+  "id": "amanten-senior-high-school-bono",
+  "name": "Amanten Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Amanten"
+ },
+ {
+  "id": "asuogyaman-senior-high-school-bono",
+  "name": "Asuogyaman Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Aworowa"
+ },
+ {
+  "id": "atebubu-senior-high-school-bono",
+  "name": "Atebubu Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Atebubu"
+ },
+ {
+  "id": "badu-senior-high-school-bono",
+  "name": "Badu Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Badu"
+ },
+ {
+  "id": "bechem-presbyterian-senior-high-school-bono",
+  "name": "Bechem Presbyterian Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Bechem"
+ },
+ {
+  "id": "berekum-senior-high-school-bono",
+  "name": "Berekum Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Berekum"
+ },
+ {
+  "id": "boakye-tromo-senior-high-school-bono",
+  "name": "Boakye Tromo Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Duayaw Nkwanta"
+ },
+ {
+  "id": "bomaa-comm-senior-high-school-bono",
+  "name": "Bomaa Comm. Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Bomaa"
+ },
+ {
+  "id": "buoyem-senior-high-school-bono",
+  "name": "Buoyem Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Boyem"
+ },
+ {
+  "id": "busunya-senior-high-school-bono",
+  "name": "Busunya Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Busunya"
+ },
+ {
+  "id": "chiraa-senior-high-school-bono",
+  "name": "Chiraa Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Chiraa"
+ },
+ {
+  "id": "dormaa-senior-high-school-bono",
+  "name": "Dormaa Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Dormaa Ahenkro"
+ },
+ {
+  "id": "drobo-senior-high-school-bono",
+  "name": "Drobo Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Drobo"
+ },
+ {
+  "id": "duayaw-nkwanta-senior-high-school-bono",
+  "name": "Duayaw Nkwanta Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Duayaw Nkwanta"
+ },
+ {
+  "id": "goka-senior-high-school-bono",
+  "name": "Goka Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Goka"
+ },
+ {
+  "id": "guakro-effa-senior-high-school-bono",
+  "name": "Guakro Effa Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Offuman"
+ },
+ {
+  "id": "gyamfi-kumanin-senior-high-school-bono",
+  "name": "Gyamfi Kumanin Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Wamahinso"
+ },
+ {
+  "id": "hwidiem-senior-high-school-bono",
+  "name": "Hwidiem Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Hwidiem"
+ },
+ {
+  "id": "jema-senior-high-school-bono",
+  "name": "Jema Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Jema"
+ },
+ {
+  "id": "jinjini-senior-high-school-bono",
+  "name": "Jinjini Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Jinjini"
+ },
+ {
+  "id": "kajaji-senior-high-school-bono",
+  "name": "Kajaji Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Kajaji Settlement Town"
+ },
+ {
+  "id": "kintampo-senior-high-school-bono",
+  "name": "Kintampo Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Kintampo"
+ },
+ {
+  "id": "koase-senior-high-school-bono",
+  "name": "Koase Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Koase"
+ },
+ {
+  "id": "kukuom-agriculture-senior-high-school-bono",
+  "name": "Kukuom Agriculture Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Kukuom"
+ },
+ {
+  "id": "kwame-danso-senior-high-school-bono",
+  "name": "Kwame Danso Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Kwame Danso"
+ },
+ {
+  "id": "lawrence-demonstration-senior-high-school-bono",
+  "name": "Lawrence Demonstration Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Sunyani"
+ },
+ {
+  "id": "mansen-comm-day-senior-high-school-bono",
+  "name": "Mansen Comm. Day Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Wamfie"
+ },
+ {
+  "id": "menji-senior-high-school-bono",
+  "name": "Menji Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Menji"
+ },
+ {
+  "id": "methodist-senior-high-school-bono",
+  "name": "Methodist Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Biadan"
+ },
+ {
+  "id": "mim-senior-high-school-bono",
+  "name": "Mim Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Mim"
+ },
+ {
+  "id": "nafana-senior-high-school-bono",
+  "name": "Nafana Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Sampa"
+ },
+ {
+  "id": "nkoranman-senior-high-school-bono",
+  "name": "Nkoranman Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Seikwa"
+ },
+ {
+  "id": "nkoranza-senior-high-school-bono",
+  "name": "Nkoranza Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Nkoranza"
+ },
+ {
+  "id": "nkrankwanta-comm-senior-high-school-bono",
+  "name": "Nkrankwanta Comm. Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Nkrankwanta"
+ },
+ {
+  "id": "notre-dame-high-school-bono",
+  "name": "Notre Dame High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Sunyani"
+ },
+ {
+  "id": "odomaseman-day-senior-high-school-bono",
+  "name": "Odomaseman Day Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Odomase"
+ },
+ {
+  "id": "ola-girls-senior-high-school-bono",
+  "name": "OLA Girls Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Kenyasi"
+ },
+ {
+  "id": "our-lady-of-providence-senior-high-school-bono",
+  "name": "Our Lady of Providence Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Kwasi Buokrom"
+ },
+ {
+  "id": "prang-senior-high-school-bono",
+  "name": "Prang Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Prang"
+ },
+ {
+  "id": "presbyterian-senior-high-school-bono",
+  "name": "Presbyterian Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Berekum"
+ },
+ {
+  "id": "sacred-heart-senior-high-school-bono",
+  "name": "Sacred Heart Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Nsoatre"
+ },
+ {
+  "id": "serwaa-kesse-girls-senior-high-school-bono",
+  "name": "Serwaa Kesse Girls' Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Duayaw Nkwanta"
+ },
+ {
+  "id": "st-james-seminary-senior-high-school-bono",
+  "name": "St. James Seminary Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Abesim"
+ },
+ {
+  "id": "sumaman-senior-high-school-bono",
+  "name": "Sumaman Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Suma-Ahenkro"
+ },
+ {
+  "id": "sunyani-business-senior-high-school-bono",
+  "name": "Sunyani Business Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Sunyani"
+ },
+ {
+  "id": "sunyani-senior-high-school-bono",
+  "name": "Sunyani Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Sunyani"
+ },
+ {
+  "id": "techiman-senior-high-school-bono",
+  "name": "Techiman Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Techiman"
+ },
+ {
+  "id": "techimantia-presbyterian-senior-high-school-bono",
+  "name": "Techimantia Presbyterian Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Techimantia"
+ },
+ {
+  "id": "tuobodom-senior-high-school-bono",
+  "name": "Tuobodom Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Tuobodom"
+ },
+ {
+  "id": "twene-amanfo-senior-high-school-bono",
+  "name": "Twene Amanfo Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Sunyani"
+ },
+ {
+  "id": "wamanafo-comm-day-senior-high-school-bono",
+  "name": "Wamanafo Comm. Day Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Wamanafo"
+ },
+ {
+  "id": "wenchi-methodist-senior-high-school-bono",
+  "name": "Wenchi Methodist Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Wenchi"
+ },
+ {
+  "id": "yamfo-anglican-senior-high-school-bono",
+  "name": "Yamfo Anglican Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Yamfo"
+ },
+ {
+  "id": "yefiriman-senior-high-school-bono",
+  "name": "Yefiriman Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Yefiri"
+ },
+ {
+  "id": "yeji-senior-high-school-bono",
+  "name": "Yeji Senior High School",
+  "region": "Bono / Bono East / Ahafo",
+  "town": "Yeji"
+ },
+ {
+  "id": "abakrampa-senior-high-technical-school-central",
+  "name": "Abakrampa Senior High Technical School",
+  "region": "Central",
+  "town": "Abakrampa"
+ },
+ {
+  "id": "aburaman-senior-high-school-central",
+  "name": "Aburaman Senior High School",
+  "region": "Central",
+  "town": "Abura Dunkwa"
+ },
+ {
+  "id": "academy-of-christ-the-king-central",
+  "name": "Academy of Christ the King",
+  "region": "Central",
+  "town": "Cape Coast"
+ },
+ {
+  "id": "adankwaman-comm-senior-high-school-central",
+  "name": "Adankwaman Comm. Senior High School",
+  "region": "Central",
+  "town": "Assin Darman"
+ },
+ {
+  "id": "adisadel-college-central",
+  "name": "Adisadel College",
+  "region": "Central",
+  "town": "Cape Coast"
+ },
+ {
+  "id": "aggrey-memorial-a-m-e-zion-senior-high-school-central",
+  "name": "Aggrey Memorial A.M.E. Zion Senior High School",
+  "region": "Central",
+  "town": "Cape Coast"
+ },
+ {
+  "id": "andam-senior-high-technical-school-central",
+  "name": "Andam Senior High & Technical School",
+  "region": "Central",
+  "town": "Oduponkpehe"
+ },
+ {
+  "id": "apam-senior-high-school-central",
+  "name": "Apam Senior High School",
+  "region": "Central",
+  "town": "Apam"
+ },
+ {
+  "id": "assin-manso-senior-high-school-central",
+  "name": "Assin Manso Senior High School",
+  "region": "Central",
+  "town": "Assin Manso"
+ },
+ {
+  "id": "assin-north-senior-high-school-central",
+  "name": "Assin North Senior High School",
+  "region": "Central",
+  "town": "Assin Asempaneye"
+ },
+ {
+  "id": "assin-nsuta-senior-high-school-central",
+  "name": "Assin Nsuta Senior High School",
+  "region": "Central",
+  "town": "Assin Nsuta"
+ },
+ {
+  "id": "asuansi-technical-institute-central",
+  "name": "Asuansi Technical Institute",
+  "region": "Central",
+  "town": "Nyamedom"
+ },
+ {
+  "id": "besease-comm-senior-high-school-central",
+  "name": "Besease Comm. Senior High School",
+  "region": "Central",
+  "town": "Besease"
+ },
+ {
+  "id": "boa-amponsem-senior-high-school-central",
+  "name": "Boa Amponsem Senior High School",
+  "region": "Central",
+  "town": "Dunkwa-On-Offin"
+ },
+ {
+  "id": "breman-asikuma-senior-high-school-central",
+  "name": "Breman Asikuma Senior High School",
+  "region": "Central",
+  "town": "Breman Asikuma"
+ },
+ {
+  "id": "cape-coast-technical-institute-central",
+  "name": "Cape Coast Technical Institute",
+  "region": "Central",
+  "town": "Cape Coast"
+ },
+ {
+  "id": "commercial-service-institute-central",
+  "name": "Commercial Service Institute",
+  "region": "Central",
+  "town": "Cape Coast"
+ },
+ {
+  "id": "diaso-senior-high-school-central",
+  "name": "Diaso Senior High School",
+  "region": "Central",
+  "town": "Diaso"
+ },
+ {
+  "id": "dunkwa-senior-high-school-central",
+  "name": "Dunkwa Senior High School",
+  "region": "Central",
+  "town": "Dunkwa-On-Offin"
+ },
+ {
+  "id": "edinaman-secondary-school-central",
+  "name": "Edinaman Secondary School",
+  "region": "Central",
+  "town": "Elmina"
+ },
+ {
+  "id": "effutu-senior-high-school-central",
+  "name": "Effutu Senior High School",
+  "region": "Central",
+  "town": "Effutu"
+ },
+ {
+  "id": "eguafo-abrem-senior-high-school-central",
+  "name": "Eguafo-Abrem Senior High School",
+  "region": "Central",
+  "town": "Agona Abirem"
+ },
+ {
+  "id": "ekumfi-t-i-ahmadiiyya-senior-high-school-central",
+  "name": "Ekumfi T. I. Ahmadiiyya Senior High School",
+  "region": "Central",
+  "town": "Esakyir"
+ },
+ {
+  "id": "enyan-denkyira-senior-high-school-central",
+  "name": "Enyan Denkyira Senior High School",
+  "region": "Central",
+  "town": "Denkyira"
+ },
+ {
+  "id": "forever-young-senior-high-school-central",
+  "name": "Forever Young Senior High School",
+  "region": "Central",
+  "town": "Hemang"
+ },
+ {
+  "id": "ghana-national-college-central",
+  "name": "Ghana National College",
+  "region": "Central",
+  "town": "Cape Coast"
+ },
+ {
+  "id": "gomoa-senior-high-school-central",
+  "name": "Gomoa Senior High School",
+  "region": "Central",
+  "town": "Dawurampon"
+ },
+ {
+  "id": "holy-child-high-school-central",
+  "name": "Holy Child High School",
+  "region": "Central",
+  "town": "Cape Coast"
+ },
+ {
+  "id": "jukwa-senior-high-school-central",
+  "name": "Jukwa Senior High School",
+  "region": "Central",
+  "town": "Jukwa"
+ },
+ {
+  "id": "komenda-senior-high-school-central",
+  "name": "Komenda Senior High School",
+  "region": "Central",
+  "town": "Komenda"
+ },
+ {
+  "id": "kwanyako-senior-high-school-central",
+  "name": "Kwanyako Senior High School",
+  "region": "Central",
+  "town": "Kwanyako"
+ },
+ {
+  "id": "kwegyir-aggrey-senior-high-school-central",
+  "name": "Kwegyir Aggrey Senior High School",
+  "region": "Central",
+  "town": "Anomabo"
+ },
+ {
+  "id": "mando-senior-high-tech-school-central",
+  "name": "Mando Senior High Tech School",
+  "region": "Central",
+  "town": "Mando"
+ },
+ {
+  "id": "mankessim-senior-high-technical-school-central",
+  "name": "Mankessim Senior High Technical School",
+  "region": "Central",
+  "town": "Mankesim"
+ },
+ {
+  "id": "mfantsiman-girls-senior-high-school-central",
+  "name": "Mfantsiman Girls' Senior High School",
+  "region": "Central",
+  "town": "Saltpond"
+ },
+ {
+  "id": "mfantsipim-school-central",
+  "name": "Mfantsipim School",
+  "region": "Central",
+  "town": "Cape Coast"
+ },
+ {
+  "id": "mozano-comm-senior-high-school-central",
+  "name": "Mozano Comm. Senior High School",
+  "region": "Central",
+  "town": "Mozano"
+ },
+ {
+  "id": "mozano-experimental-senior-high-school-central",
+  "name": "Mozano Experimental Senior High School",
+  "region": "Central",
+  "town": "Mozano"
+ },
+ {
+  "id": "naana-khadijah-islamic-girls-school-central",
+  "name": "Naana Khadijah Islamic Girls School",
+  "region": "Central",
+  "town": "Nyakrom"
+ },
+ {
+  "id": "nsaba-presbyterian-senior-high-school-central",
+  "name": "Nsaba Presbyterian Senior High School",
+  "region": "Central",
+  "town": "Nsaba"
+ },
+ {
+  "id": "nyakrom-day-senior-high-school-central",
+  "name": "Nyakrom Day Senior High School",
+  "region": "Central",
+  "town": "Nyakrom"
+ },
+ {
+  "id": "nyankumase-ahenkro-senior-high-school-central",
+  "name": "Nyankumase Ahenkro Senior High School",
+  "region": "Central",
+  "town": "Nyankumase Ahenkro"
+ },
+ {
+  "id": "obiri-yeboah-senior-high-school-central",
+  "name": "Obiri Yeboah Senior High School",
+  "region": "Central",
+  "town": "Assin Fosu"
+ },
+ {
+  "id": "obrakyere-senior-high-school-central",
+  "name": "Obrakyere Senior High School",
+  "region": "Central",
+  "town": "Obrakyere"
+ },
+ {
+  "id": "odoben-senior-high-school-central",
+  "name": "Odoben Senior High School",
+  "region": "Central",
+  "town": "Odoben"
+ },
+ {
+  "id": "oguaa-senior-high-school-central",
+  "name": "Oguaa Senior High School",
+  "region": "Central",
+  "town": "Cape Coast"
+ },
+ {
+  "id": "oxford-senior-high-school-central",
+  "name": "Oxford Senior High School",
+  "region": "Central",
+  "town": "Dunkwa-On-Offin"
+ },
+ {
+  "id": "pank-senior-high-school-central",
+  "name": "Pank Senior High School",
+  "region": "Central",
+  "town": "Bawjiase"
+ },
+ {
+  "id": "potsin-t-i-ahmadiya-senior-high-school-central",
+  "name": "Potsin T.I. Ahmadiya Senior High School",
+  "region": "Central",
+  "town": "Potsin"
+ },
+ {
+  "id": "saltpond-methodist-high-school-central",
+  "name": "Saltpond Methodist High School",
+  "region": "Central",
+  "town": "Saltpond"
+ },
+ {
+  "id": "senya-senior-high-school-central",
+  "name": "Senya Senior High School",
+  "region": "Central",
+  "town": "Senya"
+ },
+ {
+  "id": "siddiq-senior-high-school-central",
+  "name": "Siddiq Senior High School",
+  "region": "Central",
+  "town": "Nyakrom"
+ },
+ {
+  "id": "st-andrew-s-college-central",
+  "name": "St. Andrew's College",
+  "region": "Central",
+  "town": "Dunkwa-On-Offin"
+ },
+ {
+  "id": "st-augustine-s-college-central",
+  "name": "St. Augustine's College",
+  "region": "Central",
+  "town": "Cape Coast"
+ },
+ {
+  "id": "swedru-school-of-business-central",
+  "name": "Swedru School of Business",
+  "region": "Central",
+  "town": "Swedru"
+ },
+ {
+  "id": "swedru-senior-high-school-central",
+  "name": "Swedru Senior High School",
+  "region": "Central",
+  "town": "Swedru"
+ },
+ {
+  "id": "twifo-praso-senior-high-school-central",
+  "name": "Twifo Praso Senior High School",
+  "region": "Central",
+  "town": "Twifo Praso"
+ },
+ {
+  "id": "university-practice-senior-high-school-central",
+  "name": "University Practice Senior High School",
+  "region": "Central",
+  "town": "Cape Coast"
+ },
+ {
+  "id": "wesley-girls-senior-high-school-central",
+  "name": "Wesley Girls' Senior High School",
+  "region": "Central",
+  "town": "Cape Coast"
+ },
+ {
+  "id": "winneba-senior-high-school-central",
+  "name": "Winneba Senior High School",
+  "region": "Central",
+  "town": "Winneba"
+ },
+ {
+  "id": "abetifi-presbyterian-senior-high-school-eastern",
+  "name": "Abetifi Presbyterian Senior High School",
+  "region": "Eastern",
+  "town": "Abetifi"
+ },
+ {
+  "id": "abetifi-senior-high-technical-school-eastern",
+  "name": "Abetifi Senior High Technical School",
+  "region": "Eastern",
+  "town": "Abetifi"
+ },
+ {
+  "id": "abuakwa-state-college-eastern",
+  "name": "Abuakwa State College",
+  "region": "Eastern",
+  "town": "Kibi"
+ },
+ {
+  "id": "aburi-girls-senior-high-school-eastern",
+  "name": "Aburi Girls' Senior High School",
+  "region": "Eastern",
+  "town": "Aburi"
+ },
+ {
+  "id": "achiase-senior-high-school-eastern",
+  "name": "Achiase Senior High School",
+  "region": "Eastern",
+  "town": "Achiase"
+ },
+ {
+  "id": "adeiso-senior-high-school-eastern",
+  "name": "Adeiso Senior High School",
+  "region": "Eastern",
+  "town": "Adeiso"
+ },
+ {
+  "id": "adjena-senior-high-technical-school-eastern",
+  "name": "Adjena Senior High Technical School",
+  "region": "Eastern",
+  "town": "Akosombo"
+ },
+ {
+  "id": "adonten-senior-high-school-eastern",
+  "name": "Adonten Senior High School",
+  "region": "Eastern",
+  "town": "Nsawam"
+ },
+ {
+  "id": "akim-state-college-eastern",
+  "name": "Akim State College",
+  "region": "Eastern",
+  "town": "Akim Swedru"
+ },
+ {
+  "id": "akim-swedru-senior-high-school-eastern",
+  "name": "Akim Swedru Senior High School",
+  "region": "Eastern",
+  "town": "Akim Swedru"
+ },
+ {
+  "id": "akro-senior-high-technical-school-eastern",
+  "name": "Akro Senior High Technical School",
+  "region": "Eastern",
+  "town": "Odumase Krobo"
+ },
+ {
+  "id": "akroso-senior-high-school-eastern",
+  "name": "Akroso Senior High School",
+  "region": "Eastern",
+  "town": "Akim Akroso"
+ },
+ {
+  "id": "akuse-senior-high-school-eastern",
+  "name": "Akuse Senior High School",
+  "region": "Eastern",
+  "town": "Odumase Krobo"
+ },
+ {
+  "id": "akwamuman-senior-high-school-eastern",
+  "name": "Akwamuman Senior High School",
+  "region": "Eastern",
+  "town": "Atimpoku"
+ },
+ {
+  "id": "anum-presbyterian-senior-high-school-eastern",
+  "name": "Anum Presbyterian Senior High School",
+  "region": "Eastern",
+  "town": "Anum"
+ },
+ {
+  "id": "apegusu-senior-high-school-eastern",
+  "name": "Apegusu Senior High School",
+  "region": "Eastern",
+  "town": "Akwamu Apegusu"
+ },
+ {
+  "id": "asafo-akyem-senior-high-school-eastern",
+  "name": "Asafo Akyem Senior High School",
+  "region": "Eastern",
+  "town": "Asafo"
+ },
+ {
+  "id": "asamankese-senior-high-school-eastern",
+  "name": "Asamankese Senior High School",
+  "region": "Eastern",
+  "town": "Asamankese"
+ },
+ {
+  "id": "asesewa-agriculture-senior-high-school-eastern",
+  "name": "Asesewa Agriculture Senior High School",
+  "region": "Eastern",
+  "town": "Odumase Krobo"
+ },
+ {
+  "id": "asesewa-day-senior-high-school-eastern",
+  "name": "Asesewa Day Senior High School",
+  "region": "Eastern",
+  "town": "Odumase Krobo"
+ },
+ {
+  "id": "asesewa-senior-high-school-eastern",
+  "name": "Asesewa Senior High School",
+  "region": "Eastern",
+  "town": "Asesewa"
+ },
+ {
+  "id": "asuom-senior-high-school-eastern",
+  "name": "Asuom Senior High School",
+  "region": "Eastern",
+  "town": "Akropong"
+ },
+ {
+  "id": "ayirebi-senior-high-school-akyem-ayirebi-eastern",
+  "name": "Ayirebi Senior High School- Akyem Ayirebi",
+  "region": "Eastern",
+  "town": "Ofoase"
+ },
+ {
+  "id": "begoro-presbyterian-senior-high-school-eastern",
+  "name": "Begoro Presbyterian Senior High School",
+  "region": "Eastern",
+  "town": "Akim Begoro"
+ },
+ {
+  "id": "benkum-senior-high-school-eastern",
+  "name": "Benkum Senior High School",
+  "region": "Eastern",
+  "town": "Larteh-Akuapem"
+ },
+ {
+  "id": "boso-senior-high-technical-school-eastern",
+  "name": "Boso Senior High Technical School",
+  "region": "Eastern",
+  "town": "Boso"
+ },
+ {
+  "id": "christian-heritage-senior-high-technical-school-eastern",
+  "name": "Christian Heritage Senior High Technical School",
+  "region": "Eastern",
+  "town": "Kukurantumi"
+ },
+ {
+  "id": "dei-technical-institute-eastern",
+  "name": "Dei Technical Institute",
+  "region": "Eastern",
+  "town": "Begoro"
+ },
+ {
+  "id": "fodoa-community-day-senior-high-school-eastern",
+  "name": "Fodoa Community Day Senior High School",
+  "region": "Eastern",
+  "town": "Fodoa"
+ },
+ {
+  "id": "gafad-afonope-senior-high-school-eastern",
+  "name": "Gafad Afonope Senior High School",
+  "region": "Eastern",
+  "town": "Atimpoku"
+ },
+ {
+  "id": "ghana-senior-high-school-eastern",
+  "name": "Ghana Senior High School",
+  "region": "Eastern",
+  "town": "Koforidua"
+ },
+ {
+  "id": "hark-mount-sinai-senior-high-school-eastern",
+  "name": "Hark Mount Sinai Senior High School",
+  "region": "Eastern",
+  "town": "Akropong"
+ },
+ {
+  "id": "kade-senior-high-technical-school-eastern",
+  "name": "Kade Senior High-Technical School",
+  "region": "Eastern",
+  "town": "Kade"
+ },
+ {
+  "id": "kibi-senior-high-technical-school-eastern",
+  "name": "Kibi Senior High Technical School",
+  "region": "Eastern",
+  "town": "Kibi"
+ },
+ {
+  "id": "klo-agogo-senior-high-school-eastern",
+  "name": "Klo Agogo Senior High School",
+  "region": "Eastern",
+  "town": "Koforidua"
+ },
+ {
+  "id": "koforidua-senior-high-school-eastern",
+  "name": "Koforidua Senior High School",
+  "region": "Eastern",
+  "town": "Koforidua"
+ },
+ {
+  "id": "koforidua-senior-high-technical-school-eastern",
+  "name": "Koforidua Senior High Technical School",
+  "region": "Eastern",
+  "town": "Koforidua"
+ },
+ {
+  "id": "koforidua-technical-institute-eastern",
+  "name": "Koforidua Technical Institute",
+  "region": "Eastern",
+  "town": "Koforidua"
+ },
+ {
+  "id": "krobo-girls-senior-high-school-eastern",
+  "name": "Krobo Girls' Senior High School",
+  "region": "Eastern",
+  "town": "Odumase Krobo"
+ },
+ {
+  "id": "kwabeng-anglican-senior-high-technical-eastern",
+  "name": "Kwabeng Anglican Senior High Technical",
+  "region": "Eastern",
+  "town": "Kwabeng"
+ },
+ {
+  "id": "kwahu-ridge-senior-high-technical-school-eastern",
+  "name": "Kwahu Ridge Senior High Technical School",
+  "region": "Eastern",
+  "town": "Obo Kwahu"
+ },
+ {
+  "id": "manchester-senior-high-school-eastern",
+  "name": "Manchester Senior High School",
+  "region": "Eastern",
+  "town": "Begoro"
+ },
+ {
+  "id": "manya-krobo-senior-high-school-eastern",
+  "name": "Manya Krobo Senior High School",
+  "region": "Eastern",
+  "town": "Odumase Krobo"
+ },
+ {
+  "id": "methodist-girls-high-school-eastern",
+  "name": "Methodist Girls' High School",
+  "region": "Eastern",
+  "town": "Mamfe-Akuapem"
+ },
+ {
+  "id": "mpraeso-senior-high-school-mpass-eastern",
+  "name": "Mpraeso Senior High School (Mpass)",
+  "region": "Eastern",
+  "town": "Mpraeso"
+ },
+ {
+  "id": "nero-senior-high-school-eastern",
+  "name": "Nero Senior High School",
+  "region": "Eastern",
+  "town": "Kibi"
+ },
+ {
+  "id": "new-nsutam-senior-high-school-eastern",
+  "name": "New Nsutam Senior High School",
+  "region": "Eastern",
+  "town": "Nsutam"
+ },
+ {
+  "id": "new-juaben-senior-high-commercial-school-eastern",
+  "name": "New-Juaben Senior High Commercial School",
+  "region": "Eastern",
+  "town": "Koforidua"
+ },
+ {
+  "id": "nifa-senior-high-school-eastern",
+  "name": "Nifa Senior High School",
+  "region": "Eastern",
+  "town": "Adukrom"
+ },
+ {
+  "id": "nkawkaw-senior-high-school-eastern",
+  "name": "Nkawkaw Senior High School",
+  "region": "Eastern",
+  "town": "Nkawkaw"
+ },
+ {
+  "id": "nkwatia-senior-high-school-eastern",
+  "name": "Nkwatia Senior High School",
+  "region": "Eastern",
+  "town": "Nkwatia Kwahu"
+ },
+ {
+  "id": "nsawam-business-college-eastern",
+  "name": "Nsawam Business College",
+  "region": "Eastern",
+  "town": "Nsawam"
+ },
+ {
+  "id": "nsawam-senior-high-school-eastern",
+  "name": "Nsawam Senior High School",
+  "region": "Eastern",
+  "town": "Nsawam"
+ },
+ {
+  "id": "oda-senior-high-school-eastern",
+  "name": "Oda Senior High School",
+  "region": "Eastern",
+  "town": "Akim Oda"
+ },
+ {
+  "id": "ofori-panin-senior-high-school-eastern",
+  "name": "Ofori Panin Senior High School",
+  "region": "Eastern",
+  "town": "Kukurantumi"
+ },
+ {
+  "id": "okuapemman-school-eastern",
+  "name": "Okuapemman School",
+  "region": "Eastern",
+  "town": "Akropong"
+ },
+ {
+  "id": "osino-presbyterian-senior-high-technical-school-eastern",
+  "name": "Osino Presbyterian Senior High Technical School",
+  "region": "Eastern",
+  "town": "Osino"
+ },
+ {
+  "id": "oyoko-methodist-senior-high-school-eastern",
+  "name": "Oyoko Methodist Senior High School",
+  "region": "Eastern",
+  "town": "Oyoko"
+ },
+ {
+  "id": "pope-john-senior-high-school-and-minor-seminary-eastern",
+  "name": "Pope John Senior High School and Minor Seminary",
+  "region": "Eastern",
+  "town": "Effiduase"
+ },
+ {
+  "id": "presby-senior-high-technical-school-eastern",
+  "name": "Presby Senior High Technical School",
+  "region": "Eastern",
+  "town": "Nsawam"
+ },
+ {
+  "id": "presbyterian-senior-high-school-eastern",
+  "name": "Presbyterian Senior High School",
+  "region": "Eastern",
+  "town": "Akuapim-Mampong"
+ },
+ {
+  "id": "presbyterian-senior-high-technical-school-eastern",
+  "name": "Presbyterian Senior High Technical School",
+  "region": "Eastern",
+  "town": "Adukrom"
+ },
+ {
+  "id": "saint-martin-s-senior-high-school-eastern",
+  "name": "Saint Martin's Senior High School",
+  "region": "Eastern",
+  "town": "Nsawam-Adoagyiri"
+ },
+ {
+  "id": "saint-paul-technical-school-eastern",
+  "name": "Saint Paul Technical School",
+  "region": "Eastern",
+  "town": "Kukurantumi"
+ },
+ {
+  "id": "saint-stephen-s-senior-high-technical-school-eastern",
+  "name": "Saint Stephen's Senior High Technical School",
+  "region": "Eastern",
+  "town": "Asiakwa"
+ },
+ {
+  "id": "sda-senior-high-school-eastern",
+  "name": "SDA Senior High School",
+  "region": "Eastern",
+  "town": "Koforidua"
+ },
+ {
+  "id": "somanya-senior-high-technical-school-eastern",
+  "name": "Somanya Senior High Technical School",
+  "region": "Eastern",
+  "town": "Odumase Krobo"
+ },
+ {
+  "id": "st-rose-s-senior-high-school-eastern",
+  "name": "St Rose's Senior High School",
+  "region": "Eastern",
+  "town": "Akwatia"
+ },
+ {
+  "id": "st-dominics-senior-high-school-eastern",
+  "name": "St. Dominics Senior High School",
+  "region": "Eastern",
+  "town": "Pepease"
+ },
+ {
+  "id": "st-francis-senior-high-technical-school-eastern",
+  "name": "St. Francis Senior High Technical School",
+  "region": "Eastern",
+  "town": "Akim Oda"
+ },
+ {
+  "id": "st-paul-s-senior-high-school-eastern",
+  "name": "St. Paul's Senior High School",
+  "region": "Eastern",
+  "town": "Asakraka"
+ },
+ {
+  "id": "st-peter-s-boys-senior-high-school-eastern",
+  "name": "St. Peter's Boys Senior High School",
+  "region": "Eastern",
+  "town": "Nkwatia Kwahu"
+ },
+ {
+  "id": "st-thomas-senior-high-school-eastern",
+  "name": "St. Thomas Senior High School",
+  "region": "Eastern",
+  "town": "Asamankese"
+ },
+ {
+  "id": "suhum-secondary-technical-school-eastern",
+  "name": "Suhum Secondary Technical School",
+  "region": "Eastern",
+  "town": "Suhum"
+ },
+ {
+  "id": "suhum-senior-high-school-eastern",
+  "name": "Suhum Senior High School",
+  "region": "Eastern",
+  "town": "Suhum"
+ },
+ {
+  "id": "yilo-krobo-senior-high-school-eastern",
+  "name": "Yilo Krobo Senior High School",
+  "region": "Eastern",
+  "town": "Somanya"
+ },
+ {
+  "id": "accra-academy-greater-accra",
+  "name": "Accra Academy",
+  "region": "Greater Accra",
+  "town": "Bubuashi"
+ },
+ {
+  "id": "accra-girls-senior-high-school-greater-accra",
+  "name": "Accra Girls Senior High School",
+  "region": "Greater Accra",
+  "town": "Maamobi"
+ },
+ {
+  "id": "accra-grammar-school-greater-accra",
+  "name": "Accra Grammar School",
+  "region": "Greater Accra",
+  "town": "Accra"
+ },
+ {
+  "id": "accra-high-school-greater-accra",
+  "name": "Accra High School",
+  "region": "Greater Accra",
+  "town": "Asylum Down"
+ },
+ {
+  "id": "accra-technical-training-center-greater-accra",
+  "name": "Accra Technical Training Center",
+  "region": "Greater Accra",
+  "town": "Kokomlemle"
+ },
+ {
+  "id": "achimota-school-greater-accra",
+  "name": "Achimota School",
+  "region": "Greater Accra",
+  "town": "Accra"
+ },
+ {
+  "id": "action-senior-high-technical-school-greater-accra",
+  "name": "Action Senior High & Technical School",
+  "region": "Greater Accra",
+  "town": "Madina"
+ },
+ {
+  "id": "ada-senior-high-school-greater-accra",
+  "name": "Ada Senior High School",
+  "region": "Greater Accra",
+  "town": "Ada-Foah"
+ },
+ {
+  "id": "ada-senior-high-technical-school-greater-accra",
+  "name": "Ada Senior High Technical School",
+  "region": "Greater Accra",
+  "town": "Ada"
+ },
+ {
+  "id": "african-science-academy-greater-accra",
+  "name": "African Science Academy",
+  "region": "Greater Accra",
+  "town": "Tema Community 6"
+ },
+ {
+  "id": "amasaman-senior-high-school-greater-accra",
+  "name": "Amasaman Senior High School",
+  "region": "Greater Accra",
+  "town": "Amasaman"
+ },
+ {
+  "id": "armed-forces-senior-high-technical-school-greater-accra",
+  "name": "Armed Forces Senior High Technical School",
+  "region": "Greater Accra",
+  "town": "Burma Camp"
+ },
+ {
+  "id": "ashaiman-senior-high-school-greater-accra",
+  "name": "Ashaiman Senior High School",
+  "region": "Greater Accra",
+  "town": "Ashaiman"
+ },
+ {
+  "id": "chemu-senior-high-school-greater-accra",
+  "name": "Chemu Senior High School",
+  "region": "Greater Accra",
+  "town": "Tema Community 4"
+ },
+ {
+  "id": "christian-methodist-senior-high-school-greater-accra",
+  "name": "Christian Methodist Senior High School",
+  "region": "Greater Accra",
+  "town": "New Aplaku"
+ },
+ {
+  "id": "dansoman-senior-high-school-greater-accra",
+  "name": "Dansoman Senior High School",
+  "region": "Greater Accra",
+  "town": "Dansoman"
+ },
+ {
+  "id": "ebenezer-senior-high-school-greater-accra",
+  "name": "Ebenezer Senior High School",
+  "region": "Greater Accra",
+  "town": "Dansoman"
+ },
+ {
+  "id": "ghanata-senior-high-school-greater-accra",
+  "name": "Ghanata Senior High School",
+  "region": "Greater Accra",
+  "town": "P.O. Box DD 50"
+ },
+ {
+  "id": "haavad-s-senior-high-school-greater-accra",
+  "name": "Haavad's Senior High School",
+  "region": "Greater Accra",
+  "town": "Amasaman"
+ },
+ {
+  "id": "holy-trinity-senior-high-school-greater-accra",
+  "name": "Holy Trinity Senior High School",
+  "region": "Greater Accra",
+  "town": "Accra"
+ },
+ {
+  "id": "kaneshie-senior-high-school-greater-accra",
+  "name": "Kaneshie Senior High School",
+  "region": "Greater Accra",
+  "town": "Kaneshie"
+ },
+ {
+  "id": "kinbu-senior-high-technical-school-greater-accra",
+  "name": "Kinbu Senior High Technical School",
+  "region": "Greater Accra",
+  "town": "Kinbu"
+ },
+ {
+  "id": "la-presbyterian-senior-high-school-greater-accra",
+  "name": "La Presbyterian Senior High School",
+  "region": "Greater Accra",
+  "town": "Accra"
+ },
+ {
+  "id": "labone-senior-high-school-greater-accra",
+  "name": "Labone Senior High School",
+  "region": "Greater Accra",
+  "town": "Labone"
+ },
+ {
+  "id": "madina-senior-high-school-greater-accra",
+  "name": "Madina Senior High School",
+  "region": "Greater Accra",
+  "town": "Madina"
+ },
+ {
+  "id": "manhean-senior-high-school-greater-accra",
+  "name": "Manhean Senior High School",
+  "region": "Greater Accra",
+  "town": "Tema Manhean"
+ },
+ {
+  "id": "ngleshie-amanfro-senior-high-school-greater-accra",
+  "name": "Ngleshie Amanfro Senior High School",
+  "region": "Greater Accra",
+  "town": "Ngleshie Amanfro"
+ },
+ {
+  "id": "ningo-senior-high-school-greater-accra",
+  "name": "Ningo Senior High School",
+  "region": "Greater Accra",
+  "town": "Old Ningo"
+ },
+ {
+  "id": "nungua-senior-high-school-greater-accra",
+  "name": "Nungua Senior High School",
+  "region": "Greater Accra",
+  "town": "Nungua"
+ },
+ {
+  "id": "o-reilly-senior-high-school-greater-accra",
+  "name": "O'Reilly Senior High School",
+  "region": "Greater Accra",
+  "town": "Teshie"
+ },
+ {
+  "id": "odorgonno-senior-high-school-greater-accra",
+  "name": "Odorgonno Senior High School",
+  "region": "Greater Accra",
+  "town": "Awoshie"
+ },
+ {
+  "id": "osu-presbyterian-boys-boarding-school-greater-accra",
+  "name": "Osu Presbyterian Boys' Boarding School",
+  "region": "Greater Accra",
+  "town": "Osu"
+ },
+ {
+  "id": "osudoku-secondary-greater-accra",
+  "name": "Osudoku Secondary",
+  "region": "Greater Accra",
+  "town": "Asutsuare"
+ },
+ {
+  "id": "our-lady-of-mercy-senior-high-school-greater-accra",
+  "name": "Our Lady of Mercy Senior High School",
+  "region": "Greater Accra",
+  "town": "Tema Community 4"
+ },
+ {
+  "id": "presbyterian-boys-senior-high-school-greater-accra",
+  "name": "Presbyterian Boys' Senior High School",
+  "region": "Greater Accra",
+  "town": "Legon"
+ },
+ {
+  "id": "presbyterian-senior-high-school-greater-accra",
+  "name": "Presbyterian Senior High School",
+  "region": "Greater Accra",
+  "town": "Osu"
+ },
+ {
+  "id": "saint-mary-s-senior-high-school-greater-accra",
+  "name": "Saint Mary's Senior High School",
+  "region": "Greater Accra",
+  "town": "Korle Gonno"
+ },
+ {
+  "id": "st-margaret-mary-senior-high-school-greater-accra",
+  "name": "St. Margaret Mary Senior High School",
+  "region": "Greater Accra",
+  "town": "Dansoman"
+ },
+ {
+  "id": "st-thomas-aquinas-senior-high-school-greater-accra",
+  "name": "St. Thomas Aquinas Senior High School",
+  "region": "Greater Accra",
+  "town": "Cantonments"
+ },
+ {
+  "id": "tema-methodist-day-senior-high-school-greater-accra",
+  "name": "Tema Methodist Day Senior High School",
+  "region": "Greater Accra",
+  "town": "Tema"
+ },
+ {
+  "id": "tema-senior-high-school-greater-accra",
+  "name": "Tema Senior High School",
+  "region": "Greater Accra",
+  "town": "Tema Community 5"
+ },
+ {
+  "id": "teshie-presby-senior-high-school-greater-accra",
+  "name": "Teshie Presby Senior High School",
+  "region": "Greater Accra",
+  "town": "Teshie"
+ },
+ {
+  "id": "torkuase-senior-high-school-greater-accra",
+  "name": "Torkuase Senior High School",
+  "region": "Greater Accra",
+  "town": "Torkuase"
+ },
+ {
+  "id": "wadud-senior-high-school-greater-accra",
+  "name": "Wadud Senior High School",
+  "region": "Greater Accra",
+  "town": "Amasaman"
+ },
+ {
+  "id": "wesley-grammar-school-greater-accra",
+  "name": "Wesley Grammar School",
+  "region": "Greater Accra",
+  "town": "Dansoman"
+ },
+ {
+  "id": "west-africa-senior-high-school-greater-accra",
+  "name": "West Africa Senior High School",
+  "region": "Greater Accra",
+  "town": "Adenta"
+ },
+ {
+  "id": "zion-methodist-secondary-technical-school-greater-accra",
+  "name": "Zion Methodist Secondary Technical School",
+  "region": "Greater Accra",
+  "town": "Dawhenya"
+ },
+ {
+  "id": "anbariya-senior-high-school-northern",
+  "name": "Anbariya Senior High School",
+  "region": "Northern",
+  "town": "Tamale"
+ },
+ {
+  "id": "bimbilla-senior-high-school-northern",
+  "name": "Bimbilla Senior High School",
+  "region": "Northern",
+  "town": "Bimbilla"
+ },
+ {
+  "id": "bole-senior-high-school-northern",
+  "name": "Bole Senior High School",
+  "region": "Northern",
+  "town": "Bole"
+ },
+ {
+  "id": "business-senior-high-school-northern",
+  "name": "Business Senior High School",
+  "region": "Northern",
+  "town": "Tamale"
+ },
+ {
+  "id": "dabokpa-technical-institute-northern",
+  "name": "Dabokpa Technical Institute",
+  "region": "Northern",
+  "town": "Tamale"
+ },
+ {
+  "id": "dagbon-state-senior-high-technical-school-northern",
+  "name": "Dagbon State Senior High Technical School",
+  "region": "Northern",
+  "town": "Yendi"
+ },
+ {
+  "id": "damongo-senior-high-school-northern",
+  "name": "Damongo Senior High School",
+  "region": "Northern",
+  "town": "Damongo"
+ },
+ {
+  "id": "gambaga-girls-senior-high-school-northern",
+  "name": "Gambaga Girls Senior High School",
+  "region": "Northern",
+  "town": "Gambaga"
+ },
+ {
+  "id": "ghana-senior-high-school-northern",
+  "name": "Ghana Senior High School",
+  "region": "Northern",
+  "town": "Tamale"
+ },
+ {
+  "id": "kalpohin-senior-high-school-northern",
+  "name": "Kalpohin Senior High School",
+  "region": "Northern",
+  "town": "Tamale"
+ },
+ {
+  "id": "karaga-senior-high-school-northern",
+  "name": "Karaga Senior High School",
+  "region": "Northern",
+  "town": "Karaga District"
+ },
+ {
+  "id": "kasuliyili-senior-high-school-northern",
+  "name": "Kasuliyili Senior High School",
+  "region": "Northern",
+  "town": "Kasuliyili"
+ },
+ {
+  "id": "kofi-annan-technical-institute-northern",
+  "name": "Kofi Annan Technical Institute",
+  "region": "Northern",
+  "town": "Nwodua"
+ },
+ {
+  "id": "kumbungu-senior-high-school-northern",
+  "name": "Kumbungu Senior High School",
+  "region": "Northern",
+  "town": "Kumbungu"
+ },
+ {
+  "id": "kumbungu-vocational-technical-institute-northern",
+  "name": "Kumbungu Vocational Technical Institute",
+  "region": "Northern",
+  "town": "Kumbungu"
+ },
+ {
+  "id": "lamhegu-technical-institute-northern",
+  "name": "Lamhegu Technical Institute",
+  "region": "Northern",
+  "town": "Tamale"
+ },
+ {
+  "id": "nalerigu-secondary-school-northern",
+  "name": "Nalerigu Secondary School",
+  "region": "Northern",
+  "town": "Nalerigu"
+ },
+ {
+  "id": "nalerigu-youth-leadership-vocational-training-centre-northern",
+  "name": "Nalerigu Youth Leadership Vocational Training Centre",
+  "region": "Northern",
+  "town": "Nalerigu"
+ },
+ {
+  "id": "nanton-senior-high-technical-school-northern",
+  "name": "Nanton Senior High/Technical School",
+  "region": "Northern",
+  "town": "Nanton"
+ },
+ {
+  "id": "ndewura-jakpa-senior-high-technical-school-northern",
+  "name": "Ndewura Jakpa Senior High Technical School",
+  "region": "Northern",
+  "town": "Damongo"
+ },
+ {
+  "id": "northern-school-of-business-northern",
+  "name": "Northern School of Business",
+  "region": "Northern",
+  "town": "Tamale"
+ },
+ {
+  "id": "nuriya-islamic-senior-high-school-northern",
+  "name": "Nuriya Islamic Senior High School",
+  "region": "Northern",
+  "town": "Tamale"
+ },
+ {
+  "id": "nuriyya-islamic-institute-northern",
+  "name": "Nuriyya Islamic Institute",
+  "region": "Northern",
+  "town": "Tamale"
+ },
+ {
+  "id": "pong-tamale-senior-high-school-northern",
+  "name": "Pong-Tamale Senior High School",
+  "region": "Northern",
+  "town": "Pong-Tamale"
+ },
+ {
+  "id": "saboba-e-p-senior-high-school-northern",
+  "name": "Saboba E. P Senior High School",
+  "region": "Northern",
+  "town": "Saboba"
+ },
+ {
+  "id": "salaga-senior-high-school-northern",
+  "name": "Salaga Senior High School",
+  "region": "Northern",
+  "town": "Salaga"
+ },
+ {
+  "id": "salaga-t-i-amadiyya-senior-high-school-northern",
+  "name": "Salaga T.I Amadiyya Senior High School",
+  "region": "Northern",
+  "town": "Salaga"
+ },
+ {
+  "id": "savelugu-senior-high-school-northern",
+  "name": "Savelugu Senior High School",
+  "region": "Northern",
+  "town": "Savelugu"
+ },
+ {
+  "id": "st-charles-senior-high-school-northern",
+  "name": "St. Charles Senior High School",
+  "region": "Northern",
+  "town": "Tamale"
+ },
+ {
+  "id": "st-joseph-s-senior-high-technical-school-northern",
+  "name": "St. Joseph's Senior High Technical School",
+  "region": "Northern",
+  "town": "Saboba"
+ },
+ {
+  "id": "tamale-girls-senior-high-school-northern",
+  "name": "Tamale Girls' Senior High School",
+  "region": "Northern",
+  "town": "Tamale"
+ },
+ {
+  "id": "tamale-islamic-science-senior-high-school-northern",
+  "name": "Tamale Islamic Science Senior High School",
+  "region": "Northern",
+  "town": "Tamale"
+ },
+ {
+  "id": "tamale-senior-high-school-northern",
+  "name": "Tamale Senior High School",
+  "region": "Northern",
+  "town": "Tamale"
+ },
+ {
+  "id": "tatale-ep-senior-high-technical-school-northern",
+  "name": "Tatale EP Senior High Technical School",
+  "region": "Northern",
+  "town": "Tatale"
+ },
+ {
+  "id": "tolon-senior-high-school-northern",
+  "name": "Tolon Senior High School",
+  "region": "Northern",
+  "town": "Tolon"
+ },
+ {
+  "id": "vitting-senior-high-school-technical-northern",
+  "name": "Vitting Senior High School Technical",
+  "region": "Northern",
+  "town": "Tamale"
+ },
+ {
+  "id": "walewale-senior-high-technical-school-northern",
+  "name": "Walewale Senior High Technical School",
+  "region": "Northern",
+  "town": "Walewale"
+ },
+ {
+  "id": "walewale-vocational-technical-school-institute-northern",
+  "name": "Walewale Vocational/Technical School Institute",
+  "region": "Northern",
+  "town": "Walewale"
+ },
+ {
+  "id": "yendi-senior-high-school-northern",
+  "name": "Yendi Senior High School",
+  "region": "Northern",
+  "town": "Yendi"
+ },
+ {
+  "id": "zabzugu-senior-high-school-northern",
+  "name": "Zabzugu Senior High School",
+  "region": "Northern",
+  "town": "Zabzugu"
+ },
+ {
+  "id": "zugu-dabogni-technical-institute-northern",
+  "name": "Zugu Dabogni Technical Institute",
+  "region": "Northern",
+  "town": "Zugu Dabogu"
+ },
+ {
+  "id": "ahamansu-islamic-senior-high-school-oti",
+  "name": "Ahamansu Islamic Senior High School",
+  "region": "Oti",
+  "town": "Ahamansu"
+ },
+ {
+  "id": "asukawkaw-senior-high-school-oti",
+  "name": "Asukawkaw Senior High School",
+  "region": "Oti",
+  "town": "Asukawkaw"
+ },
+ {
+  "id": "baglo-senior-high-school-oti",
+  "name": "Baglo Senior High School",
+  "region": "Oti",
+  "town": "Baglo"
+ },
+ {
+  "id": "bueman-senior-high-school-oti",
+  "name": "Bueman Senior High School",
+  "region": "Oti",
+  "town": "Jasikan"
+ },
+ {
+  "id": "dodi-papase-comm-senior-high-school-oti",
+  "name": "Dodi-Papase Comm. Senior High School",
+  "region": "Oti",
+  "town": "Dodi Papase"
+ },
+ {
+  "id": "kadjebi-asato-senior-high-school-oti",
+  "name": "Kadjebi-Asato Senior High School",
+  "region": "Oti",
+  "town": "Kadjeto-Asato"
+ },
+ {
+  "id": "kete-krachi-senior-high-school-oti",
+  "name": "Kete-Krachi Senior High School",
+  "region": "Oti",
+  "town": "Kete-Krachi"
+ },
+ {
+  "id": "kpassa-senior-high-school-oti",
+  "name": "Kpassa Senior High School",
+  "region": "Oti",
+  "town": "Kpassa"
+ },
+ {
+  "id": "krachi-senior-high-school-oti",
+  "name": "Krachi Senior High School",
+  "region": "Oti",
+  "town": "Kete-Krachi"
+ },
+ {
+  "id": "nattan-senior-high-school-oti",
+  "name": "Nattan Senior High School",
+  "region": "Oti",
+  "town": "Nkonya"
+ },
+ {
+  "id": "nkonya-senior-high-school-oti",
+  "name": "Nkonya Senior High School",
+  "region": "Oti",
+  "town": "Nkonya"
+ },
+ {
+  "id": "nkwanta-senior-high-school-oti",
+  "name": "Nkwanta Senior High School",
+  "region": "Oti",
+  "town": "Nkwanta"
+ },
+ {
+  "id": "ntruboman-senior-high-school-oti",
+  "name": "Ntruboman Senior High School",
+  "region": "Oti",
+  "town": "Brewaniase"
+ },
+ {
+  "id": "okadjakrom-senior-high-school-oti",
+  "name": "Okadjakrom Senior High School",
+  "region": "Oti",
+  "town": "Okadjakrom"
+ },
+ {
+  "id": "oti-senior-high-school-oti",
+  "name": "Oti Senior High School",
+  "region": "Oti",
+  "town": "Dambai"
+ },
+ {
+  "id": "worawora-secondary-oti",
+  "name": "Worawora Secondary",
+  "region": "Oti",
+  "town": "Worawora"
+ },
+ {
+  "id": "sawla-senior-high-school-savannah",
+  "name": "Sawla Senior High School",
+  "region": "Savannah",
+  "town": "Sawla"
+ },
+ {
+  "id": "bawku-senior-high-school-upper-east",
+  "name": "Bawku Senior High School",
+  "region": "Upper East",
+  "town": "Bawku"
+ },
+ {
+  "id": "bawku-senior-high-technical-school-upper-east",
+  "name": "Bawku Senior High/Technical School",
+  "region": "Upper East",
+  "town": "Bawku"
+ },
+ {
+  "id": "bawku-technical-institute-upper-east",
+  "name": "Bawku Technical Institute",
+  "region": "Upper East",
+  "town": "Bawku"
+ },
+ {
+  "id": "bolgatanga-girls-senior-high-school-upper-east",
+  "name": "Bolgatanga Girls Senior High School",
+  "region": "Upper East",
+  "town": "Bolgatanga"
+ },
+ {
+  "id": "bolgatanga-senior-high-school-upper-east",
+  "name": "Bolgatanga Senior High School",
+  "region": "Upper East",
+  "town": "Winkogo"
+ },
+ {
+  "id": "bolgatanga-technical-college-upper-east",
+  "name": "Bolgatanga Technical College",
+  "region": "Upper East",
+  "town": "Yikene"
+ },
+ {
+  "id": "bolgatanga-technical-institute-upper-east",
+  "name": "Bolgatanga Technical Institute",
+  "region": "Upper East",
+  "town": "Bolgatanga"
+ },
+ {
+  "id": "bongo-senior-high-school-upper-east",
+  "name": "Bongo Senior High School",
+  "region": "Upper East",
+  "town": "Bongo"
+ },
+ {
+  "id": "chiana-senior-high-school-upper-east",
+  "name": "Chiana Senior High School",
+  "region": "Upper East",
+  "town": "Chiana"
+ },
+ {
+  "id": "fumbisi-senior-high-school-upper-east",
+  "name": "Fumbisi Senior High School",
+  "region": "Upper East",
+  "town": "Fumbisi"
+ },
+ {
+  "id": "garu-tempane-senior-high-school-upper-east",
+  "name": "Garu/Tempane Senior High School",
+  "region": "Upper East",
+  "town": "Tempane"
+ },
+ {
+  "id": "gowrie-senior-high-technical-school-upper-east",
+  "name": "Gowrie Senior High Technical School",
+  "region": "Upper East",
+  "town": "Gowrie"
+ },
+ {
+  "id": "ho-school-of-business-upper-east",
+  "name": "Ho School of Business",
+  "region": "Upper East",
+  "town": "Bolgatanga"
+ },
+ {
+  "id": "kongo-senior-high-school-upper-east",
+  "name": "Kongo Senior High School",
+  "region": "Upper East",
+  "town": "Kongo"
+ },
+ {
+  "id": "mirigu-senior-high-school-upper-east",
+  "name": "Mirigu Senior High School",
+  "region": "Upper East",
+  "town": "Mirigu"
+ },
+ {
+  "id": "navrongo-senior-high-school-upper-east",
+  "name": "Navrongo Senior High School",
+  "region": "Upper East",
+  "town": "Navrongo"
+ },
+ {
+  "id": "notre-dame-seminary-senior-high-school-upper-east",
+  "name": "Notre Dame Seminary Senior High School",
+  "region": "Upper East",
+  "town": "Navrongo"
+ },
+ {
+  "id": "sandema-senior-high-school-upper-east",
+  "name": "Sandema Senior High School",
+  "region": "Upper East",
+  "town": "Sandema"
+ },
+ {
+  "id": "sandema-senior-high-technical-school-upper-east",
+  "name": "Sandema Senior High Technical School",
+  "region": "Upper East",
+  "town": "Sandema"
+ },
+ {
+  "id": "tongo-senior-high-school-upper-east",
+  "name": "Tongo Senior High School",
+  "region": "Upper East",
+  "town": "Tongo"
+ },
+ {
+  "id": "zamse-senior-high-technical-school-upper-east",
+  "name": "Zamse Senior High Technical School",
+  "region": "Upper East",
+  "town": "Bolgatanga"
+ },
+ {
+  "id": "zebilla-senior-high-school-upper-east",
+  "name": "Zebilla Senior High School",
+  "region": "Upper East",
+  "town": "Zebilla"
+ },
+ {
+  "id": "zuarungu-senior-high-school-upper-east",
+  "name": "Zuarungu Senior High School",
+  "region": "Upper East",
+  "town": "Zuarungu"
+ },
+ {
+  "id": "ahmadiyya-senior-high-school-upper-west",
+  "name": "Ahmadiyya Senior High School",
+  "region": "Upper West",
+  "town": "Wa"
+ },
+ {
+  "id": "brifor-senior-high-school-upper-west",
+  "name": "Brifor Senior High School",
+  "region": "Upper West",
+  "town": "Babile"
+ },
+ {
+  "id": "eremon-senior-high-school-upper-west",
+  "name": "Eremon Senior High School",
+  "region": "Upper West",
+  "town": "Lawra"
+ },
+ {
+  "id": "holy-family-senior-high-school-upper-west",
+  "name": "Holy Family Senior High School",
+  "region": "Upper West",
+  "town": "Hamile"
+ },
+ {
+  "id": "jirapa-senior-high-school-upper-west",
+  "name": "Jirapa Senior High School",
+  "region": "Upper West",
+  "town": "Jirapa"
+ },
+ {
+  "id": "kanton-senior-high-school-upper-west",
+  "name": "Kanton Senior High School",
+  "region": "Upper West",
+  "town": "Tumu"
+ },
+ {
+  "id": "ko-senior-high-school-upper-west",
+  "name": "Ko Senior High School",
+  "region": "Upper West",
+  "town": "Nandom"
+ },
+ {
+  "id": "lassia-tuolu-senior-high-school-upper-west",
+  "name": "Lassia-Tuolu Senior High School",
+  "region": "Upper West",
+  "town": "Wa"
+ },
+ {
+  "id": "lawra-senior-high-school-upper-west",
+  "name": "Lawra Senior High School",
+  "region": "Upper West",
+  "town": "Lawra"
+ },
+ {
+  "id": "pinna-senior-high-school-upper-west",
+  "name": "Pinna Senior High School",
+  "region": "Upper West",
+  "town": "Wa"
+ },
+ {
+  "id": "queen-of-peace-senior-high-school-upper-west",
+  "name": "Queen of Peace Senior High School",
+  "region": "Upper West",
+  "town": "Nadowli"
+ },
+ {
+  "id": "st-francis-girls-senior-high-school-upper-west",
+  "name": "St. Francis Girls' Senior High School",
+  "region": "Upper West",
+  "town": "Jirapa"
+ },
+ {
+  "id": "st-francis-xavier-minor-seminary-upper-west",
+  "name": "St. Francis Xavier Minor Seminary",
+  "region": "Upper West",
+  "town": "Wa"
+ },
+ {
+  "id": "tumu-senior-high-technical-school-upper-west",
+  "name": "Tumu Senior High Technical School",
+  "region": "Upper West",
+  "town": "Tumu"
+ },
+ {
+  "id": "ullo-senior-high-school-upper-west",
+  "name": "Ullo Senior High School",
+  "region": "Upper West",
+  "town": "Jirapa"
+ },
+ {
+  "id": "wa-islamic-senior-high-school-upper-west",
+  "name": "Wa Islamic Senior High School",
+  "region": "Upper West",
+  "town": "Wa"
+ },
+ {
+  "id": "wa-senior-high-school-upper-west",
+  "name": "Wa Senior High School",
+  "region": "Upper West",
+  "town": "Wa"
+ },
+ {
+  "id": "wa-senior-high-technical-school-upper-west",
+  "name": "Wa Senior High Technical School",
+  "region": "Upper West",
+  "town": "Wa"
+ },
+ {
+  "id": "wa-technical-institute-upper-west",
+  "name": "Wa Technical Institute",
+  "region": "Upper West",
+  "town": "Wa"
+ },
+ {
+  "id": "abor-senior-high-school-volta",
+  "name": "Abor Senior High School",
+  "region": "Volta",
+  "town": "Abor"
+ },
+ {
+  "id": "abutia-senior-high-school-volta",
+  "name": "Abutia Senior High School",
+  "region": "Volta",
+  "town": "Abutia-Teti"
+ },
+ {
+  "id": "adaklu-comm-senior-high-school-volta",
+  "name": "Adaklu Comm. Senior High School",
+  "region": "Volta",
+  "town": "Adaklu"
+ },
+ {
+  "id": "adaklu-senior-high-school-volta",
+  "name": "Adaklu Senior High School",
+  "region": "Volta",
+  "town": "Adaklu Waya"
+ },
+ {
+  "id": "adidome-senior-high-school-volta",
+  "name": "Adidome Senior High School",
+  "region": "Volta",
+  "town": "Adidome"
+ },
+ {
+  "id": "afadjato-senior-high-school-volta",
+  "name": "Afadjato Senior High School",
+  "region": "Volta",
+  "town": "Gbledi-Agbogame"
+ },
+ {
+  "id": "agate-comm-senior-high-school-volta",
+  "name": "Agate Comm. Senior High School",
+  "region": "Volta",
+  "town": "Agate"
+ },
+ {
+  "id": "agotime-senior-high-school-volta",
+  "name": "Agotime Senior High School",
+  "region": "Volta",
+  "town": "Kpetoe"
+ },
+ {
+  "id": "akatsi-senior-high-school-volta",
+  "name": "Akatsi Senior High School",
+  "region": "Volta",
+  "town": "Akatsi"
+ },
+ {
+  "id": "akome-senior-high-school-volta",
+  "name": "Akome Senior High School",
+  "region": "Volta",
+  "town": "Akome"
+ },
+ {
+  "id": "akpafu-senior-high-school-volta",
+  "name": "Akpafu Senior High School",
+  "region": "Volta",
+  "town": "Akpafu"
+ },
+ {
+  "id": "alavanyo-senior-high-school-volta",
+  "name": "Alavanyo Senior High School",
+  "region": "Volta",
+  "town": "Alavanyo"
+ },
+ {
+  "id": "anfoega-senior-high-school-volta",
+  "name": "Anfoega Senior High School",
+  "region": "Volta",
+  "town": "Anfoega"
+ },
+ {
+  "id": "anlo-afiadenyigba-senior-high-school-volta",
+  "name": "Anlo Afiadenyigba Senior High School",
+  "region": "Volta",
+  "town": "Anlo Afiadenyigba"
+ },
+ {
+  "id": "anlo-awomefia-senior-senior-high-school-volta",
+  "name": "Anlo Awomefia Senior Senior High School",
+  "region": "Volta",
+  "town": "Anyako"
+ },
+ {
+  "id": "anlo-senior-high-school-volta",
+  "name": "Anlo Senior High School",
+  "region": "Volta",
+  "town": "Anloga"
+ },
+ {
+  "id": "anlo-technical-institute-antech-volta",
+  "name": "Anlo Technical Institute (ANTECH)",
+  "region": "Volta",
+  "town": "Anloga"
+ },
+ {
+  "id": "anyako-senior-high-school-volta",
+  "name": "Anyako Senior High School",
+  "region": "Volta",
+  "town": "Anyako"
+ },
+ {
+  "id": "atiavi-senior-high-school-volta",
+  "name": "Atiavi Senior High School",
+  "region": "Volta",
+  "town": "Atiavi"
+ },
+ {
+  "id": "avatime-senior-high-school-volta",
+  "name": "Avatime Senior High School",
+  "region": "Volta",
+  "town": "Vane"
+ },
+ {
+  "id": "ave-senior-high-school-volta",
+  "name": "Ave Senior High School",
+  "region": "Volta",
+  "town": "Ave-Dakpa"
+ },
+ {
+  "id": "aveyime-battor-senior-high-school-volta",
+  "name": "Aveyime Battor Senior High School",
+  "region": "Volta",
+  "town": "Aveyime-Battor"
+ },
+ {
+  "id": "awudome-senior-high-school-awusco-volta",
+  "name": "Awudome Senior High School (AWUSCO)",
+  "region": "Volta",
+  "town": "Tsito"
+ },
+ {
+  "id": "baglo-senior-high-school-volta",
+  "name": "Baglo Senior High School",
+  "region": "Volta",
+  "town": "Ho"
+ },
+ {
+  "id": "bishop-herman-college-volta",
+  "name": "Bishop Herman College",
+  "region": "Volta",
+  "town": "Kpandu"
+ },
+ {
+  "id": "comboni-technical-school-combotech-volta",
+  "name": "Comboni Technical School (COMBOTECH)",
+  "region": "Volta",
+  "town": "Sogakope"
+ },
+ {
+  "id": "dabala-senior-high-school-volta",
+  "name": "Dabala Senior High School",
+  "region": "Volta",
+  "town": "Dabala"
+ },
+ {
+  "id": "dofor-comm-agricultural-senior-high-school-volta",
+  "name": "Dofor Comm. Agricultural Senior High School",
+  "region": "Volta",
+  "town": "Podoe"
+ },
+ {
+  "id": "dzodze-penyi-senior-high-school-volta",
+  "name": "Dzodze Penyi Senior High School",
+  "region": "Volta",
+  "town": "Dzodze"
+ },
+ {
+  "id": "dzolo-senior-high-school-volta",
+  "name": "Dzolo Senior High School",
+  "region": "Volta",
+  "town": "Dzolo"
+ },
+ {
+  "id": "e-p-senior-high-school-volta",
+  "name": "E. P. Senior High School",
+  "region": "Volta",
+  "town": "Hohoe"
+ },
+ {
+  "id": "e-p-church-mawuko-girls-senior-high-school-volta",
+  "name": "E.P. Church Mawuko Girls Senior High School",
+  "region": "Volta",
+  "town": "Ho"
+ },
+ {
+  "id": "have-senior-high-school-volta",
+  "name": "Have Senior High School",
+  "region": "Volta",
+  "town": "Have"
+ },
+ {
+  "id": "ideal-college-volta",
+  "name": "Ideal College",
+  "region": "Volta",
+  "town": "Ho"
+ },
+ {
+  "id": "jim-bourton-memorial-agriculture-senior-high-school-volta",
+  "name": "Jim Bourton Memorial Agriculture Senior High School",
+  "region": "Volta",
+  "town": "Logba Adzekoe"
+ },
+ {
+  "id": "keta-business-college-volta",
+  "name": "Keta Business College",
+  "region": "Volta",
+  "town": "Keta"
+ },
+ {
+  "id": "keta-senior-high-technical-school-volta",
+  "name": "Keta Senior High Technical School",
+  "region": "Volta",
+  "town": "Keta"
+ },
+ {
+  "id": "klikor-senior-high-school-volta",
+  "name": "Klikor Senior High School",
+  "region": "Volta",
+  "town": "Klikor"
+ },
+ {
+  "id": "kpando-senior-high-school-volta",
+  "name": "Kpando Senior High School",
+  "region": "Volta",
+  "town": "Kpando"
+ },
+ {
+  "id": "kpedze-senior-high-school-volta",
+  "name": "Kpedze Senior High School",
+  "region": "Volta",
+  "town": "Kpedze"
+ },
+ {
+  "id": "kpeve-senior-high-school-volta",
+  "name": "Kpeve Senior High School",
+  "region": "Volta",
+  "town": "Kpeve"
+ },
+ {
+  "id": "leklebi-senior-high-school-volta",
+  "name": "Leklebi Senior High School",
+  "region": "Volta",
+  "town": "Leklebi"
+ },
+ {
+  "id": "likpe-senior-high-school-volta",
+  "name": "Likpe Senior High School",
+  "region": "Volta",
+  "town": "Likpe-Mate"
+ },
+ {
+  "id": "mafi-kumase-senior-high-technical-school-volta",
+  "name": "Mafi Kumase Senior High Technical School",
+  "region": "Volta",
+  "town": "Mafi-Kumasi"
+ },
+ {
+  "id": "mafi-kumase-senior-high-school-volta",
+  "name": "Mafi-Kumase Senior High School",
+  "region": "Volta",
+  "town": "Mafi-Kumase"
+ },
+ {
+  "id": "mafi-kumasi-comm-senior-high-school-volta",
+  "name": "Mafi-Kumasi Comm. Senior High School",
+  "region": "Volta",
+  "town": "Mafi-Kumasi"
+ },
+ {
+  "id": "mawuli-school-volta",
+  "name": "Mawuli School",
+  "region": "Volta",
+  "town": "Ho"
+ },
+ {
+  "id": "ola-girls-senior-high-school-volta",
+  "name": "OLA Girls Senior High School",
+  "region": "Volta",
+  "town": "Ho"
+ },
+ {
+  "id": "peki-senior-high-school-volta",
+  "name": "Peki Senior High School",
+  "region": "Volta",
+  "town": "Peki"
+ },
+ {
+  "id": "peki-senior-high-technical-school-volta",
+  "name": "Peki Senior High Technical School",
+  "region": "Volta",
+  "town": "Peki"
+ },
+ {
+  "id": "saint-prosper-s-college-volta",
+  "name": "Saint Prosper's College",
+  "region": "Volta",
+  "town": "Ho"
+ },
+ {
+  "id": "sedzordzi-shaker-anthony-s-school-complex-volta",
+  "name": "Sedzordzi Shaker Anthony's School Complex",
+  "region": "Volta",
+  "town": "Ho"
+ },
+ {
+  "id": "sogakope-senior-high-school-sogasco-volta",
+  "name": "Sogakope Senior High School (SOGASCO)",
+  "region": "Volta",
+  "town": "Sogakope"
+ },
+ {
+  "id": "some-senior-high-school-volta",
+  "name": "Some Senior High School",
+  "region": "Volta",
+  "town": "Agbozume"
+ },
+ {
+  "id": "st-kizito-senior-high-school-volta",
+  "name": "St. Kizito Senior High School",
+  "region": "Volta",
+  "town": "Mepe"
+ },
+ {
+  "id": "st-mary-s-seminary-senior-high-school-volta",
+  "name": "St. Mary's Seminary/Senior High School",
+  "region": "Volta",
+  "town": "Lolobi"
+ },
+ {
+  "id": "st-paul-s-senior-high-school-volta",
+  "name": "St. Paul's Senior High School",
+  "region": "Volta",
+  "town": "Hatsukope/Aflao"
+ },
+ {
+  "id": "taviefe-comm-senior-high-school-volta",
+  "name": "Taviefe Comm. Senior High School",
+  "region": "Volta",
+  "town": "Taviefe"
+ },
+ {
+  "id": "three-town-senior-high-school-volta",
+  "name": "Three Town Senior High School",
+  "region": "Volta",
+  "town": "Denu"
+ },
+ {
+  "id": "tongor-senior-high-technical-school-volta",
+  "name": "Tongor Senior High Technical School",
+  "region": "Volta",
+  "town": "Tongor Tsanakpe"
+ },
+ {
+  "id": "tsito-senior-high-school-volta",
+  "name": "Tsito Senior High School",
+  "region": "Volta",
+  "town": "Tsito"
+ },
+ {
+  "id": "vakpo-senior-high-school-volta",
+  "name": "Vakpo Senior High School",
+  "region": "Volta",
+  "town": "Vakpo"
+ },
+ {
+  "id": "vakpo-senior-high-technical-school-volta",
+  "name": "Vakpo Senior High Technical School",
+  "region": "Volta",
+  "town": "Vakpo"
+ },
+ {
+  "id": "ve-comm-senior-high-school-volta",
+  "name": "Ve Comm. Senior High School",
+  "region": "Volta",
+  "town": "Ve-Koloenu"
+ },
+ {
+  "id": "wovenu-senior-senior-high-school-volta",
+  "name": "Wovenu Senior Senior High School",
+  "region": "Volta",
+  "town": "Tadzewu"
+ },
+ {
+  "id": "zion-college-volta",
+  "name": "Zion College",
+  "region": "Volta",
+  "town": "Anloga"
+ },
+ {
+  "id": "ziope-senior-high-school-volta",
+  "name": "Ziope Senior High School",
+  "region": "Volta",
+  "town": "Agotime Ziope"
+ },
+ {
+  "id": "adiembra-senior-high-school-western",
+  "name": "Adiembra Senior High School",
+  "region": "Western",
+  "town": "Adiembra"
+ },
+ {
+  "id": "ahantaman-girls-senior-high-school-western",
+  "name": "Ahantaman Girls Senior High School",
+  "region": "Western",
+  "town": "Ketan"
+ },
+ {
+  "id": "amenfiman-senior-high-school-western",
+  "name": "Amenfiman Senior High School",
+  "region": "Western",
+  "town": "Wassa Akropong"
+ },
+ {
+  "id": "annor-agyei-senior-high-school-western",
+  "name": "Annor Agyei Senior High School",
+  "region": "Western",
+  "town": "Shama"
+ },
+ {
+  "id": "archbishop-porter-girls-senior-high-school-western",
+  "name": "Archbishop Porter Girls' Senior High School",
+  "region": "Western",
+  "town": "Sekondi"
+ },
+ {
+  "id": "asankrangwa-senior-high-school-asanc0-western",
+  "name": "Asankrangwa Senior High School (ASANC0)",
+  "region": "Western",
+  "town": "Asankrangwa"
+ },
+ {
+  "id": "asankrangwa-senior-high-technical-school-asectech-western",
+  "name": "Asankrangwa Senior High Technical School (ASECTECH)",
+  "region": "Western",
+  "town": "Asankrangwa"
+ },
+ {
+  "id": "axim-girls-senior-high-school-western",
+  "name": "Axim Girls Senior High School",
+  "region": "Western",
+  "town": "Axim"
+ },
+ {
+  "id": "baidoo-bonsoe-senior-high-technical-school-western",
+  "name": "Baidoo Bonsoe Senior High Technical School",
+  "region": "Western",
+  "town": "Agona Nkwanta"
+ },
+ {
+  "id": "bompeh-senior-high-technical-school-western",
+  "name": "Bompeh Senior High Technical School",
+  "region": "Western",
+  "town": "Takoradi"
+ },
+ {
+  "id": "bonzo-kaku-senior-high-school-western",
+  "name": "Bonzo Kaku Senior High School",
+  "region": "Western",
+  "town": "Awiebo"
+ },
+ {
+  "id": "daboase-senior-high-technical-school-western",
+  "name": "Daboase Senior High Technical School",
+  "region": "Western",
+  "town": "Daboase"
+ },
+ {
+  "id": "diabene-senior-high-technical-school-western",
+  "name": "Diabene Senior High Technical School",
+  "region": "Western",
+  "town": "Diabene Krom"
+ },
+ {
+  "id": "esiama-senior-high-technical-school-western",
+  "name": "Esiama Senior High Technical School",
+  "region": "Western",
+  "town": "Esiama"
+ },
+ {
+  "id": "fiaseman-senior-high-school-western",
+  "name": "Fiaseman Senior High School",
+  "region": "Western",
+  "town": "Tarkwa"
+ },
+ {
+  "id": "fijai-senior-high-school-western",
+  "name": "Fijai Senior High School",
+  "region": "Western",
+  "town": "Fijai"
+ },
+ {
+  "id": "genesis-senior-high-school-western",
+  "name": "Genesis Senior High School",
+  "region": "Western",
+  "town": "Manso Amenfi"
+ },
+ {
+  "id": "ghana-senior-high-technical-school-western",
+  "name": "Ghana Senior High Technical School",
+  "region": "Western",
+  "town": "Takoradi"
+ },
+ {
+  "id": "half-assini-senior-high-school-western",
+  "name": "Half Assini Senior High School",
+  "region": "Western",
+  "town": "Half Assini"
+ },
+ {
+  "id": "huni-valley-senior-high-school-western",
+  "name": "Huni Valley Senior High School",
+  "region": "Western",
+  "town": "Huni Valley"
+ },
+ {
+  "id": "kikam-technical-institute-western",
+  "name": "Kikam Technical Institute",
+  "region": "Western",
+  "town": "Kikam"
+ },
+ {
+  "id": "methodist-senior-high-school-western",
+  "name": "Methodist Senior High School",
+  "region": "Western",
+  "town": "Sekondi"
+ },
+ {
+  "id": "ming-daw-senior-high-school-western",
+  "name": "Ming Daw Senior High School",
+  "region": "Western",
+  "town": "Shama"
+ },
+ {
+  "id": "mpohor-senior-high-school-western",
+  "name": "Mpohor Senior High School",
+  "region": "Western",
+  "town": "Mpohor"
+ },
+ {
+  "id": "nkroful-agricultural-senior-high-school-western",
+  "name": "Nkroful Agricultural Senior High School",
+  "region": "Western",
+  "town": "Nkroful"
+ },
+ {
+  "id": "nsein-senior-high-school-western",
+  "name": "Nsein Senior High School",
+  "region": "Western",
+  "town": "Axim"
+ },
+ {
+  "id": "prestea-senior-high-technical-school-prestech-western",
+  "name": "Prestea Senior High Technical School (Prestech)",
+  "region": "Western",
+  "town": "Prestea"
+ },
+ {
+  "id": "sekondi-college-western",
+  "name": "Sekondi College",
+  "region": "Western",
+  "town": "Sekondi"
+ },
+ {
+  "id": "shama-senior-high-school-western",
+  "name": "Shama Senior High School",
+  "region": "Western",
+  "town": "Shama"
+ },
+ {
+  "id": "st-augustine-s-senior-high-school-western",
+  "name": "St. Augustine's Senior High School",
+  "region": "Western",
+  "town": "Bogoso"
+ },
+ {
+  "id": "st-john-s-school-western",
+  "name": "St. John's School",
+  "region": "Western",
+  "town": "Sekondi"
+ },
+ {
+  "id": "st-mary-s-boys-school-western",
+  "name": "St. Mary's Boys' School",
+  "region": "Western",
+  "town": "Apowa"
+ },
+ {
+  "id": "takoradi-senior-high-school-western",
+  "name": "Takoradi Senior High School",
+  "region": "Western",
+  "town": "Takoradi"
+ },
+ {
+  "id": "takoradi-technical-institute-western",
+  "name": "Takoradi Technical Institute",
+  "region": "Western",
+  "town": "Takoradi"
+ },
+ {
+  "id": "tarkwa-senior-high-school-western",
+  "name": "Tarkwa Senior High School",
+  "region": "Western",
+  "town": "Tarkwa"
+ },
+ {
+  "id": "uthman-bin-affan-islamic-senior-high-school-western",
+  "name": "Uthman Bin Affan Islamic Senior High School",
+  "region": "Western",
+  "town": "Kamgbunli"
+ },
+ {
+  "id": "adjoafua-community-day-senior-high-school-adsec-western-north",
+  "name": "Adjoafua Community Day Senior High School (ADSEC)",
+  "region": "Western North",
+  "town": "Adjoafua"
+ },
+ {
+  "id": "bibiani-senior-high-technical-school-western-north",
+  "name": "Bibiani Senior High Technical School",
+  "region": "Western North",
+  "town": "Bibiani"
+ },
+ {
+  "id": "sefwi-bekwai-senior-high-school-western-north",
+  "name": "Sefwi Bekwai Senior High School]",
+  "region": "Western North",
+  "town": "Sefwi Bekwai"
+ },
+ {
+  "id": "sefwi-wiawso-senior-high-school-sewass-western-north",
+  "name": "Sefwi Wiawso Senior High School (SEWASS)",
+  "region": "Western North",
+  "town": "Sefwi Wiawso"
+ },
+ {
+  "id": "wadud-senior-high-school-western-north",
+  "name": "Wadud Senior High School",
+  "region": "Western North",
+  "town": "Sefwi Bekwai"
+ }
+]

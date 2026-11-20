@@ -9,7 +9,7 @@ const ACCOUNTS = "gp_teachers_v1";   // { [email]: account }
 const SESSION = "gp_teacher_session"; // { email }
 const COOKIE = "gp_role";             // read by middleware.ts
 
-export type Teacher = { fullName: string; email: string; phone: string; school: string; region: string };
+export type Teacher = { fullName: string; email: string; phone: string; school: string; region: string; schoolId?: string };
 
 const read = (k: string, d: any) => { try { return JSON.parse(localStorage.getItem(k) || "null") ?? d; } catch { return d; } };
 const hex = (b: ArrayBuffer | Uint8Array) => Array.from(new Uint8Array(b as any)).map((x) => x.toString(16).padStart(2, "0")).join("");
@@ -36,8 +36,18 @@ export function getTeacher(): Teacher | null {
   const s = read(SESSION, null);
   const a = s ? read(ACCOUNTS, {})[String(s.email).toLowerCase()] : null;
   if (!a) return null;
-  const { fullName, email, phone, school, region } = a;
-  return { fullName, email, phone, school, region };
+  const { fullName, email, phone, school, region, schoolId } = a;
+  return { fullName, email, phone, school, region, schoolId };
+}
+
+/** Saves the school a teacher chose. Their classrooms then show on that school's headmaster dashboard. */
+export function setTeacherSchool(emailRaw: string, s: { id: string; name: string; region: string }) {
+  const accounts = read(ACCOUNTS, {});
+  const email = emailRaw.trim().toLowerCase();
+  if (!accounts[email]) return false;
+  accounts[email] = { ...accounts[email], schoolId: s.id, school: s.name, region: s.region };
+  localStorage.setItem(ACCOUNTS, JSON.stringify(accounts));
+  return true;
 }
 
 export function logoutTeacher() {

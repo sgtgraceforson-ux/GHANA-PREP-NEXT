@@ -55,3 +55,14 @@ The sign-in screen shows a "Continue with Google" button once `NEXT_PUBLIC_GOOGL
 5. Copy the client ID (it ends in `.apps.googleusercontent.com`) into `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in `.env.local` and in Vercel → Settings → Environment Variables, then redeploy. No client secret is needed.
 
 How it behaves: someone whose Google email already has an account is signed straight in. A new person is asked for their phone number, role and school once, with no password and no email code, because Google has already verified the email.
+
+## Headmaster dashboard
+
+Every government SHS has a headmaster code: the first 3 letters of the school's name and 4 numbers, for example `ACH-6335`. The headmaster signs in at `/headmaster` with it (the first time they also enter their name). Teachers must choose their school from the list when they sign up, and every classroom they create then appears on that school's headmaster dashboard.
+
+Codes are never stored in the code or sent to the browser. They are worked out on the server from the secret `HEADMASTER_CODE_SECRET`.
+
+1. `.env.local` already has a `HEADMASTER_CODE_SECRET`. Add the **same value** in Vercel → Settings → Environment Variables, then redeploy. Changing it later changes every school's code.
+2. Run `node scripts/headmaster-codes.mjs` to write all codes to `private/headmaster-codes.csv` (open it in Excel). This file is excluded from git: keep it private and give each headmaster only their own code.
+
+The school list (`lib/schools.json`) comes from Wikipedia's list of senior high schools in Ghana and is incomplete (about 550 of roughly 720 public SHS). Add missing schools at the **end** of the file so existing codes do not change, then run the script again.
