@@ -30,6 +30,7 @@ import { getRole, startTeacherSession, teacherProfileByPhone } from "@/lib/roles
 import { getTeacher } from "@/lib/teacher-auth";
 import { act, syncData, clearSynced } from "@/lib/sync";
 import { PremiumSheet, PLANS, PRICE_FROM } from "@/components/premium-sheet";
+import { VerifyCelebration } from "@/components/verify-celebration";
 import { SchoolPicker } from "@/components/school-picker";
 
 // ── Your real business details ───────────────────────────────────
@@ -4751,7 +4752,7 @@ function VerifyEmailScreen({ pending, onSuccess, onBack }) {
   const [resent,    setResent]    = useState(false);
   const [cooldown,  setCooldown]  = useState(0);
   const [devCode,   setDevCode]   = useState(pending.devCode || null); // local development only
-  const [verified,  setVerified]  = useState(false); // code accepted: show the logo briefly
+  const [verified,  setVerified]  = useState(false); // code accepted: play the celebration
 
   // Load the logo ahead of time so it appears the instant the code is accepted
   useEffect(() => { const img = new Image(); img.src = "/logo.webp"; }, []);
@@ -4821,9 +4822,8 @@ function VerifyEmailScreen({ pending, onSuccess, onBack }) {
     setLoading(false);
 
     if (!regRes.ok) { setError(regRes.msg); return; }
-    // Show the app logo for 2 seconds, then continue into the app
+    // Celebrate (merry-go-round of the code digits around the crest), then continue into the app
     setVerified(true);
-    setTimeout(onSuccess, 2000);
   }
 
   async function resend() {
@@ -4845,19 +4845,7 @@ function VerifyEmailScreen({ pending, onSuccess, onBack }) {
     a + b.replace(/./g, "•") + c
   );
 
-  if (verified) return (
-    <div role="status" aria-label="Email verified. Welcome to GhanaPrep." style={{
-      minHeight:"100vh", maxWidth:430, margin:"0 auto", background:"#0a0f0d",
-      display:"flex", alignItems:"center", justifyContent:"center", padding:24,
-    }}>
-      <style>{`
-        @keyframes logoIn { from{opacity:0;transform:scale(0.86)} to{opacity:1;transform:scale(1)} }
-        @media (prefers-reduced-motion: reduce) { .verified-logo { animation:none !important; } }
-      `}</style>
-      <img className="verified-logo" src="/logo.webp" alt="GhanaPrep" width={275} height={320}
-        style={{ width:"min(72vw, 275px)", height:"auto", animation:"logoIn 0.5s cubic-bezier(.22,.68,0,1.2) both" }}/>
-    </div>
-  );
+  if (verified) return <VerifyCelebration code={fullCode} name={pending.name} onDone={onSuccess} />;
 
   return (
     <div style={{
