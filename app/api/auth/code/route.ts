@@ -9,8 +9,9 @@
 // and SMTP_PASS to a Google "app password" (see README).
 
 import nodemailer from "nodemailer";
-import { createHmac, randomInt, timingSafeEqual } from "crypto";
+import { randomInt, timingSafeEqual } from "crypto";
 import { sameOrigin, clientIp, tooLarge, limited, HOUR, DAY } from "@/lib/api-guard";
+import { signEmailCode as sign } from "@/lib/server/email-code";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -18,10 +19,6 @@ export const runtime = "nodejs";
 const TTL_MS = 10 * 60 * 1000; // codes last 10 minutes
 const MAX_TRIES = 5;           // wrong guesses allowed per code
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-
-const secret = () => process.env.AUTH_SECRET || process.env.SMTP_PASS || "test-mode-secret";
-const sign = (email: string, code: string, expires: number) =>
-  createHmac("sha256", secret()).update(`${email}|${code}|${expires}`).digest("hex");
 
 // Wrong guesses per code (best-effort, held in this server instance's memory).
 const tries = new Map<string, number>();

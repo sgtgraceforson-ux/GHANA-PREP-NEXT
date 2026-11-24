@@ -1,7 +1,8 @@
-// Classroom announcements. Demo/local mode: stored in this browser's localStorage,
-// so they reach students on the same device only. Swap these functions for Supabase
-// queries (plus a realtime subscription in subscribe()) to reach every phone.
+// Classroom announcements, stored in the GhanaPrep database so they reach every student's phone.
+// Changes go through the server (only the classroom's teacher can post); reads use this device's
+// synced copy, refreshed every few seconds while a screen is open (subscribe).
 import { listStudentClassrooms, type Classroom } from "@/lib/classrooms";
+import { act, syncData, onSynced } from "@/lib/sync";
 import type { Attachment } from "@/lib/assignments";
 
 export type Announcement = {
@@ -17,15 +18,11 @@ export const MAX_ATTACHMENT = 700 * 1024;
 export const MAX_TITLE = 80, MAX_MESSAGE = 1000;
 
 const read = (k: string, d: any) => { try { return JSON.parse(localStorage.getItem(k) || "null") ?? d; } catch { return d; } };
-function write(k: string, v: any): boolean {
-  try { localStorage.setItem(k, JSON.stringify(v)); ping(); return true; } catch { return false; } // false = storage full
-}
 const all = (): Announcement[] => read(KEY, []);
 // pinned first, then newest first
 const order = (a: Announcement, b: Announcement) => Number(b.pinned) - Number(a.pinned) || b.createdAt - a.createdAt;
 
 export type SaveResult = { ok: boolean; error?: string; announcement?: Announcement };
-const FULL = "This device's storage is full. Remove the attachment or delete old announcements.";
 
 function check(title: string, message: string): string | null {
   if (!title.trim()) return "Add a title.";
@@ -35,33 +32,21 @@ function check(title: string, message: string): string | null {
   return null;
 }
 
-export function createAnnouncement(room: Classroom, input: { title: string; message: string; attachment: Attachment | null }): SaveResult {
+export async function createAnnouncement(room: Classroom, input: { title: string; message: string; attachment: Attachment | null }): Promise<SaveResult> {
   const error = check(input.title, input.message); if (error) return { ok: false, error };
-  const a: Announcement = {
-    id: "an_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
-    classroomId: room.id, teacherName: room.teacherName,
-    title: input.title.trim(), message: input.message.trim(), attachment: input.attachment,
-    pinned: false, createdAt: Date.now(), editedAt: null,
-  };
-  return write(KEY, [...all(), a]) ? { ok: true, announcement: a } : { ok: false, error: FULL };
+  const r = await act<Announcement>("announcement.save", { classroomId: room.id, ...input });
+  return r.ok ? { ok: true, announcement: r.result } : { ok: false, error: r.error };
 }
 
-export function updateAnnouncement(id: string, input: { title: string; message: string; attachment: Attachment | null }): SaveResult {
+export async function updateAnnouncement(id: string, input: { title: string; message: string; attachment: Attachment | null }): Promise<SaveResult> {
   const error = check(input.title, input.message); if (error) return { ok: false, error };
-  const list = all(); const a = list.find((x) => x.id === id);
-  if (!a) return { ok: false, error: "This announcement no longer exists." };
-  a.title = input.title.trim(); a.message = input.message.trim(); a.attachment = input.attachment; a.editedAt = Date.now();
-  return write(KEY, list) ? { ok: true, announcement: a } : { ok: false, error: FULL };
+  const r = await act<Announcement>("announcement.save", { id, ...input });
+  return r.ok ? { ok: true, announcement: r.result } : { ok: false, error: r.error };
 }
 
-export function togglePin(id: string): void {
-  const list = all(); const a = list.find((x) => x.id === id);
-  if (a) { a.pinned = !a.pinned; write(KEY, list); }
-}
+export async function togglePin(id: string): Promise<void> { await act("announcement.pin", { id }); }
 
-export function deleteAnnouncement(id: string): void {
-  write(KEY, all().filter((x) => x.id !== id));
-}
+export async function deleteAnnouncement(id: string): Promise<void> { await act("announcement.delete", { id }); }
 
 export const listAnnouncements = (classroomId: string): Announcement[] => all().filter((a) => a.classroomId === classroomId).sort(order);
 
@@ -78,23 +63,20 @@ export function listForStudent(phone: string, classroomId?: string): StudentAnno
 }
 export const unreadCount = (phone: string): number => listForStudent(phone).filter((a) => a.unread).length;
 
-export function markRead(phone: string, ids: string[]): void {
+export async function markRead(phone: string, ids: string[]): Promise<void> {
   if (!phone || !ids.length) return;
-  const store = read(READ_KEY, {}); const mine = store[phone] || {}; let changed = false;
-  ids.forEach((id) => { if (!mine[id]) { mine[id] = Date.now(); changed = true; } });
-  if (changed) { store[phone] = mine; write(READ_KEY, store); }
+  const seen = reads(phone);
+  const fresh = ids.filter((id) => !seen[id]);
+  if (fresh.length) await act("announcement.read", { ids: fresh });
 }
 
 /* ---------- live updates ----------
    Calls fn whenever announcements may have changed: straight away in this tab,
    through the browser's storage event in other tabs, and on a short timer as a fallback. */
-const EVT = "gp-announcements";
-function ping() { try { window.dispatchEvent(new Event(EVT)); } catch {} }
-export function subscribe(fn: () => void, everyMs = 4000): () => void {
-  const onStorage = (e: StorageEvent) => { if (!e.key || e.key === KEY || e.key === READ_KEY) fn(); };
-  window.addEventListener(EVT, fn); window.addEventListener("storage", onStorage);
-  const t = window.setInterval(fn, everyMs);
-  return () => { window.removeEventListener(EVT, fn); window.removeEventListener("storage", onStorage); window.clearInterval(t); };
+export function subscribe(fn: () => void, everyMs = 8000): () => void {
+  const off = onSynced(fn); // after any refresh of the synced copy
+  const t = window.setInterval(() => { if (document.visibilityState === "visible") syncData(); }, everyMs);
+  return () => { off(); window.clearInterval(t); };
 }
 
 export const formatDateTime = (ms: number): string =>

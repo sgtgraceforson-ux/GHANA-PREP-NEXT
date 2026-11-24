@@ -1,5 +1,7 @@
-// Classrooms + join codes. Demo/local mode (localStorage): codes only work on the same device
-// until this is moved to a shared database (e.g. Supabase) with a UNIQUE constraint on `code`.
+// Classrooms + join codes, stored in the GhanaPrep database. Changes go through the server
+// (act), which checks the teacher owns the classroom; reads come from this device's synced copy
+// of the data the signed-in person may see (see lib/sync.ts).
+import { act, type ActResult } from "@/lib/sync";
 export const SUBJECTS = [
   "Maths", "English", "Science", "Social Studies", "RME", "ICT", "French", "Twi", "Ga", "Ewe",
   "Physics", "Chemistry", "Biology", "Economics", "Geography", "Business",
@@ -13,13 +15,11 @@ export const TERMS = ["Term 1", "Term 2", "Term 3"];
 
 const CLS = "gp_classrooms_v1";          // { [id]: Classroom }
 const MEM = "gp_classroom_members_v1";   // { [classroomId]: [{ phone, name, joinedAt }] }
-const ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // 32 chars, no 0/O/1/I
 
 export type Classroom = { id: string; schoolId?: string; teacherEmail: string; teacherName: string; name: string; subject: string; level: string; term: string; code: string; createdAt: number };
 export type Student = { phone: string; name: string };
 
 const read = (k: string, d: any) => { try { return JSON.parse(localStorage.getItem(k) || "null") ?? d; } catch { return d; } };
-const write = (k: string, v: any) => localStorage.setItem(k, JSON.stringify(v));
 
 export const formatCode = (c: string) => "GH-" + c;
 // accepts "7k2p9x", "GH-7K2P9X", "gh7k2p9x"
@@ -29,21 +29,8 @@ export function normalizeCode(raw: string) {
   return c;
 }
 
-function uniqueCode(taken: Set<string>) {
-  for (let i = 0; i < 1000; i++) {
-    const code = Array.from(crypto.getRandomValues(new Uint8Array(6)), (b) => ALPHA[b % ALPHA.length]).join("");
-    if (!taken.has(code)) return code; // must be unique across ALL classrooms
-  }
-  throw new Error("Could not generate a unique code. Try again.");
-}
-const takenCodes = (all: Record<string, Classroom>) => new Set(Object.values(all).map((c) => c.code));
-
-export function createClassroom(t: { email: string; fullName: string; schoolId?: string }, d: { name: string; subject: string; level: string; term: string }): Classroom {
-  const all = read(CLS, {});
-  const id = Array.from(crypto.getRandomValues(new Uint8Array(8)), (b) => b.toString(16).padStart(2, "0")).join("");
-  const room: Classroom = { id, schoolId: t.schoolId || "", teacherEmail: t.email.toLowerCase(), teacherName: t.fullName, name: d.name.trim(), subject: d.subject, level: d.level, term: d.term, code: uniqueCode(takenCodes(all)), createdAt: Date.now() };
-  all[id] = room; write(CLS, all);
-  return room;
+export async function createClassroom(_t: { email: string; fullName: string; schoolId?: string }, d: { name: string; subject: string; level: string; term: string }): Promise<ActResult<Classroom>> {
+  return act<Classroom>("classroom.create", d);
 }
 
 export function memberCount(id: string) { return (read(MEM, {})[id] || []).length; }
@@ -55,13 +42,8 @@ export function listTeacherClassrooms(email: string) {
     .map((c) => ({ ...c, count: memberCount(c.id) }));
 }
 
-export function regenerateCode(id: string, teacherEmail: string) {
-  const all = read(CLS, {});
-  const room = all[id];
-  if (!room || room.teacherEmail !== teacherEmail.toLowerCase()) return null;
-  room.code = uniqueCode(takenCodes(all)); // the old code stops working
-  write(CLS, all);
-  return room as Classroom;
+export async function regenerateCode(id: string, _teacherEmail?: string): Promise<ActResult<Classroom>> {
+  return act<Classroom>("classroom.regenerate", { id }); // the old code stops working
 }
 
 export function findByCode(raw: string): Classroom | null {
@@ -70,15 +52,9 @@ export function findByCode(raw: string): Classroom | null {
   return (Object.values(read(CLS, {})) as Classroom[]).find((r) => r.code === c) || null;
 }
 
-export function joinClassroom(s: Student, raw: string): { ok: boolean; error?: string; classroom?: Classroom } {
-  const room = findByCode(raw);
-  if (!room) return { ok: false, error: "Invalid code. Check with your teacher." };
-  const mem = read(MEM, {});
-  const list = mem[room.id] || [];
-  if (list.some((m: any) => m.phone === s.phone)) return { ok: false, error: "You're already in this classroom." };
-  mem[room.id] = [...list, { phone: s.phone, name: s.name, joinedAt: Date.now() }];
-  write(MEM, mem);
-  return { ok: true, classroom: room };
+export async function joinClassroom(_s: Student, raw: string): Promise<{ ok: boolean; error?: string; classroom?: Classroom }> {
+  const r = await act<Classroom>("classroom.join", { code: raw });
+  return r.ok ? { ok: true, classroom: r.result } : { ok: false, error: r.error };
 }
 
 export function listStudentClassrooms(phone: string): Classroom[] {

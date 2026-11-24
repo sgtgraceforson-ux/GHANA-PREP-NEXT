@@ -2,6 +2,7 @@
 import { JoinBodySkeleton } from "@/components/skeletons";
 import { useEffect, useState } from "react";
 import { joinClassroom, listStudentClassrooms, normalizeCode, formatCode, type Classroom } from "@/lib/classrooms";
+import { useSyncedData } from "@/lib/sync";
 
 const CSS = `@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
 .jp *{box-sizing:border-box} .jp input:focus{border-color:#22c55e !important}`;
@@ -14,17 +15,22 @@ export default function JoinClassroomPage() {
   const [joined, setJoined] = useState<Classroom | null>(null);
   const [mine, setMine] = useState<Classroom[]>([]);
 
+  const [busy, setBusy] = useState(false);
+  const { ready, v } = useSyncedData();
   useEffect(() => {
+    if (!ready) return;
     let s = null;
     try { s = JSON.parse(localStorage.getItem("gp_session_v3") || "null"); } catch {}
     setStudent(s);
     if (s) setMine(listStudentClassrooms(s.phone));
-  }, []);
+  }, [ready, v]);
 
-  function submit() {
-    if (!student) return;
+  async function submit() {
+    if (!student || busy) return;
     if (normalizeCode(code).length !== 6) { setJoined(null); setMsg({ ok: false, text: "Invalid code. Check with your teacher." }); return; }
-    const r = joinClassroom(student, code);
+    setBusy(true);
+    const r = await joinClassroom(student, code);
+    setBusy(false);
     if (r.ok) { setJoined(r.classroom); setMsg(null); setCode(""); setMine(listStudentClassrooms(student.phone)); }
     else { setJoined(null); setMsg({ ok: false, text: r.error }); }
   }

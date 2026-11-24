@@ -49,15 +49,19 @@ function CreateModal({ room, onClose, onCreated }: { room: Classroom; onClose: (
     }
     setFiles(next); setErr({ ...err, files: msg });
   }
-  function submit() {
+  const [saving, setSaving] = useState(false);
+  async function submit() {
+    if (saving) return;
     const e: Record<string, string> = {}; const m = Number(marks);
     if (title.trim().length < 3) e.title = "Enter a title";
     if (!due) e.due = "Choose a due date"; else if (endOfDay(due) < Date.now()) e.due = "The due date cannot be in the past";
     if (!marks || !Number.isFinite(m) || m <= 0 || m > 1000) e.marks = "Enter total marks between 1 and 1000";
     setErr(e); if (Object.keys(e).length) return;
-    try {
-      onCreated(createAssignment(room, { title, instructions, dueAt: endOfDay(due), totalMarks: m, attachments: files, questions: bank.filter((q) => sel.includes(q.key)) }));
-    } catch { setErr({ files: "Could not save: browser storage is full. Remove some files and try again." }); }
+    setSaving(true);
+    const r = await createAssignment(room, { title, instructions, dueAt: endOfDay(due), totalMarks: m, attachments: files, questions: bank.filter((q) => sel.includes(q.key)) });
+    setSaving(false);
+    if (r.ok && r.assignment) onCreated(r.assignment);
+    else setErr({ files: r.error || "Could not save the assignment. Try again." });
   }
 
   return (
@@ -127,8 +131,8 @@ function Detail({ room, a, onBack }: { room: Classroom; a: Assignment; onBack: (
   const graded = done.filter((m) => subs[dg(m.phone)].gradedAt).length;
 
   function open(m: Member) { const s = subs[dg(m.phone)]; setGrading(dg(m.phone)); setMarks(s.marks === null ? "" : String(s.marks)); setFb(s.feedback || ""); setGerr(""); }
-  function save() {
-    const r = gradeSubmission(a.id, grading!, marks === "" ? NaN : Number(marks), fb);
+  async function save() {
+    const r = await gradeSubmission(a.id, grading!, marks === "" ? NaN : Number(marks), fb);
     if (!r.ok) { setGerr(r.error); return; }
     setGrading(null); load();
   }

@@ -28,6 +28,7 @@ function Ico({ n, size = "1.08em" }) {
 }
 import { getRole, startTeacherSession, teacherProfileByPhone } from "@/lib/roles";
 import { getTeacher } from "@/lib/teacher-auth";
+import { act, syncData, clearSynced } from "@/lib/sync";
 import { SchoolPicker } from "@/components/school-picker";
 
 // ── Your real business details ───────────────────────────────────
@@ -301,299 +302,112 @@ const GLOBAL_CSS = `
 `;
 
 /* ═══════════════════════════════════════════════════════════════
-   SUPABASE CONFIG  — Real-time leaderboard + user accounts
-   ─────────────────────────────────────────────────────────────
-   SETUP (5 min, free at supabase.com):
-
-   1. Create a project at https://supabase.com
-   2. SQL Editor → run ALL of this:
-
-   -- Users table
-   create table if not exists gp_users (
-     id            uuid primary key default gen_random_uuid(),
-     phone         text unique not null,
-     email         text unique,
-     name          text not null,
-     password_hash text not null,
-     school        text default '',
-     avatar_color  text default '#22c55e',
-     email_verified boolean default false,
-     joined_at     bigint not null,
-     stats         jsonb not null default '{"done":0,"totalScore":0,"weak":{},
-       "objDone":0,"theoryDone":0,"objScore":0,"theoryScore":0,
-       "doneToday":0,"lastDay":"","streak":0,"weekScore":0,
-       "weekDay":""}' ::jsonb
-   );
-   alter table gp_users enable row level security;
-   create policy "public_rw" on gp_users for all using (true) with check (true);
-
-   -- Leaderboard view (auto-computed from real user stats)
-   create or replace view gp_leaderboard as
-   select
-     name,
-     school,
-     avatar_color,
-     (stats->'done')::int                                    as done,
-     round((stats->'totalScore')::numeric, 1)               as total_score,
-     case when (stats->'done')::int > 0
-       then round((stats->'totalScore')::numeric /
-                  (stats->'done')::int, 2) else 0 end       as avg_score,
-     (stats->'doneToday')::int                              as done_today,
-     (stats->'weekScore')::numeric                          as week_score,
-     (stats->'streak')::int                                 as streak,
-     joined_at
-   from gp_users
-   where (stats->'done')::int > 0
-   order by total_score desc;
-
-   3. Settings → API → copy Project URL + anon key below:
+   ACCOUNTS — stored in the GhanaPrep database (Supabase), reached only through this app's
+   own server (/api/auth/*, /api/me, /api/leaderboard). Signing in sets a secure session
+   cookie that the browser cannot read or change.
+   The copy kept in localStorage ("gp_session_v3", and the account copy in "gp_local_accs")
+   is only a cache for screens that still use device storage (classrooms, quizzes, parents,
+   headmaster) until they move to the database too. It is never trusted by the server.
 ═══════════════════════════════════════════════════════════════ */
-const SUPA_URL = "https://xyzxyzxyz.supabase.co";  // ← paste your URL
-const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder"; // ← anon key
-const IS_LOCAL = SUPA_URL.includes("xyzxyzxyz");   // true = demo mode
-
-/* Questions answered per calendar day ("YYYY-MM-DD" -> count), for the weekly activity
-   register on the headmaster dashboard. Keeps about 4 months. */
-function logDay(days) {
-  const d = new Date(), key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-  const out = { ...(days || {}) }; out[key] = (out[key] || 0) + 1;
-  const keys = Object.keys(out).sort(); while (keys.length > 120) delete out[keys.shift()];
-  return out;
+async function api(path, body) {
+  const res = await fetch(path, body === undefined
+    ? { cache:"no-store" }
+    : { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(body) });
+  const data = await res.json().catch(()=>({}));
+  return { ok: res.ok, status: res.status, data };
 }
+const NET_ERR = "Network error. Check your connection and try again.";
+const readLS  = (k, d) => { try { return JSON.parse(localStorage.getItem(k)||"null") ?? d; } catch { return d; } };
+const writeLS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 
-/* Simple deterministic hash — good enough for a demo app.
-   In production use bcrypt on a server. */
-async function hashPassword(password) {
-  const enc = new TextEncoder();
-  const data = enc.encode("ghanaprep_salt_2025_" + password);
-  const buf  = await crypto.subtle.digest("SHA-256", data);
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
-}
-
-const supa = {
-  async query(path, opts={}) {
-    const res = await fetch(`${SUPA_URL}/rest/v1${path}`, {
-      ...opts,
-      headers: {
-        "Content-Type":  "application/json",
-        "apikey":        SUPA_KEY,
-        "Authorization": `Bearer ${SUPA_KEY}`,
-        "Prefer":        "return=representation",
-        ...(opts.headers||{})
-      }
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(()=>({}));
-      throw new Error(err.message || `DB error ${res.status}`);
-    }
-    const text = await res.text();
-    return text ? JSON.parse(text) : [];
-  }
-};
-
-/* ── AUTH STORE (Supabase-backed, session in localStorage) ── */
 const AUTH = {
-  /* ─ session helpers (localStorage only stores phone+name token) ─ */
-  getSession()      { return JSON.parse(localStorage.getItem("gp_session_v3")||"null"); },
-  setSession(u)     { localStorage.setItem("gp_session_v3", JSON.stringify(u)); },
-  clearSession()    { localStorage.removeItem("gp_session_v3"); },
+  signedOut: false,
+  getSession()   { return readLS("gp_session_v3", null); },
+  setSession(u)  { writeLS("gp_session_v3", u); },
+  clearSession() { localStorage.removeItem("gp_session_v3"); clearSynced(); fetch("/api/auth/logout", { method:"POST" }).catch(()=>{}); },
 
-  /* ─ register ─────────────────────────────────────────────── */
-  async register(name, phone, email, password, school="", avatarColor="#22c55e") {
-    try {
-      const existing = await supa.query(`/gp_users?phone=eq.${encodeURIComponent(phone)}&select=phone`);
-      if (existing.length > 0) return { ok:false, msg:"This phone number is already registered." };
-
-      if (email) {
-        const emailExisting = await supa.query(`/gp_users?email=eq.${encodeURIComponent(email)}&select=email`);
-        if (emailExisting.length > 0) return { ok:false, msg:"This email address is already registered." };
-      }
-
-      const password_hash = await hashPassword(password);
-      const stats = { done:0, totalScore:0, weak:{}, objDone:0, theoryDone:0,
-        objScore:0, theoryScore:0, doneToday:0, lastDay:"", streak:0, weekScore:0, weekDay:"" };
-
-      await supa.query("/gp_users", {
-        method: "POST",
-        body: JSON.stringify({ name, phone, email: email||null, password_hash, school,
-          avatar_color: avatarColor, email_verified: true, joined_at: Date.now(), stats })
-      });
-
-      this.setSession({ name, phone, email: email||"" });
-      return { ok:true };
-    } catch(e) {
-      if (IS_LOCAL) return this._localRegister(name, phone, email, password, school, avatarColor);
-      return { ok:false, msg:"Network error. Check connection and try again." };
+  /* keeps this device's copy of the account in step with the server (see note above) */
+  remember(u) {
+    if (!u || !u.phone) return u;
+    const digits = String(u.phone).replace(/\D/g,"");
+    const accs = readLS("gp_local_accs", {});
+    accs[u.phone] = { name:u.name, phone:u.phone, email:u.email, school:u.school, avatar_color:u.avatar_color, stats:u.stats||{} };
+    writeLS("gp_local_accs", accs);
+    const roles = readLS("gp_roles_v1", {});
+    if (u.role === "teacher" || u.role === "parent") roles[digits] = u.role; else delete roles[digits];
+    writeLS("gp_roles_v1", roles);
+    if (u.role === "teacher") {
+      const t = readLS("gp_teachers_v1", {}); const prev = t[u.email] || {};
+      t[u.email] = { ...prev, fullName:u.name, email:u.email, phone:digits, school:u.school, region:u.region, schoolId:u.schoolId||prev.schoolId||"", createdAt:prev.createdAt||Date.now() };
+      writeLS("gp_teachers_v1", t);
     }
+    return u;
+  },
+  signIn(u) {
+    clearSynced(); // nothing from a previous person stays on this device
+    this.remember(u); this.signedOut = false;
+    this.setSession({ name:u.name, phone:u.phone, email:u.email });
+    return { ok:true, name:u.name, phone:u.phone, email:u.email, role:u.role, user:u };
   },
 
-  /* ─ login ────────────────────────────────────────────────── */
-  async login(identifier, password) {
-    // Sign-in is by email. Accounts created before email sign-in have no email on file,
-    // so a phone number typed in the same box still works for them.
-    const id      = String(identifier||"").trim();
-    const byEmail = id.includes("@");
-    const key     = byEmail ? id.toLowerCase() : id;
+  /* extra: { role, schoolId, proof } — proof shows the email is real: the emailed code, or Google */
+  async register(name, phone, email, password, school="", avatarColor="#22c55e", extra={}) {
     try {
-      const rows = await supa.query(`/gp_users?${byEmail?"email":"phone"}=eq.${encodeURIComponent(key)}&select=name,phone,email,password_hash`);
-      if (rows.length === 0) return { ok:false, msg: byEmail ? "No account found with this email address." : "No account found. Sign in with your email address." };
-
-      const user = rows[0];
-      const hash = await hashPassword(password);
-      if (hash !== user.password_hash) return { ok:false, msg:"Incorrect password. If you signed up with Google, use Continue with Google." };
-
-      this.setSession({ name: user.name, phone: user.phone, email: user.email||"" });
-      return { ok:true, name: user.name, phone: user.phone, email: user.email||"" };
-    } catch(e) {
-      if (SUPA_URL.includes("xyzxyzxyz")) return this._localLogin(key, password);
-      return { ok:false, msg:"Network error. Check connection and try again." };
-    }
+      const r = await api("/api/auth/register", { name, phone, email, password, school, avatarColor,
+        role: extra.role || "student", schoolId: extra.schoolId || "", proof: extra.proof || this.pendingProof(email) });
+      if (!r.ok || !r.data.user) return { ok:false, msg: r.data.error || "Could not create your account. Try again." };
+      this.clearPendingVerification();
+      return this.signIn(r.data.user);
+    } catch { return { ok:false, msg:NET_ERR }; }
   },
 
-  /* ─ Google sign-in: the server has already checked the Google token, so no password is needed ─ */
-  async loginWithGoogle(email) {
-    const key = String(email||"").trim().toLowerCase();
+  async login(email, password) {
     try {
-      const rows = await supa.query(`/gp_users?email=eq.${encodeURIComponent(key)}&select=name,phone,email`);
-      if (rows.length === 0) return { ok:false, notFound:true };
-      const user = rows[0];
-      this.setSession({ name: user.name, phone: user.phone, email: user.email||key });
-      return { ok:true, name: user.name, phone: user.phone, email: user.email||key };
-    } catch(e) {
-      if (!IS_LOCAL) return { ok:false, msg:"Network error. Check connection and try again." };
-      const acc = Object.values(this._localAccounts()).find(u => (u.email||"").toLowerCase() === key);
-      if (!acc) return { ok:false, notFound:true };
-      this.setSession({ name:acc.name, phone:acc.phone, email:key });
-      return { ok:true, name:acc.name, phone:acc.phone, email:key };
-    }
+      const r = await api("/api/auth/login", { email: String(email||"").trim(), password });
+      if (!r.ok || !r.data.user) return { ok:false, msg: r.data.error || "Could not sign you in. Try again." };
+      return this.signIn(r.data.user);
+    } catch { return { ok:false, msg:NET_ERR }; }
   },
 
-  /* ─ is this phone / email already registered? (checked before a code is emailed) ─ */
+  /* Google: signs straight in, or reports a new person who must finish their profile */
+  async google(credential) {
+    try {
+      const r = await api("/api/auth/google", { credential });
+      if (!r.ok) return { ok:false, msg: r.data.error || "Google sign-in failed. Try again." };
+      if (r.data.user) return this.signIn(r.data.user);
+      return { ok:false, needsProfile:true, email:r.data.email, name:r.data.name || "", proof:r.data.proof };
+    } catch { return { ok:false, msg:NET_ERR }; }
+  },
+
+  /* is this phone / email already registered? (checked before a code is emailed) */
   async findTaken(phone, email) {
-    try {
-      const byPhone = await supa.query(`/gp_users?phone=eq.${encodeURIComponent(phone)}&select=phone`);
-      if (byPhone.length > 0) return "This phone number is already registered.";
-      const byEmail = await supa.query(`/gp_users?email=eq.${encodeURIComponent(email)}&select=email`);
-      if (byEmail.length > 0) return "This email address is already registered. Sign in instead.";
-      return "";
-    } catch(e) {
-      if (!IS_LOCAL) return "";
-      const a = this._localAccounts();
-      if (a[phone]) return "This phone number is already registered.";
-      if (Object.values(a).some(u => (u.email||"").toLowerCase() === email)) return "This email address is already registered. Sign in instead.";
-      return "";
-    }
+    try { const r = await api("/api/auth/check", { phone, email }); return r.ok ? (r.data.taken || "") : (r.data.error || ""); }
+    catch { return ""; }
   },
 
-  /* ─ get user stats ───────────────────────────────────────── */
-  async getUser(phone) {
+  /* the signed-in person's account; null when not signed in (then AUTH.signedOut is true) */
+  async getUser() {
     try {
-      const rows = await supa.query(`/gp_users?phone=eq.${encodeURIComponent(phone)}&select=name,phone,stats,joined_at`);
-      if (rows.length === 0) return null;
-      return rows[0];
-    } catch(e) {
-      if (SUPA_URL.includes("xyzxyzxyz")) return this._localGetUser(phone);
-      return null;
-    }
+      const r = await api("/api/me");
+      this.signedOut = r.status === 401;
+      if (!r.ok || !r.data.user) return null;
+      return this.remember(r.data.user);
+    } catch { return null; }
   },
 
-  /* ─ update stats ─────────────────────────────────────────── */
   async updateStats(phone, score, topic, mode) {
     try {
-      const rows = await supa.query(`/gp_users?phone=eq.${encodeURIComponent(phone)}&select=stats`);
-      if (rows.length === 0) return;
-      const s = { ...rows[0].stats };
-      const today   = new Date().toDateString();
-      const thisWeek = `W${Math.floor(Date.now()/(7*24*3600*1000))}`;
-
-      // Daily reset
-      if (s.lastDay !== today) {
-        // Streak: increment if yesterday was active, else reset
-        const yesterday = new Date(Date.now()-86400000).toDateString();
-        s.streak = (s.lastDay === yesterday) ? (s.streak||0)+1 : 1;
-        s.doneToday = 0;
-        s.lastDay   = today;
+      const r = await api("/api/me/stats", { score, topic, mode });
+      if (r.ok && r.data.stats) {
+        const accs = readLS("gp_local_accs", {});
+        if (accs[phone]) { accs[phone].stats = r.data.stats; writeLS("gp_local_accs", accs); }
       }
-      // Weekly reset
-      if (s.weekDay !== thisWeek) { s.weekScore=0; s.weekDay=thisWeek; }
-
-      s.done++;
-      s.totalScore = (s.totalScore||0) + score;
-      s.weekScore  = (s.weekScore||0)  + score;
-      s.doneToday++;
-      s.days = logDay(s.days);
-      s.lastActiveAt = Date.now();
-      if (mode==="objectives") { s.objDone=(s.objDone||0)+1; s.objScore=(s.objScore||0)+score; }
-      else { s.theoryDone=(s.theoryDone||0)+1; s.theoryScore=(s.theoryScore||0)+score; }
-      if (!s.weak) s.weak={};
-      if (score < 6) s.weak[topic] = (s.weak[topic]||0)+1;
-
-      await supa.query(`/gp_users?phone=eq.${encodeURIComponent(phone)}`, {
-        method: "PATCH", body: JSON.stringify({ stats: s })
-      });
-    } catch(e) {
-      if (IS_LOCAL) this._localUpdateStats(phone, score, topic, mode);
-    }
+    } catch {}
   },
 
-  /* ─ real leaderboard fetch ───────────────────────────────── */
   async fetchLeaderboard(period="alltime") {
-    try {
-      if (IS_LOCAL) return this._localLeaderboard(period);
-      // Query the gp_leaderboard view created in Supabase
-      const col   = period==="today"  ? "done_today"
-                  : period==="week"   ? "week_score"
-                  : "total_score";
-      const rows = await supa.query(
-        `/gp_leaderboard?select=name,school,avatar_color,done,total_score,avg_score,done_today,week_score,streak&order=${col}.desc&limit=50`
-      );
-      return rows.map((r,i) => ({
-        rank:        i+1,
-        name:        r.name,
-        school:      r.school||"",
-        avatarColor: r.avatar_color||"#22c55e",
-        done:        r.done||0,
-        totalScore:  parseFloat(r.total_score)||0,
-        avgScore:    parseFloat(r.avg_score)||0,
-        doneToday:   r.done_today||0,
-        weekScore:   parseFloat(r.week_score)||0,
-        streak:      r.streak||0,
-        score:       period==="today"  ? (r.done_today||0)*10
-                   : period==="week"   ? Math.round((r.week_score||0)*10)/10
-                   : Math.round((parseFloat(r.total_score)||0)),
-      }));
-    } catch(e) {
-      return this._localLeaderboard(period);
-    }
-  },
-
-  /* ─ local leaderboard (uses all local accounts) ─────────── */
-  _localLeaderboard(period) {
-    const accounts = Object.values(this._localAccounts());
-    const thisWeek = `W${Math.floor(Date.now()/(7*24*3600*1000))}`;
-    return accounts
-      .filter(a => (a.stats?.done||0) > 0)
-      .map((a,i) => {
-        const s = a.stats||{};
-        const isThisWeek = s.weekDay === thisWeek;
-        const score = period==="today"  ? (s.doneToday||0)*10
-                    : period==="week"   ? (isThisWeek ? s.weekScore||0 : 0)
-                    : s.totalScore||0;
-        return {
-          name:       a.name,
-          school:     a.school||"",
-          avatarColor:a.avatar_color||"#22c55e",
-          done:       s.done||0,
-          totalScore: s.totalScore||0,
-          avgScore:   s.done>0 ? s.totalScore/s.done : 0,
-          doneToday:  s.doneToday||0,
-          weekScore:  isThisWeek ? s.weekScore||0 : 0,
-          streak:     s.streak||0,
-          score:      Math.round(score*10)/10,
-        };
-      })
-      .sort((a,b)=>b.score-a.score)
-      .map((u,i)=>({...u, rank:i+1}));
+    try { const r = await api(`/api/leaderboard?period=${encodeURIComponent(period)}`); return r.ok ? (r.data.rows || []) : []; }
+    catch { return []; }
   },
 
   /* ─ email verification ─────────────────────────────────── */
@@ -625,7 +439,7 @@ const AUTH = {
       });
       const d = await res.json().catch(()=>({}));
       if (!res.ok || !d.ok) return { ok:false, msg: d.error || "Incorrect code. Try again." };
-      localStorage.removeItem("gp_pending_verify");
+      writeLS("gp_pending_verify", { ...pending, code: inputCode.trim() }); // sign-up sends this to the server as proof
       return { ok:true };
     } catch(e) {
       return { ok:false, msg:"Network error. Check your connection and try again." };
@@ -635,45 +449,10 @@ const AUTH = {
   clearPendingVerification() {
     localStorage.removeItem("gp_pending_verify");
   },
-
-  /* ─ localStorage fallback (when Supabase not configured) ─── */
-  _localAccounts() { return JSON.parse(localStorage.getItem("gp_local_accs")||"{}"); },
-  _saveLocal(a)    { localStorage.setItem("gp_local_accs", JSON.stringify(a)); },
-
-  _localRegister(name, phone, email, password, school="", avatarColor="#22c55e") {
-    const a = this._localAccounts();
-    if (a[phone]) return { ok:false, msg:"This phone number is already registered." };
-    if (email) {
-      const emailTaken = Object.values(a).some(u => (u.email||"").toLowerCase() === email.toLowerCase());
-      if (emailTaken) return { ok:false, msg:"This email address is already registered." };
-    }
-    a[phone] = { name, phone, email: email||"", password, school, avatar_color: avatarColor,
-      email_verified: true,
-      stats:{ done:0, totalScore:0, weak:{}, objDone:0, theoryDone:0,
-        objScore:0, theoryScore:0, doneToday:0, lastDay:"", streak:0, weekScore:0, weekDay:"" }};
-    this._saveLocal(a); this.setSession({ name, phone, email: email||"" });
-    return { ok:true };
+  pendingProof(email) {
+    const p = readLS("gp_pending_verify", null);
+    return p && p.email === email && p.code ? { kind:"email", code:p.code, token:p.token, expires:p.expires } : null;
   },
-  _localLogin(id, password) {
-    const a = this._localAccounts();
-    const acc = id.includes("@") ? Object.values(a).find(u => (u.email||"").toLowerCase() === id) : a[id];
-    if (!acc) return { ok:false, msg: id.includes("@") ? "No account found with this email address." : "No account found. Sign in with your email address." };
-    if (acc.password !== password) return { ok:false, msg:"Incorrect password. If you signed up with Google, use Continue with Google." };
-    this.setSession({ name:acc.name, phone:acc.phone, email:acc.email||"" });
-    return { ok:true, name:acc.name, phone:acc.phone, email:acc.email||"" };
-  },
-  _localGetUser(phone) { return this._localAccounts()[phone]||null; },
-  _localUpdateStats(phone, score, topic, mode) {
-    const a = this._localAccounts();
-    if (!a[phone]) return;
-    const today = new Date().toDateString();
-    const s = a[phone].stats;
-    if (s.lastDay!==today){const y=new Date(Date.now()-86400000).toDateString();s.streak=(s.lastDay===y)?(s.streak||0)+1:1;s.doneToday=0;s.lastDay=today;}
-    s.done++;s.totalScore+=score;s.doneToday++;s.days=logDay(s.days); s.lastActiveAt=Date.now();
-    if(mode==="objectives"){s.objDone++;s.objScore+=score;}else{s.theoryDone++;s.theoryScore+=score;}
-    if(score<6)s.weak[topic]=(s.weak[topic]||0)+1;
-    a[phone].stats=s; this._saveLocal(a);
-  }
 };
 
 /* ═══════════════════════════════════════════════════════════════
@@ -681,23 +460,26 @@ const AUTH = {
    (localStorage; swap for Supabase tables in production)
 ═══════════════════════════════════════════════════════════════ */
 const QUIZ_STORE = {
-  generateCode() {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    let code;
-    do {
-      code = Array.from({length:6}, () => chars[Math.floor(Math.random()*chars.length)]).join("");
-    } while (this.getAll()[code]);
-    return code;
-  },
+  /* Quizzes and results live in the GhanaPrep database. Reads use this device's synced copy
+     (see lib/sync.ts); saving goes through the server, which gives each quiz its unique code. */
   getAll() {
     try { return JSON.parse(localStorage.getItem("gp_quizzes_v1") || "{}"); }
     catch { return {}; }
   },
-  saveQuiz(quiz) {
-    const all = this.getAll();
-    all[quiz.code] = quiz;
-    localStorage.setItem("gp_quizzes_v1", JSON.stringify(all));
-    return quiz;
+  async saveQuiz(quiz) {
+    const r = await act("quiz.save", { quiz });
+    return r.ok ? { ok:true, quiz:r.result } : { ok:false, error:r.error };
+  },
+  /* finds a quiz by its code, asking the server when this device has not seen it yet */
+  async fetchQuiz(code) {
+    const c = String(code || "").toUpperCase().trim();
+    const cached = this.getQuiz(c);
+    if (cached) return cached;
+    const r = await act("quiz.get", { code: c });
+    if (!r.ok || !r.result) return null;
+    const all = this.getAll(); all[c] = r.result;
+    try { localStorage.setItem("gp_quizzes_v1", JSON.stringify(all)); } catch {}
+    return r.result;
   },
   getQuiz(code) {
     return this.getAll()[String(code || "").toUpperCase().trim()] || null;
@@ -714,24 +496,17 @@ const QUIZ_STORE = {
   getResults(code) {
     return this.getAllResults()[code] || [];
   },
-  saveResult(code, result) {
-    const all = this.getAllResults();
-    const list = all[code] || [];
-    list.push(result);
-    all[code] = list;
-    localStorage.setItem("gp_quiz_results_v1", JSON.stringify(all));
+  async saveResult(code, result) {
+    return act("quiz.result", { code, result });
   },
   /* Challenges a student has opened with a code (kept per phone number). */
   getJoined(studentPhone) {
     try { return (JSON.parse(localStorage.getItem("gp_challenge_joined_v1") || "{}")[studentPhone]) || []; }
     catch { return []; }
   },
-  markJoined(code, studentPhone) {
+  async markJoined(code, studentPhone) {
     if (!studentPhone) return;
-    try {
-      const all = JSON.parse(localStorage.getItem("gp_challenge_joined_v1") || "{}");
-      if (!(all[studentPhone]||[]).includes(code)) { all[studentPhone] = [...(all[studentPhone]||[]), code]; localStorage.setItem("gp_challenge_joined_v1", JSON.stringify(all)); }
-    } catch {}
+    await act("quiz.open", { code });
   },
   hasAttempted(code, studentPhone) {
     return this.getResults(code).some(r => r.studentPhone === studentPhone);
@@ -1598,7 +1373,10 @@ function App() {
     const sess = AUTH.getSession();
     if (sess) {
       setUser(sess);
-      AUTH.getUser(sess.phone).then(u => { if(u) setUserData(u); }).catch(()=>{}).finally(()=>setUserLoaded(true));
+      AUTH.getUser().then(u => {
+        if (u) { setUserData(u); syncData(); return; } // classrooms, quizzes, parent links
+        if (AUTH.signedOut) { AUTH.clearSession(); setUser(null); setScreen("auth"); } // session ended or signed out elsewhere
+      }).catch(()=>{}).finally(()=>setUserLoaded(true));
       setScreen("levels");
     } else {
       setTimeout(() => setScreen("auth"), 1500);
@@ -1608,13 +1386,13 @@ function App() {
   /* Reload user data when user changes */
   useEffect(() => {
     if (!user) return;
-    AUTH.getUser(user.phone).then(u => { if(u) setUserData(u); }).catch(()=>{}).finally(()=>setUserLoaded(true));
+    AUTH.getUser().then(u => { if(u) setUserData(u); }).catch(()=>{}).finally(()=>setUserLoaded(true));
   }, [user?.phone]);
 
   /* Refresh stats after answer */
   function refreshUser() {
     if (!user) return;
-    setTimeout(() => AUTH.getUser(user.phone).then(u => { if(u) setUserData(u); }), 400);
+    setTimeout(() => AUTH.getUser().then(u => { if(u) setUserData(u); }), 400);
   }
 
   const stats     = userData?.stats || { done:0, totalScore:0, weak:{}, objDone:0, theoryDone:0, objScore:0, theoryScore:0, doneToday:0 };
@@ -1845,7 +1623,7 @@ function App() {
       onPendingVerify={(pending) => setPendingReg(pending)}
       onSuccess={(u) => {
         setUser(u);
-        AUTH.getUser(u.phone).then(d => setUserData(d));
+        AUTH.getUser().then(d => { if (d) setUserData(d); });
         setScreen("levels");
       }}
     />
@@ -2536,24 +2314,13 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport, onLe
   async function handleGoogle(resp) {
     if (!resp || !resp.credential) return;
     setErrors({}); setServerErr(""); setLoading(true);
-    let g = null;
-    try {
-      const r = await fetch("/api/auth/google", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ credential: resp.credential }),
-      });
-      const d = await r.json().catch(()=>({}));
-      if (!r.ok || !d.email) { setLoading(false); setServerErr(d.error || "Google sign-in failed. Try again."); return; }
-      g = d;
-    } catch(err) {
-      setLoading(false); setServerErr("Network error. Check your connection and try again."); return;
-    }
-    const res = await AUTH.loginWithGoogle(g.email);
+    const res = await AUTH.google(resp.credential);
     setLoading(false);
     if (res.ok) { routeSignedIn(res, true); return; }
-    if (!res.notFound) { setServerErr(res.msg || "Google sign-in failed. Try again."); return; }
+    if (!res.needsProfile) { setServerErr(res.msg || "Google sign-in failed. Try again."); return; }
+    const g = res;
     // First time here: the email is confirmed by Google, so only the profile details are left.
-    setGoogleUser({ email: g.email, name: g.name || "" });
+    setGoogleUser({ email: g.email, name: g.name || "", proof: g.proof });
     setName(n => n.trim() ? n : (g.name || ""));
     setEmail(g.email); setPassword(""); setConfirm("");
     switchMode("register");
@@ -2643,9 +2410,9 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport, onLe
       if (viaGoogle) {
         // Google has already confirmed this email, so there is no code step: create the account now.
         // The account gets a random password nobody knows; these users always come in through Google.
-        const randomPw = crypto.randomUUID() + crypto.randomUUID();
         const cleanSchool = role==="parent" ? "" : role==="teacher" ? schoolPick.name : school.trim();
-        const gres = await AUTH.register(name.trim(), phone, trimEmail, randomPw, cleanSchool, avatarColor);
+        const gres = await AUTH.register(name.trim(), phone, trimEmail, "", cleanSchool, avatarColor,
+          { role, schoolId: role==="teacher" ? schoolPick.id : "", proof: { kind:"google", token: googleUser.proof } });
         setLoading(false);
         if (!gres.ok) { setServerErr(gres.msg); return; }
         if (role === "teacher") {
@@ -3455,6 +3222,7 @@ function TeacherQuizHub({ user, onClose, mode="teacher", onTake }) {
 
   useEffect(() => {
     setMyQuizzes(loadMine());
+    syncData().then(() => setMyQuizzes(loadMine()));
   }, [tab]);
 
   /* Teachers see the quizzes they set. Students also see challenges they have taken,
@@ -3494,14 +3262,12 @@ function TeacherQuizHub({ user, onClose, mode="teacher", onTake }) {
     return shuffled.slice(0, Math.min(numQs, shuffled.length));
   }
 
-  function createQuiz() {
+  async function createQuiz() {
     if (!quizTitle.trim()) { alert("Give your quiz a title first!"); return; }
     const questions = buildQuestionsForQuiz();
     if (questions.length === 0) { alert("No questions found for this selection. Try a different subject or topic."); return; }
 
-    const code = QUIZ_STORE.generateCode();
     const quiz = {
-      code,
       title:         quizTitle.trim(),
       subject,
       topics:        selTopics.length ? selTopics : ["All Topics"],
@@ -3516,8 +3282,9 @@ function TeacherQuizHub({ user, onClose, mode="teacher", onTake }) {
       createdAt:     Date.now(),
       status:        "active",
     };
-    QUIZ_STORE.saveQuiz(quiz);
-    setCreatedQuiz(quiz);
+    const saved = await QUIZ_STORE.saveQuiz(quiz);
+    if (!saved.ok) { alert(saved.error || "Could not save the quiz. Check your connection and try again."); return; }
+    setCreatedQuiz(saved.quiz);
     setMyQuizzes(loadMine());
   }
 
@@ -3985,15 +3752,16 @@ function JoinQuizModal({ user, onJoin, onClose }) {
     setCode(c);
     setError(""); setPreview(null);
     if (c.length===6) {
-      const quiz = QUIZ_STORE.getQuiz(c);
-      if (quiz) setPreview(quiz);
+      QUIZ_STORE.fetchQuiz(c).then(quiz => { if (quiz) setPreview(quiz); });
     }
   }
 
-  function joinQuiz() {
+  async function joinQuiz() {
     setError("");
     if (code.length!==6) { setError("Enter a 6-character quiz code."); return; }
-    const quiz = QUIZ_STORE.getQuiz(code);
+    setLoading(true);
+    const quiz = await QUIZ_STORE.fetchQuiz(code);
+    setLoading(false);
     if (!quiz) { setError("Invalid code. Check with your teacher."); return; }
     if (quiz.status==="closed") { setError("This quiz has been closed by the teacher."); return; }
 
@@ -4015,7 +3783,7 @@ function JoinQuizModal({ user, onJoin, onClose }) {
       return;
     }
 
-    if (quiz.kind==="challenge") QUIZ_STORE.markJoined(quiz.code, user?.phone); // so it shows in My Challenges straight away
+    if (quiz.kind==="challenge") await QUIZ_STORE.markJoined(quiz.code, user?.phone); // so it shows in My Challenges straight away
     setLoading(true);
     setTimeout(()=>{ setLoading(false); onJoin(quiz); }, 600);
   }
@@ -4223,15 +3991,16 @@ function QuizTakerScreen({ quiz, user, onClose }) {
 
     const result = {
       studentPhone: user?.phone||"guest",
-      studentName:  user?.name||(AUTH.getUser(user?.phone)||{}).name||"Student",
+      studentName:  user?.name||"Student",
       code:   quiz.code,
       correct, total:totalMcq, pct,
       feedback, timeTaken,
       timeSecs: Math.round((Date.now()-startTime)/1000),
       submittedAt: Date.now(),
     };
-    QUIZ_STORE.saveResult(quiz.code, result);
-    setResults(result);
+    const saved = await QUIZ_STORE.saveResult(quiz.code, result);
+    if (!saved.ok) alert(saved.error || "Your result could not be saved. Check your connection.");
+    setResults(saved.ok && saved.result ? { ...result, ...saved.result } : result);
 
     // Update personal stats
     AUTH.updateStats(user?.phone, pct/10, quiz.subject, "objectives");
@@ -4629,7 +4398,7 @@ function LeaderboardModal({ currentUser, userData, onClose }) {
       const tagged = rows.map(r => ({
         ...r,
         isMe: r.name === (userData?.name || currentUser?.name) &&
-              (IS_LOCAL ? true : true), // server returns anonymised names; match by name+school
+              true, // the server marks your own row
       }));
       setBoard(tagged);
       setLastFetched(new Date());
@@ -4734,7 +4503,7 @@ function LeaderboardModal({ currentUser, userData, onClose }) {
                 Live Leaderboard
               </h2>
               <p style={{ fontSize:11, color:"var(--muted)", marginTop:2 }}>
-                Real students · {IS_LOCAL ? "On this device" : "Live"}
+                Real students · Live
                 {lastFetched && <span style={{color:"#22c55e",marginLeft:4}}>· Updated {lastFetched.toLocaleTimeString()}</span>}
               </p>
             </div>
@@ -5045,7 +4814,8 @@ function VerifyEmailScreen({ pending, onSuccess, onBack }) {
     // Code correct — complete registration
     const regRes = await AUTH.register(
       pending.name, pending.phone, pending.email,
-      pending.password, pending.school, pending.avatarColor
+      pending.password, pending.school, pending.avatarColor,
+      { role: pending.role || "student", schoolId: pending.schoolId || "" }
     );
     setLoading(false);
 

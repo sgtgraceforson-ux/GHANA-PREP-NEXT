@@ -3,6 +3,7 @@
 // same device as the child until this is moved to a server (e.g. Supabase).
 import { listStudentClassrooms, type Classroom } from "@/lib/classrooms";
 import { listAssignments, getSubmission, statusFor, type Status } from "@/lib/assignments";
+import { act } from "@/lib/sync";
 
 const ROLES = "gp_roles_v1";              // { [phoneDigits]: "teacher" | "parent" }
 const PARENTS = "gp_parents_v1";          // { [phoneDigits]: { name, phone, createdAt } }
@@ -33,27 +34,26 @@ export function getParent(): Parent | null {
   return a ? { name: a.name, phone: a.phone } : null;
 }
 export function logoutParent() {
+  try { fetch("/api/auth/logout", { method: "POST" }).catch(() => {}); } catch {} // ends the server session too
   localStorage.removeItem(PSESSION);
   try { document.cookie = `${COOKIE}=; path=/; max-age=0; SameSite=Lax`; } catch {}
 }
 
 /* ---------- the code a student shares ---------- */
-const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O or 1/I, so it is easy to read out
-const makeCode = (taken: string[]) => { let c = ""; do { c = Array.from(crypto.getRandomValues(new Uint8Array(6)), (b) => ALPHABET[b % ALPHABET.length]).join(""); } while (taken.includes(c)); return c; };
 export const formatParentCode = (c: string) => "PA-" + c;
 export const normalizeParentCode = (raw: string) => String(raw || "").toUpperCase().replace(/^PA[-\s]?/, "").replace(/[^A-Z0-9]/g, "");
 
-/** The student's current parent code (created the first time it is asked for). */
-export function getParentCode(studentPhone: string): string {
-  const phone = digits(studentPhone); const all = read(CODES, {});
-  if (!all[phone]) { all[phone] = makeCode(Object.values(all)); write(CODES, all); }
-  return all[phone];
+/** The student's current parent code (created on the server the first time it is asked for). */
+export async function getParentCode(studentPhone: string): Promise<string> {
+  const cached = read(CODES, {})[digits(studentPhone)];
+  if (cached) return cached;
+  const r = await act<string>("parent.code");
+  return r.ok ? (r.result as string) : "";
 }
 /** Replaces the code. Parents already linked stay linked; the old code stops working. */
-export function newParentCode(studentPhone: string): string {
-  const phone = digits(studentPhone); const all = read(CODES, {});
-  all[phone] = makeCode(Object.values(all)); write(CODES, all);
-  return all[phone];
+export async function newParentCode(_studentPhone: string): Promise<string> {
+  const r = await act<string>("parent.code", { renew: true });
+  return r.ok ? (r.result as string) : "";
 }
 
 /* ---------- links ---------- */
@@ -61,19 +61,11 @@ export type Ward = { phone: string; name: string; linkedAt: number };
 export type LinkedParent = { phone: string; name: string; linkedAt: number };
 const account = (phone: string): any => (Object.values(read(ACCOUNTS, {})) as any[]).find((a) => digits(a.phone) === digits(phone)) || null;
 
-export function linkWard(parentPhone: string, rawCode: string): { ok: boolean; error?: string; ward?: Ward } {
+export async function linkWard(_parentPhone: string, rawCode: string): Promise<{ ok: boolean; error?: string; ward?: Ward }> {
   const code = normalizeParentCode(rawCode);
   if (code.length !== 6) return { ok: false, error: "Enter the 6-character code from your child's app, for example PA-7K2P9X." };
-  const entry = Object.entries(read(CODES, {})).find(([, c]) => c === code);
-  const acc = entry ? account(entry[0]) : null;
-  if (!entry || !acc) return { ok: false, error: "That code was not found. Ask your child to open Parent Access in their app and read it out again." };
-  const parent = digits(parentPhone), student = digits(entry[0]);
-  const all = read(LINKS, {}); const mine: any[] = all[parent] || [];
-  if (mine.some((l) => l.student === student)) return { ok: false, error: `${acc.name} is already on your list.` };
-  const link = { student, linkedAt: Date.now() };
-  all[parent] = [...mine, link];
-  if (!write(LINKS, all)) return { ok: false, error: "This device's storage is full." };
-  return { ok: true, ward: { phone: student, name: acc.name, linkedAt: link.linkedAt } };
+  const r = await act<Ward>("parent.link", { code });
+  return r.ok ? { ok: true, ward: r.result } : { ok: false, error: r.error };
 }
 export function listWards(parentPhone: string): Ward[] {
   return ((read(LINKS, {})[digits(parentPhone)] || []) as any[])
@@ -81,9 +73,10 @@ export function listWards(parentPhone: string): Ward[] {
     .filter((w): w is Ward => w !== null);
 }
 /** Used by both sides: a parent removing a child, or a student removing a parent. */
-export function unlink(parentPhone: string, studentPhone: string) {
-  const all = read(LINKS, {}); const p = digits(parentPhone);
-  all[p] = (all[p] || []).filter((l: any) => l.student !== digits(studentPhone)); write(LINKS, all);
+export async function unlink(parentPhone: string, studentPhone: string) {
+  const me = JSON.parse(localStorage.getItem(STUDENT_SESSION) || "null");
+  const iAmStudent = me && digits(me.phone) === digits(studentPhone);
+  await act("parent.unlink", iAmStudent ? { parentPhone } : { studentPhone });
 }
 export function parentsOf(studentPhone: string): LinkedParent[] {
   const student = digits(studentPhone); const parents = read(PARENTS, {});

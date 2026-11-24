@@ -6,6 +6,9 @@
 // No client secret is used: this flow only proves who the person is.
 
 import { sameOrigin, clientIp, tooLarge, limited, MINUTE } from "@/lib/api-guard";
+import { signToken } from "@/lib/server/auth";
+import { db, NotConfigured } from "@/lib/server/db";
+import { findAccount, signedIn } from "@/lib/server/users";
 
 export const dynamic = "force-dynamic";
 
@@ -40,8 +43,20 @@ export async function POST(req: Request) {
   if (info?.aud !== clientId || !issuerOk || !notExpired) return fail("Google sign-in failed. Try again.", 401);
   if (String(info?.email_verified) !== "true" || !info?.email) return fail("Your Google account's email is not verified.", 403);
 
-  return Response.json({
-    email: String(info.email).trim().toLowerCase(),
-    name: String(info.name || "").trim().slice(0, 80),
-  });
+  const email = String(info.email).trim().toLowerCase();
+  const name = String(info.name || "").trim().slice(0, 80);
+  try {
+    // existing account: sign straight in
+    const a = await findAccount("email", email);
+    if (a) {
+      if (!a.google) await db().from("gp_accounts").update({ google: true }).eq("id", a.id);
+      return signedIn(a);
+    }
+  } catch (e) {
+    if (e instanceof NotConfigured) return fail("Accounts are not set up yet. Please contact GhanaPrep support.", 500);
+    return fail("Could not sign you in. Try again.", 500);
+  }
+  // new person: they finish their profile, and sign-up accepts this short-lived proof of the email
+  const proof = signToken("google", { email, exp: Date.now() + 30 * 60 * 1000 });
+  return Response.json({ needsProfile: true, email, name, proof });
 }

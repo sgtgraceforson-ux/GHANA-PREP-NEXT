@@ -7,6 +7,7 @@ import { AnnouncementsTab } from "./announcements";
 import { AnalyticsTab } from "./analytics";
 import { getTeacher } from "@/lib/teacher-auth";
 import { getClassroom, listMembers, formatCode, formatDate, timeAgo, type Classroom, type Member } from "@/lib/classrooms";
+import { useSyncedData } from "@/lib/sync";
 
 const TABS = ["Students", "Assignments", "Announcements", "Impact"];
 const card = { background: "#161d18", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: 16 } as const;
@@ -55,14 +56,16 @@ export default function ClassroomPage({ params }: { params: { id: string } }) {
   const [state, setState] = useState<"loading" | "missing" | "ready">("loading");
   const [room, setRoom] = useState<Classroom | null>(null);
   const [tab, setTab] = useState(0);
+  const { ready } = useSyncedData();
 
   useEffect(() => {
+    if (!ready) return;
     const me = getTeacher();
     if (!me) { router.replace("/"); return; }
     const r = getClassroom(params.id);
     if (!r || r.teacherEmail !== me.email.toLowerCase()) { setState("missing"); return; } // only the owner can open it
     setRoom(r); setState("ready");
-  }, [params.id, router]);
+  }, [params.id, router, ready]);
 
   if (state === "loading") return <ClassroomSkeleton />;
   if (state === "missing" || !room) return (

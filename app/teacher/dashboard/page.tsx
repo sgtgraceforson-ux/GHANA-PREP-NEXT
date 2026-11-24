@@ -6,6 +6,7 @@ import { SchoolPicker } from "@/components/school-picker";
 import type { School } from "@/lib/schools";
 import { ClassroomsPanel } from "../classrooms";
 import { TeacherDashboardSkeleton } from "@/components/skeletons";
+import { useSyncedData } from "@/lib/sync";
 
 const read = (k: string, d: any) => { try { return JSON.parse(localStorage.getItem(k) || "null") ?? d; } catch { return d; } };
 
@@ -15,15 +16,17 @@ export default function TeacherDashboard() {
   const [quizzes, setQuizzes] = useState<any[]>([]);
   const [pick, setPick] = useState<School | null>(null);
   const [pickErr, setPickErr] = useState("");
+  const { ready, v } = useSyncedData(); // classrooms and quizzes come from the database
 
   useEffect(() => {
+    if (!ready) return;
     const me = getTeacher();
     if (!me) { clearRoleCookie(); router.replace("/"); return; } // not a signed-in teacher
     setT(me);
     const all = Object.values(read("gp_quizzes_v1", {})) as any[];
     const results = read("gp_quiz_results_v1", {});
     setQuizzes(all.filter((q) => q.teacherPhone === me.phone).map((q) => ({ ...q, results: results[q.code] || [] })));
-  }, [router]);
+  }, [router, ready, v]);
 
   if (!t) return <TeacherDashboardSkeleton />;
 
@@ -50,14 +53,14 @@ export default function TeacherDashboard() {
           ))}
         </div>
 
-        {t.schoolId ? <ClassroomsPanel teacher={t} /> : (
+        {t.schoolId ? <ClassroomsPanel teacher={t} version={v} /> : (
           // Teachers who signed up before schools were compulsory must choose one before creating classrooms
           <div style={{ ...card, marginBottom: 16, border: "1.5px solid rgba(232,196,104,.5)" }}>
             <p style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 15 }}>Choose your school</p>
             <p style={{ fontSize: 13, color: "#8899aa", lineHeight: 1.6, margin: "6px 0 14px" }}>Pick your school from the list to create classrooms. Your classrooms will then appear on your headmaster's dashboard.</p>
             <SchoolPicker label="Your school" value={pick} error={pickErr} onChange={(s) => { setPick(s); setPickErr(""); }}
               onMissing={() => setPickErr("Your school is not on our list yet. Contact GhanaPrep support with your school's name and town, and we will add it.")} />
-            <button onClick={() => { if (!pick) { setPickErr("Choose your school from the list"); return; } setTeacherSchool(t.email, pick); setT(getTeacher()); }}
+            <button onClick={async () => { if (!pick) { setPickErr("Choose your school from the list"); return; } if (!(await setTeacherSchool(t.email, pick))) { setPickErr("Could not save your school. Try again."); return; } setT(getTeacher()); }}
               style={{ padding: "11px 16px", border: "none", borderRadius: 10, background: "#22c55e", color: "#000", fontWeight: 800, fontSize: 14, cursor: "pointer" }}>Save my school</button>
           </div>
         )}

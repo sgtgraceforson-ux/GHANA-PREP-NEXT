@@ -1,5 +1,8 @@
-// Assignments, submissions and grading. Demo/local mode (localStorage), same limits as classrooms.
+// Assignments, submissions and grading, stored in the GhanaPrep database. Changes go through the
+// server (which checks the teacher owns the class, or the student is in it); reads use this
+// device's synced copy (see lib/sync.ts). Students' copies have no answer keys.
 import { DB } from "./question-bank";
+import { act } from "@/lib/sync";
 
 const AS = "gp_assignments_v1";   // { [id]: Assignment }
 const SUB = "gp_submissions_v1";  // { [assignmentId]: { [phoneDigits]: Submission } }
@@ -11,7 +14,6 @@ export type Submission = { phone: string; name: string; text: string; answers: R
 export type Status = "Pending" | "Submitted" | "Graded" | "Overdue";
 
 const read = (k: string, d: any) => { try { return JSON.parse(localStorage.getItem(k) || "null") ?? d; } catch { return d; } };
-const write = (k: string, v: any) => localStorage.setItem(k, JSON.stringify(v)); // throws if storage is full
 const digits = (p: string) => String(p || "").replace(/\D/g, "");
 
 export const MAX_FILE = 700 * 1024, MAX_TOTAL = 1500 * 1024;
@@ -41,12 +43,9 @@ export function bankFor(subject: string, level: string): AQuestion[] {
   return [...(sub.objectives || []).map((q: any) => mk("mcq", q)), ...(sub.theory || []).map((q: any) => mk("theory", q))];
 }
 
-export function createAssignment(classroom: { id: string; subject: string }, d: { title: string; instructions: string; dueAt: number; totalMarks: number; attachments: Attachment[]; questions: AQuestion[] }): Assignment {
-  const all = read(AS, {});
-  const id = Array.from(crypto.getRandomValues(new Uint8Array(8)), (b) => b.toString(16).padStart(2, "0")).join("");
-  const a: Assignment = { id, classroomId: classroom.id, title: d.title.trim(), instructions: d.instructions.trim(), subject: classroom.subject, dueAt: d.dueAt, totalMarks: d.totalMarks, attachments: d.attachments, questions: d.questions, createdAt: Date.now() };
-  all[id] = a; write(AS, all);
-  return a;
+export async function createAssignment(classroom: { id: string; subject: string }, d: { title: string; instructions: string; dueAt: number; totalMarks: number; attachments: Attachment[]; questions: AQuestion[] }): Promise<{ ok: boolean; error?: string; assignment?: Assignment }> {
+  const r = await act<Assignment>("assignment.create", { classroomId: classroom.id, ...d });
+  return r.ok ? { ok: true, assignment: r.result } : { ok: false, error: r.error };
 }
 export const getAssignment = (id: string): Assignment | null => read(AS, {})[id] || null;
 export const listAssignments = (classroomId: string): Assignment[] =>
@@ -55,23 +54,17 @@ export const listAssignments = (classroomId: string): Assignment[] =>
 export const getSubmission = (aid: string, phone: string): Submission | null => (read(SUB, {})[aid] || {})[digits(phone)] || null;
 export const listSubmissions = (aid: string): Submission[] => Object.values(read(SUB, {})[aid] || {}) as Submission[];
 
-export function submitAssignment(aid: string, student: { phone: string; name: string }, content: { text: string; answers: Record<string, string> }, now = Date.now()): { ok: boolean; error?: string; submission?: Submission } {
-  const a = getAssignment(aid); if (!a) return { ok: false, error: "Assignment not found." };
+export async function submitAssignment(aid: string, _student: { phone: string; name: string }, content: { text: string; answers: Record<string, string> }): Promise<{ ok: boolean; error?: string; submission?: Submission }> {
   const hasAnswer = content.text.trim() || Object.values(content.answers).some((v) => String(v).trim());
   if (!hasAnswer) return { ok: false, error: "Write or choose at least one answer before submitting." };
-  const all = read(SUB, {}); const mine = (all[aid] = all[aid] || {}); const prev = mine[digits(student.phone)];
-  if (prev && prev.gradedAt) return { ok: false, error: "This assignment has already been graded." };
-  const s: Submission = { phone: digits(student.phone), name: student.name, text: content.text.trim(), answers: content.answers, submittedAt: now, late: now > a.dueAt, marks: null, feedback: "", gradedAt: null };
-  mine[s.phone] = s; write(SUB, all);
-  return { ok: true, submission: s };
+  const r = await act<Submission>("assignment.submit", { assignmentId: aid, ...content });
+  return r.ok ? { ok: true, submission: r.result } : { ok: false, error: r.error };
 }
 
-export function gradeSubmission(aid: string, phone: string, marks: number, feedback: string, now = Date.now()): { ok: boolean; error?: string } {
-  const a = getAssignment(aid); const all = read(SUB, {}); const s = all[aid]?.[digits(phone)];
-  if (!a || !s) return { ok: false, error: "Submission not found." };
-  if (!Number.isFinite(marks) || marks < 0 || marks > a.totalMarks) return { ok: false, error: `Marks must be between 0 and ${a.totalMarks}.` };
-  s.marks = marks; s.feedback = feedback.trim(); s.gradedAt = now; write(SUB, all);
-  return { ok: true };
+export async function gradeSubmission(aid: string, phone: string, marks: number, feedback: string): Promise<{ ok: boolean; error?: string }> {
+  if (!Number.isFinite(marks)) return { ok: false, error: "Enter the marks." };
+  const r = await act("assignment.grade", { assignmentId: aid, phone, marks, feedback });
+  return r.ok ? { ok: true } : { ok: false, error: r.error };
 }
 
 // Pending / Submitted / Graded / Overdue

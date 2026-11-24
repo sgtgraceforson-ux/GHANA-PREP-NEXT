@@ -7,6 +7,7 @@ import { BookOpen, Target, Flame, Clock, FileDown, UserPlus, TriangleAlert, Grad
 import { getParent, logoutParent, listWards, linkWard, unlink, wardReport, type Parent, type Ward, type WardReport, type ReportAssignment } from "@/lib/parents";
 import { formatDate, timeAgo } from "@/lib/classrooms";
 import { ParentSkeleton } from "@/components/skeletons";
+import { useSyncedData } from "@/lib/sync";
 
 // Colours are CSS variables so the same markup prints as a light report.
 const CSS = `
@@ -139,27 +140,33 @@ export default function ParentPage() {
   const [code, setCode] = useState("");
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [report, setReport] = useState<WardReport | null>(null);
+  const [busy, setBusy] = useState(false);
+  const { ready, v } = useSyncedData(); // children and their work come from the database
 
   useEffect(() => {
+    if (!ready) return;
     const me = getParent();
     if (!me) { logoutParent(); router.replace("/"); return; } // not a signed-in parent
     setParent(me);
     const w = listWards(me.phone); setWards(w); setSel(w[0]?.phone || null);
-    // run once when the page opens, so choosing or adding a child is never reset
+    // run once the data has loaded, so choosing or adding a child is never reset
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  useEffect(() => { setReport(parent && sel ? wardReport(parent.phone, sel) : null); }, [parent, sel, wards]);
+  }, [ready]);
+  useEffect(() => { setReport(parent && sel ? wardReport(parent.phone, sel) : null); }, [parent, sel, wards, v]);
 
   if (!parent) return <ParentSkeleton />;
 
-  function add() {
-    const r = linkWard(parent!.phone, code);
+  async function add() {
+    if (busy) return;
+    setBusy(true);
+    const r = await linkWard(parent!.phone, code);
+    setBusy(false);
     if (!r.ok) { setMsg({ ok: false, text: r.error || "Could not add." }); return; }
     setWards(listWards(parent!.phone)); setSel(r.ward!.phone); setCode(""); setAdding(false);
     setMsg({ ok: true, text: `${r.ward!.name} added. You can now see their progress.` });
   }
-  function remove(phone: string) {
-    unlink(parent!.phone, phone); const w = listWards(parent!.phone);
+  async function remove(phone: string) {
+    await unlink(parent!.phone, phone); const w = listWards(parent!.phone);
     setWards(w); setSel(w[0]?.phone || null); setMsg({ ok: true, text: "Removed from your list." });
   }
   const showForm = adding || wards.length === 0;

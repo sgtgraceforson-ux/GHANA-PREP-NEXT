@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ClassAnnouncements } from "@/components/announcements";
 import { getClassroom, listStudentClassrooms, formatDate, timeAgo, type Classroom } from "@/lib/classrooms";
 import { listAssignments, getSubmission, submitAssignment, statusFor, STATUS_COLOR, type Assignment, type Submission, type Status } from "@/lib/assignments";
+import { useSyncedData } from "@/lib/sync";
 
 const card = { background: "#161d18", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: 16 } as const;
 const page = { minHeight: "100vh", background: "#0a0f0d", color: "#f0f4f8", fontFamily: "'DM Sans',sans-serif", display: "flex", justifyContent: "center", padding: "24px 18px 48px" } as const;
@@ -22,8 +23,12 @@ function AssignmentView({ a, student, onBack }: { a: Assignment; student: { name
   const status = statusFor(a, sub); const locked = status === "Graded";
   const overdue = !sub && Date.now() > a.dueAt;
 
-  function submit() {
-    const r = submitAssignment(a.id, student, { text, answers });
+  const [busy, setBusy] = useState(false);
+  async function submit() {
+    if (busy) return;
+    setBusy(true);
+    const r = await submitAssignment(a.id, student, { text, answers });
+    setBusy(false);
     if (!r.ok) { setMsg({ ok: false, text: r.error }); return; }
     setSub(r.submission); setMsg({ ok: true, text: r.submission.late ? "Submitted (marked late)." : "Submitted. Your teacher will grade it." });
   }
@@ -82,13 +87,15 @@ export default function StudentClassroomPage({ params }: { params: { id: string 
   const [list, setList] = useState<Assignment[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
   const load = (s: { phone: string }) => setList(listAssignments(params.id).sort((x, y) => x.dueAt - y.dueAt));
+  const { ready, v } = useSyncedData(20000); // classrooms and assignments come from the database
 
   useEffect(() => {
+    if (!ready) return;
     let s = null; try { s = JSON.parse(localStorage.getItem("gp_session_v3") || "null"); } catch {}
     setStudent(s); if (!s) return;
     setRoom(getClassroom(params.id));
     const ok = listStudentClassrooms(s.phone).some((c) => c.id === params.id); setMember(ok); if (ok) load(s);
-  }, [params.id]);
+  }, [params.id, ready, v]);
 
   const body = student === undefined ? <AssignmentsBodySkeleton /> : student === null ? (
     <div style={card}><p style={{ fontSize: 14, marginBottom: 10 }}>Sign in to the student app first.</p><a href="/" style={{ color: "#22c55e", fontWeight: 700 }}>Go to sign in</a></div>

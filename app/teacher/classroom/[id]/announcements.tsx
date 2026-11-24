@@ -35,9 +35,13 @@ function Composer({ room, editing, onDone, onCancel }: { room: Classroom; editin
     if (f.size > MAX_ATTACHMENT) { setErr(`${f.name} is larger than 700 KB. Choose a smaller file.`); return; }
     try { setFile(await readFile(f)); setErr(""); } catch { setErr("That file could not be read. Try another one."); }
   }
-  function save() {
+  const [saving, setSaving] = useState(false);
+  async function save() {
+    if (saving) return;
     const input = { title, message, attachment: file };
-    const r = editing ? updateAnnouncement(editing.id, input) : createAnnouncement(room, input);
+    setSaving(true);
+    const r = editing ? await updateAnnouncement(editing.id, input) : await createAnnouncement(room, input);
+    setSaving(false);
     if (!r.ok) { setErr(r.error || "Could not save."); return; }
     onDone(editing ? "Announcement updated." : "Announcement posted. Students in this classroom can see it now.");
   }
@@ -65,7 +69,7 @@ function Composer({ room, editing, onDone, onCancel }: { room: Classroom; editin
 
       {err && <p role="alert" style={{ color: "#f87171", fontSize: 13, fontWeight: 600, marginTop: 10 }}>{err}</p>}
       <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-        <button type="button" onClick={save} style={primary}>{editing ? "Save changes" : "Post announcement"}</button>
+        <button type="button" onClick={save} disabled={saving} style={{ ...primary, opacity: saving ? 0.6 : 1 }}>{saving ? "Saving…" : editing ? "Save changes" : "Post announcement"}</button>
         {editing && <button type="button" onClick={onCancel} style={{ ...btn, padding: "11px 16px" }}>Cancel</button>}
       </div>
     </div>
@@ -115,13 +119,13 @@ export function AnnouncementsTab({ room }: { room: Classroom }) {
                 <div role="alertdialog" aria-label="Confirm delete" style={{ marginTop: 14, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.3)", borderRadius: 10, padding: "10px 12px" }}>
                   <p style={{ fontSize: 13, marginBottom: 9 }}>Delete this announcement? Students will no longer see it.</p>
                   <div style={{ display: "flex", gap: 8 }}>
-                    <button type="button" onClick={() => { deleteAnnouncement(a.id); setConfirmId(null); if (editing?.id === a.id) setEditing(null); setNote("Announcement deleted."); load(); }} style={{ ...btn, background: "#f87171", borderColor: "#f87171", color: "#1a0505", fontWeight: 800 }}>Yes, delete</button>
+                    <button type="button" onClick={async () => { await deleteAnnouncement(a.id); setConfirmId(null); if (editing?.id === a.id) setEditing(null); setNote("Announcement deleted."); load(); }} style={{ ...btn, background: "#f87171", borderColor: "#f87171", color: "#1a0505", fontWeight: 800 }}>Yes, delete</button>
                     <button type="button" onClick={() => setConfirmId(null)} style={btn}>Keep it</button>
                   </div>
                 </div>
               ) : (
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 14 }}>
-                  <button type="button" onClick={() => { togglePin(a.id); setNote(""); load(); }} aria-pressed={a.pinned} style={btn}>{a.pinned ? <><PinOff size={14} aria-hidden /> Unpin</> : <><Pin size={14} aria-hidden /> Pin</>}</button>
+                  <button type="button" onClick={async () => { await togglePin(a.id); setNote(""); load(); }} aria-pressed={a.pinned} style={btn}>{a.pinned ? <><PinOff size={14} aria-hidden /> Unpin</> : <><Pin size={14} aria-hidden /> Pin</>}</button>
                   <button type="button" onClick={() => { setEditing(a); setNote(""); window.scrollTo({ top: 0, behavior: "smooth" }); }} style={btn}><Pencil size={14} aria-hidden /> Edit</button>
                   <button type="button" onClick={() => setConfirmId(a.id)} style={{ ...btn, color: "#f87171", borderColor: "rgba(248,113,113,.35)" }}><Trash2 size={14} aria-hidden /> Delete</button>
                 </div>

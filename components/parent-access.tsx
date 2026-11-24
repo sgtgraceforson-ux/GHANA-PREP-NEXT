@@ -17,7 +17,7 @@ export function ParentAccessRow({ phone }: { phone?: string }) {
   const [confirmNew, setConfirmNew] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
 
-  const load = () => { if (phone) { setCode(getParentCode(phone)); setParents(parentsOf(phone)); } };
+  const load = () => { if (phone) { getParentCode(phone).then(setCode); setParents(parentsOf(phone)); } };
   useEffect(() => { if (open) load(); }, [open, phone]);
   useEffect(() => {
     if (!open) return;
@@ -64,7 +64,7 @@ export function ParentAccessRow({ phone }: { phone?: string }) {
               <div role="alertdialog" aria-label="Confirm new code" style={{ marginTop: 10, background: "rgba(232,196,104,.08)", border: "1px solid rgba(232,196,104,.3)", borderRadius: 12, padding: "11px 13px" }}>
                 <p style={{ fontSize: 13, lineHeight: 1.55, margin: "0 0 9px" }}>Make a new code? The old one stops working. Parents already linked stay linked.</p>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <button onClick={() => { setCode(newParentCode(phone)); setConfirmNew(false); }} style={{ ...btn, padding: "8px 13px", background: "#e8c468", border: "none", color: "#1a1303", fontWeight: 800 }}>Yes, new code</button>
+                  <button onClick={async () => { setCode(await newParentCode(phone)); setConfirmNew(false); }} style={{ ...btn, padding: "8px 13px", background: "#e8c468", border: "none", color: "#1a1303", fontWeight: 800 }}>Yes, new code</button>
                   <button onClick={() => setConfirmNew(false)} style={{ ...btn, padding: "8px 13px" }}>Cancel</button>
                 </div>
               </div>
@@ -82,7 +82,7 @@ export function ParentAccessRow({ phone }: { phone?: string }) {
                       </span>
                       {removing === p.phone ? (
                         <span style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                          <button onClick={() => { unlink(p.phone, phone); setRemoving(null); load(); }} style={{ ...btn, padding: "7px 11px", background: "#f87171", border: "none", color: "#1a0505", fontWeight: 800 }}>Remove</button>
+                          <button onClick={async () => { await unlink(p.phone, phone); setRemoving(null); load(); }} style={{ ...btn, padding: "7px 11px", background: "#f87171", border: "none", color: "#1a0505", fontWeight: 800 }}>Remove</button>
                           <button onClick={() => setRemoving(null)} style={{ ...btn, padding: "7px 11px" }}>Keep</button>
                         </span>
                       ) : <button onClick={() => setRemoving(p.phone)} aria-label={`Remove ${p.name}`} style={{ ...btn, padding: "7px 11px", color: "#f87171", borderColor: "rgba(248,113,113,.35)", flexShrink: 0 }}>Remove access</button>}

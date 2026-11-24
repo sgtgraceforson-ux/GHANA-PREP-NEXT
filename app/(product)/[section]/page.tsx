@@ -32,7 +32,7 @@ export default function SectionPage({ params }: { params: { section: string } })
       {[["Name", u.name], ["School", u.school || "Not set"], ["Phone", u.phone], ["Questions answered", u.stats.done]].map(([k, v]) => (
         <div key={k as string} className="flex justify-between border-b pb-2 text-sm last:border-0"><span className="text-muted-foreground">{k}</span><span className="font-medium">{v || "-"}</span></div>
       ))}
-      <Button variant="outline" onClick={() => { localStorage.removeItem("gp_session_v3"); window.location.href = "/"; }}>Sign out</Button>
+      <Button variant="outline" onClick={() => { localStorage.removeItem("gp_session_v3"); fetch("/api/auth/logout", { method: "POST" }).finally(() => { window.location.href = "/"; }); }}>Sign out</Button>
     </CardContent></Card>
   );
   else body = (

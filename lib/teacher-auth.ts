@@ -41,16 +41,18 @@ export function getTeacher(): Teacher | null {
 }
 
 /** Saves the school a teacher chose. Their classrooms then show on that school's headmaster dashboard. */
-export function setTeacherSchool(emailRaw: string, s: { id: string; name: string; region: string }) {
+export async function setTeacherSchool(emailRaw: string, s: { id: string; name: string; region: string }) {
+  const { act } = await import("@/lib/sync");
+  const r = await act("teacher.school", { schoolId: s.id });
+  if (!r.ok) return false;
   const accounts = read(ACCOUNTS, {});
   const email = emailRaw.trim().toLowerCase();
-  if (!accounts[email]) return false;
-  accounts[email] = { ...accounts[email], schoolId: s.id, school: s.name, region: s.region };
-  localStorage.setItem(ACCOUNTS, JSON.stringify(accounts));
+  if (accounts[email]) { accounts[email] = { ...accounts[email], schoolId: s.id, school: s.name, region: s.region }; localStorage.setItem(ACCOUNTS, JSON.stringify(accounts)); }
   return true;
 }
 
 export function logoutTeacher() {
+  try { fetch("/api/auth/logout", { method: "POST" }).catch(() => {}); } catch {} // ends the server session too
   localStorage.removeItem(SESSION);
   clearRoleCookie();
 }

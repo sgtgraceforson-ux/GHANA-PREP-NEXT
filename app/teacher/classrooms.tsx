@@ -16,7 +16,7 @@ async function copyText(t: string) {
   catch { const a = document.createElement("textarea"); a.value = t; document.body.appendChild(a); a.select(); document.execCommand("copy"); a.remove(); }
 }
 
-export function ClassroomsPanel({ teacher }: { teacher: Teacher }) {
+export function ClassroomsPanel({ teacher, version = 0 }: { teacher: Teacher; version?: number }) {
   const [rooms, setRooms] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
   const [f, setF] = useState({ name: "", subject: "", level: "", term: "" });
@@ -24,23 +24,29 @@ export function ClassroomsPanel({ teacher }: { teacher: Teacher }) {
   const [created, setCreated] = useState<Classroom | null>(null);
   const [copied, setCopied] = useState("");
   const refresh = () => setRooms(listTeacherClassrooms(teacher.email));
-  useEffect(() => { refresh(); }, [teacher.email]);
+  useEffect(() => { refresh(); }, [teacher.email, version]); // version: the database copy was refreshed
 
   const up = (k: string) => (e: any) => { setF({ ...f, [k]: e.target.value }); setErr({ ...err, [k]: "" }); };
   const close = () => { setOpen(false); setCreated(null); setF({ name: "", subject: "", level: "", term: "" }); setErr({}); };
-  function submit() {
+  const [saving, setSaving] = useState(false);
+  async function submit() {
+    if (saving) return;
     const e: Record<string, string> = {};
     if (f.name.trim().length < 3) e.name = 'Enter a classroom name, e.g. "Form 3 Science A"';
     if (!f.subject) e.subject = "Choose one subject";
     if (!f.level) e.level = "Choose a class / level";
     if (!f.term) e.term = "Choose the school term";
     setErr(e); if (Object.keys(e).length) return;
-    setCreated(createClassroom(teacher, f)); refresh();
+    setSaving(true);
+    const r = await createClassroom(teacher, f);
+    setSaving(false);
+    if (!r.ok || !r.result) { setErr({ name: r.error || "Could not create the classroom. Try again." }); return; }
+    setCreated(r.result); refresh();
   }
   async function copy(r: Classroom) { await copyText(formatCode(r.code)); setCopied(r.id); setTimeout(() => setCopied(""), 1800); }
   function regen(r: Classroom) {
     if (!window.confirm("Generate a new code? The old code will stop working.")) return;
-    regenerateCode(r.id, teacher.email); refresh();
+    regenerateCode(r.id, teacher.email).then(refresh);
   }
   const err_ = (k: string) => err[k] && <p style={{ color: "#f87171", fontSize: 12, marginTop: 5 }}>{err[k]}</p>;
 

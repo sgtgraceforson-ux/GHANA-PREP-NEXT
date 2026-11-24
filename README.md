@@ -66,3 +66,12 @@ Codes are never stored in the code or sent to the browser. They are worked out o
 2. Run `node scripts/headmaster-codes.mjs` to write all codes to `private/headmaster-codes.csv` (open it in Excel). This file is excluded from git: keep it private and give each headmaster only their own code.
 
 The school list (`lib/schools.json`) comes from Wikipedia's list of senior high schools in Ghana and is incomplete (about 550 of roughly 720 public SHS). Add missing schools at the **end** of the file so existing codes do not change, then run the script again.
+
+## Database (Supabase)
+
+Accounts, practice progress, classrooms, assignments, announcements, quizzes, parent links and the headmaster dashboard are stored in Supabase.
+
+- The browser never talks to Supabase. Every read and change goes through this app's server (`/api/auth/*`, `/api/me`, `/api/data`, `/api/leaderboard`), which checks the signed sign-in cookie first and sends each person only what they may see (`lib/server/data.ts`).
+- Every table has row level security ON with no policies, so the public key cannot read anything.
+- Set up a new database by running `supabase/schema.sql` in the Supabase SQL Editor (safe to run again).
+- Needed in `.env.local` and on Vercel: `SUPABASE_URL`, `SUPABASE_SECRET_KEY` (the secret / service_role key, server-only) and `AUTH_SECRET` (signs sessions). Never put the secret key in browser code.

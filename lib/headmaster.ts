@@ -1,8 +1,9 @@
 // Headmaster session and the school overview shown on the headmaster dashboard.
-// The code itself is checked on the server (/api/headmaster/login). Everything else here is
-// demo/local mode (localStorage): the dashboard only sees teachers and classrooms saved on this
-// device until the app moves to a shared database (e.g. Supabase).
+// The code is checked on the server (/api/headmaster/login), which then sets a signed cookie for
+// that school. The overview is built from the school's data in the database (synced copy, see
+// lib/sync.ts): every teacher who chose the school, from any phone.
 import { listMembers, type Classroom } from "@/lib/classrooms";
+import { clearSynced } from "@/lib/sync";
 
 const HSESSION = "gp_headmaster_session"; // { schoolId, schoolName, region, town, name }
 const HEADS = "gp_headmasters_v1";        // { [schoolId]: { name } } remembers the headmaster's name on this device
@@ -16,10 +17,10 @@ const read = (k: string, d: any) => { try { return JSON.parse(localStorage.getIt
 const write = (k: string, v: any) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 const digits = (p: string) => String(p || "").replace(/\D/g, "");
 
-/** Asks the server whether the code is right. */
-export async function checkHeadCode(code: string): Promise<{ ok: boolean; school?: HeadSchool; error?: string }> {
+/** Asks the server whether the code is right. With a name it also signs the headmaster in. */
+export async function checkHeadCode(code: string, name?: string): Promise<{ ok: boolean; school?: HeadSchool; error?: string }> {
   try {
-    const r = await fetch("/api/headmaster/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code }) });
+    const r = await fetch("/api/headmaster/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code, name }) });
     const d = await r.json().catch(() => ({}));
     if (!r.ok || !d.school) return { ok: false, error: d.error || "Sign-in failed. Try again." };
     return { ok: true, school: d.school };
@@ -30,11 +31,15 @@ export async function checkHeadCode(code: string): Promise<{ ok: boolean; school
 
 export const savedHeadName = (schoolId: string): string => read(HEADS, {})[schoolId]?.name || "";
 
-export function startHeadSession(school: HeadSchool, name: string) {
+/** Signs in on the server (signed cookie) and remembers the session details on this device. */
+export async function startHeadSession(code: string, school: HeadSchool, name: string): Promise<{ ok: boolean; error?: string }> {
+  const r = await checkHeadCode(code, name.trim());
+  if (!r.ok) return { ok: false, error: r.error };
   const heads = read(HEADS, {}); heads[school.id] = { name: name.trim() }; write(HEADS, heads);
   write(HSESSION, { schoolId: school.id, schoolName: school.name, region: school.region, town: school.town, name: name.trim() });
   OTHER_SESSIONS.forEach((k) => { try { localStorage.removeItem(k); } catch {} });
   try { document.cookie = `${COOKIE}=headmaster; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`; } catch {}
+  return { ok: true };
 }
 
 export function getHeadSession(): HeadSession | null {
@@ -44,6 +49,8 @@ export function getHeadSession(): HeadSession | null {
 
 export function logoutHead() {
   try { localStorage.removeItem(HSESSION); } catch {}
+  clearSynced();
+  try { fetch("/api/headmaster/logout", { method: "POST" }).catch(() => {}); } catch {}
   try { document.cookie = `${COOKIE}=; path=/; max-age=0; SameSite=Lax`; } catch {}
 }
 

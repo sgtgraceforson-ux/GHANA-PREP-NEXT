@@ -4,6 +4,7 @@ import { checkHeadCode, getHeadSession, logoutHead, savedHeadName, schoolOvervie
   type HeadSchool, type HeadSession, type SchoolOverview } from "@/lib/headmaster";
 import { formatCode, type Classroom, type Member } from "@/lib/classrooms";
 import { ClassRegister, ReportSheet } from "@/components/headmaster-register";
+import { useSyncedData } from "@/lib/sync";
 
 const font = "'DM Sans',system-ui,sans-serif", display = "'Syne','DM Sans',sans-serif";
 const page = { minHeight: "100vh", background: "#0a0f0d", color: "#f0f4f8", fontFamily: font, display: "flex", justifyContent: "center", padding: "24px 18px 48px" } as const;
@@ -41,13 +42,23 @@ function SignIn({ onDone }: { onDone: (s: HeadSession) => void }) {
     setBusy(false);
     if (!r.ok) { setErr(r.error); return; }
     const known = savedHeadName(r.school.id);
-    if (known) { startHeadSession(r.school, known); onDone(getHeadSession()!); return; }
+    if (known) {
+      setBusy(true);
+      const s = await startHeadSession(code.trim(), r.school, known);
+      setBusy(false);
+      if (!s.ok) { setErr(s.error || "Sign-in failed. Try again."); return; }
+      onDone(getHeadSession()!); return;
+    }
     setSchool(r.school); // first time: ask for their name
   }
-  function submitName(e: React.FormEvent) {
+  async function submitName(e: React.FormEvent) {
     e.preventDefault();
+    if (busy) return;
     if (name.trim().length < 3) { setErr("Enter your full name."); return; }
-    startHeadSession(school!, name);
+    setBusy(true);
+    const s = await startHeadSession(code.trim(), school!, name);
+    setBusy(false);
+    if (!s.ok) { setErr(s.error || "Sign-in failed. Try again."); return; }
     onDone(getHeadSession()!);
   }
 
@@ -96,14 +107,13 @@ function Dashboard({ session, onSignOut }: { session: HeadSession; onSignOut: ()
   const [data, setData] = useState<SchoolOverview | null>(null);
   const [openRoom, setOpenRoom] = useState("");
   const [report, setReport] = useState<{ member: Member; room: Classroom } | null>(null);
+  const { ready, v } = useSyncedData(); // the whole school's data, from the database
   useEffect(() => {
-    const load = () => setData(schoolOverview(session.schoolId));
-    load();
-    // refresh when a teacher on this device creates a classroom in another tab, or when the page is shown again
-    const onStorage = (e: StorageEvent) => { if (!e.key || /classroom|teachers|quiz/.test(e.key)) load(); };
-    window.addEventListener("storage", onStorage); window.addEventListener("focus", load);
-    return () => { window.removeEventListener("storage", onStorage); window.removeEventListener("focus", load); };
-  }, [session.schoolId]);
+    // the signed sign-in can expire: go back to the code screen if the server no longer accepts it
+    fetch("/api/data", { cache: "no-store" }).then((r) => { if (r.status === 401) onSignOut(); }).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => { if (ready) setData(schoolOverview(session.schoolId)); }, [session.schoolId, ready, v]);
 
   if (!data) return <div style={page} />;
   const t = data.totals;
