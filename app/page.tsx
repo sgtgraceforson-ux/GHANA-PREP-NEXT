@@ -29,6 +29,7 @@ function Ico({ n, size = "1.08em" }) {
 import { getRole, startTeacherSession, teacherProfileByPhone } from "@/lib/roles";
 import { getTeacher } from "@/lib/teacher-auth";
 import { act, syncData, clearSynced } from "@/lib/sync";
+import { PremiumSheet, PLANS, PRICE_FROM } from "@/components/premium-sheet";
 import { SchoolPicker } from "@/components/school-picker";
 
 // ── Your real business details ───────────────────────────────────
@@ -1742,7 +1743,7 @@ function App() {
           ? <div className="fadeUp5" style={{ background:"linear-gradient(135deg,rgba(232,196,104,0.12),rgba(232,196,104,0.03))", border:"1px solid rgba(232,196,104,0.26)", borderRadius:18, padding:"14px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:12 }}>
               <div style={{ minWidth:0 }}>
                 <p style={{ fontSize:13.5, fontWeight:800, color:"#e8c468", fontFamily:"'Syne',sans-serif" }}>Go unlimited</p>
-                <p style={{ fontSize:12, color:"var(--muted)", marginTop:2 }}>All questions, AI marking and Twi voice. GHS 50/month</p>
+                <p style={{ fontSize:12, color:"var(--muted)", marginTop:2 }}>All questions, AI marking and Twi voice. {PRICE_FROM}</p>
               </div>
               <button onClick={()=>setShowPaywall(true)} style={{ background:"linear-gradient(135deg,#f0d383,#d9ae4a)", color:"#1a1303", border:"none", borderRadius:999, padding:"10px 17px", fontSize:12.5, fontWeight:800, fontFamily:"'Syne',sans-serif", whiteSpace:"nowrap", flexShrink:0, cursor:"pointer" }}>Upgrade</button>
             </div>
@@ -2081,7 +2082,7 @@ function App() {
                 {!revealed && limitHit && (
                   <div style={{ background:"rgba(251,191,36,0.07)", border:"1px solid rgba(251,191,36,0.2)", borderRadius:12, padding:14, marginTop:4 }}>
                     <p style={{ fontWeight:700, color:"#fbbf24", marginBottom:6 }}><Ico n="lock" /> Daily Limit Reached</p>
-                    <p style={{ fontSize:13, color:"var(--muted)", marginBottom:12 }}>You've used your 3 free questions. Upgrade for GHS 50/month chale!</p>
+                    <p style={{ fontSize:13, color:"var(--muted)", marginBottom:12 }}>You've used your 3 free questions. Go Premium, {PRICE_FROM.toLowerCase()}, chale!</p>
                     <PrimaryBtn onClick={()=>setShowPaywall(true)} color="#fbbf24">Upgrade with MoMo →</PrimaryBtn>
                   </div>
                 )}
@@ -2768,7 +2769,7 @@ function AuthScreen({ mode, setMode, onSuccess, onPendingVerify, onSupport, onLe
           marginTop:20 }}>
           {[
             [<Ico n="ok" />,"Free 3 Qs/day","pill-1"],
-            [<Ico n="key" />,"GHS 50/month","pill-2"],
+            [<Ico n="key" />,PRICE_FROM,"pill-2"],
             [<Ico n="mic" />,"Twi Voice","pill-3"],
             [<Ico n="chart" />,"Dashboard","pill-4"],
           ].map(([icon,label,cls])=>(
@@ -2942,7 +2943,7 @@ function SupportModal({ onClose }) {
 
   const faqs = [
     { q:"How do I get my free questions?", a:"You get 3 free questions every day automatically after signing in. The count resets at midnight each day." },
-    { q:"How do I upgrade to unlimited?", a:"Tap 'Upgrade' on the home screen or during practice. Pay GHS 50/month via MTN MoMo or Vodafone Cash." },
+    { q:"How do I upgrade to unlimited?", a:"Tap 'Upgrade' on the home screen or during practice, choose a plan (weekly, monthly, termly or yearly) and pay with MTN MoMo, Telecel Cash or AT Money." },
     { q:"What is Twi voice and how do I use it?", a:"After marking a Theory question, tap the Twi button. Your feedback will be translated to Twi (Akan) and read aloud." },
     { q:"I forgot my password. What do I do?", a:"Currently, contact our support team via WhatsApp or email below and we will help you reset it." },
     { q:"What exams does GhanaPrep cover?", a:"We cover JHS BECE (Maths, English, Science, Social Studies) and SHS WASSCE core subjects (Core Maths, Core English, Core Science, Social Studies)." },
@@ -3134,7 +3135,7 @@ function DashboardView({ stats, weakList, avgScore, isPaid, onUpgrade, accent="#
       {!isPaid
         ? <div className="fadeUp5" style={{ background:"linear-gradient(135deg,#0d2618,#0a1820)", border:"1px solid rgba(34,197,94,0.18)", borderRadius:14, padding:18 }}>
             <p style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:16, marginBottom:6 }}><Ico n="rocket" /> Unlock Unlimited</p>
-            <p style={{ fontSize:13, color:"var(--muted)", marginBottom:14 }}>GHS 50/month • Objectives + Theory • All BECE + WASSCE subjects • Mobile Money</p>
+            <p style={{ fontSize:13, color:"var(--muted)", marginBottom:14 }}>{PRICE_FROM} • Objectives + Theory • All BECE + WASSCE subjects • Mobile Money</p>
             <PrimaryBtn onClick={onUpgrade} color="#22c55e">Subscribe with MoMo →</PrimaryBtn>
           </div>
         : <div style={{ background:"rgba(34,197,94,0.07)", border:"1px solid rgba(34,197,94,0.18)", borderRadius:14, padding:16, textAlign:"center" }}>
@@ -5040,78 +5041,10 @@ function VerifyEmailScreen({ pending, onSuccess, onBack }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   PAYWALL MODAL  — GHS 50/month (demo: no real payment is taken)
+   PAYWALL MODAL  — GhanaPrep Premium plans (components/premium-sheet.tsx; test mode, no real payment)
 ═══════════════════════════════════════════════════════════════ */
 function PaywallModal({ onClose, onPay }) {
-  const [network, setNetwork] = useState("MTN MoMo");
-  const [phone,   setPhone]   = useState("");
-  const [stage,   setStage]   = useState("form"); // form | processing
-  const [error,   setError]   = useState("");
-
-  function pay() {
-    const digits = phone.replace(/\D/g, "");
-    if (!/^0[2-9]\d{8}$/.test(digits)) { setError("Enter a valid 10-digit Ghana number, e.g. 024 123 4567"); return; }
-    setError(""); setStage("processing");
-    setTimeout(() => onPay(), 2200);
-  }
-
-  return (
-    <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", zIndex:700,
-      display:"flex", alignItems:"flex-end", justifyContent:"center",
-      backdropFilter:"blur(6px)", animation:"fadeIn .2s ease" }}>
-      <div style={{ background:"var(--surface)", borderRadius:"24px 24px 0 0", width:"100%",
-        maxWidth:430, border:"1px solid rgba(251,191,36,0.25)", borderBottom:"none",
-        padding:"22px 20px 36px", animation:"slideUp .32s cubic-bezier(.22,.68,0,1.2)",
-        fontFamily:"'DM Sans',sans-serif", color:"var(--text)" }}>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:14 }}>
-          <div>
-            <h2 style={{ fontFamily:"'Syne',sans-serif", fontSize:20, fontWeight:800 }}><Ico n="key" /> Go Unlimited</h2>
-            <p style={{ fontSize:12, color:"var(--muted)", marginTop:3 }}>GHS 50 per month · cancel anytime · no hidden fees</p>
-          </div>
-          <button onClick={onClose} disabled={stage==="processing"} aria-label="Close"
-            style={{ width:34, height:34, borderRadius:999, background:"var(--surface3)",
-              border:"1px solid var(--border2)", color:"var(--muted2)", fontSize:18, cursor:"pointer" }}><Ico n="close" /></button>
-        </div>
-
-        <div style={{ background:"var(--surface2)", border:"1px solid var(--border)", borderRadius:12, padding:"12px 14px", marginBottom:16 }}>
-          {["Unlimited practice questions every day","AI marking with Pidgin feedback","Twi voice explanations","Full dashboard and weak-topic tracking"].map(f => (
-            <p key={f} style={{ fontSize:13, color:"var(--muted2)", padding:"3px 0" }}><Ico n="ok" /> {f}</p>
-          ))}
-        </div>
-
-        {stage === "processing" ? (
-          <div style={{ textAlign:"center", padding:"20px 0" }}>
-            <div style={{ fontSize:38, marginBottom:10, animation:"crownBob 1s ease-in-out infinite" }}><Ico n="phone" /></div>
-            <p style={{ fontSize:14, fontWeight:700 }}>Approve the prompt on your phone…</p>
-            <p style={{ fontSize:12, color:"var(--muted)", marginTop:4 }}>Test mode: no real payment is taken.</p>
-          </div>
-        ) : (<>
-          <p style={{ fontSize:11, fontWeight:700, color:"var(--muted2)", textTransform:"uppercase", letterSpacing:"0.07em", marginBottom:8 }}>Pay with</p>
-          <div style={{ display:"flex", gap:8, marginBottom:14 }}>
-            {["MTN MoMo","Vodafone Cash","AirtelTigo"].map(n => (
-              <button key={n} onClick={()=>setNetwork(n)} style={{ flex:1, padding:"9px 4px", borderRadius:10, cursor:"pointer",
-                background: network===n ? "rgba(251,191,36,0.15)" : "var(--surface3)",
-                border:`1.5px solid ${network===n ? "#fbbf24" : "var(--border)"}`,
-                color: network===n ? "#fbbf24" : "var(--muted)", fontSize:11, fontWeight:700 }}>{n}</button>
-            ))}
-          </div>
-          <input value={phone} onChange={e=>{ setPhone(e.target.value); setError(""); }}
-            placeholder="Mobile money number" inputMode="tel"
-            style={{ width:"100%", padding:"13px 14px", background:"var(--surface3)", border:"1.5px solid var(--border2)",
-              borderRadius:12, fontSize:15, color:"var(--text)", outline:"none", boxSizing:"border-box", marginBottom:8 }}/>
-          {error && <p style={{ fontSize:12, color:"#f87171", marginBottom:8 }}><Ico n="warn" /> {error}</p>}
-          <button onClick={pay} style={{ width:"100%", padding:"14px", marginTop:4, border:"none", borderRadius:999,
-            background:"linear-gradient(135deg,#fbbf24,#f59e0b)", color:"#000", fontSize:15, fontWeight:800,
-            fontFamily:"'Syne',sans-serif", cursor:"pointer", boxShadow:"0 4px 22px rgba(251,191,36,0.4)" }}>
-            Pay GHS 50 →
-          </button>
-          <p style={{ fontSize:10, color:"var(--muted)", textAlign:"center", marginTop:10, lineHeight:1.6 }}>
-            Test mode: no money is taken. We never store your MoMo PIN or payment details.
-          </p>
-        </>)}
-      </div>
-    </div>
-  );
+  return <PremiumSheet onClose={onClose} onPaid={() => onPay()} />;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -5297,8 +5230,8 @@ please do not use the service.`,
       {
         h:"2. The Service",
         p:`GhanaPrep provides AI-powered BECE and WASSCE practice questions, marking, and
-study tools. The free tier allows 3 questions per day. The premium tier (GHS 50/month)
-provides unlimited access.`,
+study tools. The free tier allows 3 questions per day. Premium provides unlimited access
+and is offered as: ${PLANS.map(p => `${p.name} GHS ${p.price} per ${p.period}`).join(", ")}.`,
       },
       {
         h:"3. No Fake Reviews / No Unsupported Claims",
@@ -5309,7 +5242,7 @@ will vary based on effort and prior knowledge.`,
       {
         h:"4. No Dark Patterns / No Hidden Fees",
         p:`We do not use deceptive UI patterns to trick you into subscribing. The price of
-premium access is clearly stated as GHS 50/month with no hidden charges. Cancellation
+each Premium plan is clearly stated (${PLANS.map(p => `${p.name} GHS ${p.price} per ${p.period}`).join(", ")}) with no hidden charges. Cancellation
 is immediate and takes effect at the end of the current billing period.`,
       },
       {
@@ -5366,7 +5299,7 @@ No partial-month refunds are issued after the 7-day window.`,
       },
       {
         h:"No Hidden Fees",
-        p:`The full cost of premium access is GHS 50/month. There are no setup fees,
+        p:`The full cost of Premium is the plan price shown (${PLANS.map(p => `${p.name} GHS ${p.price} per ${p.period}`).join(", ")}). There are no setup fees,
 cancellation fees, or automatic price increases without prior notice.`,
       },
     ],
