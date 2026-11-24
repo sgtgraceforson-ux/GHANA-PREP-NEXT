@@ -17,7 +17,7 @@ const CONFETTI = ["#CE1126", "#FCD116", "#13a05a", "#e8c468", "#f5f7f6"];
 const CSS = `
 .vc{position:fixed;inset:0;z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;
   background:radial-gradient(60% 42% at 50% 40%,rgba(232,196,104,.17),transparent 70%),radial-gradient(90% 55% at 50% 105%,rgba(22,163,74,.24),transparent 70%),#06100b;
-  color:#f3f6f4;font-family:'DM Sans',system-ui,sans-serif;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+  color:#f3f6f4;font-family:'Plus Jakarta Sans','DM Sans',system-ui,sans-serif;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
 .vc.done{cursor:pointer}
 .vc-stage{position:relative;width:340px;max-width:100vw;height:300px;flex:none}
 .vc-center{position:absolute;left:50%;top:46%;width:0;height:0}
@@ -50,7 +50,7 @@ const CSS = `
 .vc.done .vc-wave.two{animation-delay:.17s}
 @keyframes vcWave{0%{opacity:1;transform:scale(.06)}70%{opacity:.5}100%{opacity:0;transform:scale(1)}}
 .vc-tile{position:absolute;left:0;top:0;width:44px;height:54px;margin:-27px 0 0 -22px;border-radius:12px;display:flex;align-items:center;justify-content:center;
-  font-family:'Syne','DM Sans',sans-serif;font-weight:800;font-size:26px;will-change:transform,opacity;
+  font-family:'Sora','Syne',sans-serif;letter-spacing:-.022em;font-weight:800;font-size:26px;will-change:transform,opacity;
   box-shadow:0 10px 18px -8px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.45),inset 0 -3px 0 rgba(0,0,0,.18)}
 .vc-tile::before{content:"";position:absolute;left:50%;bottom:100%;width:3px;height:38px;margin-left:-1.5px;border-radius:2px;
   background:linear-gradient(180deg,rgba(232,196,104,0),#e8c468 70%)}
@@ -66,7 +66,7 @@ const CSS = `
 .vc-kicker{font-size:12px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#e8c468;margin:0}
 .vc-wait{font-size:14px;color:#a9b8b1;margin:10px 0 0;animation:vcBlink 1.1s ease-in-out infinite}
 @keyframes vcBlink{50%{opacity:.45}}
-.vc-title{font-family:'Syne','DM Sans',sans-serif;font-weight:800;font-size:clamp(25px,7.4vw,32px);line-height:1.18;margin:10px 0 0}
+.vc-title{font-family:'Sora','Syne',sans-serif;letter-spacing:-.022em;font-weight:800;font-size:clamp(25px,7.4vw,32px);line-height:1.18;margin:10px 0 0}
 .vc-word{display:inline-block;white-space:nowrap}
 .vc-title .vc-l{display:inline-block;opacity:0;transform:translateY(16px) scale(.5) rotate(-8deg)}
 .vc.done .vc-title .vc-l{animation:vcLetter .55s cubic-bezier(.2,.9,.25,1.45) forwards}

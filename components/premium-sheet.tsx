@@ -38,7 +38,7 @@ const BENEFITS = [
 
 const CSS = `
 .pw-back{position:fixed;inset:0;z-index:700;background:rgba(2,6,4,.82);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .2s ease}
-.pw{position:relative;width:100%;max-width:430px;max-height:94vh;overflow-y:auto;border-radius:26px 26px 0 0;background:#0b110e;color:#f3f6f4;font-family:'DM Sans',system-ui,sans-serif;border:1px solid rgba(232,196,104,.28);border-bottom:none;animation:slideUp .34s cubic-bezier(.22,.68,0,1.2);overscroll-behavior:contain}
+.pw{position:relative;width:100%;max-width:430px;max-height:94vh;overflow-y:auto;border-radius:26px 26px 0 0;background:#0b110e;color:#f3f6f4;font-family:'Plus Jakarta Sans','DM Sans',system-ui,sans-serif;border:1px solid rgba(232,196,104,.28);border-bottom:none;animation:slideUp .34s cubic-bezier(.22,.68,0,1.2);overscroll-behavior:contain}
 .pw *{box-sizing:border-box}
 .pw-hero{position:relative;overflow:hidden;padding:26px 22px 22px;text-align:center;background:radial-gradient(120% 90% at 50% 0%,rgba(232,196,104,.26),transparent 62%),linear-gradient(180deg,#13201a,#0b110e)}
 .pw-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,235,170,.10) 50%,transparent 65%);background-size:250% 100%;animation:pwShine 4.5s linear infinite;pointer-events:none}
@@ -46,7 +46,7 @@ const CSS = `
 .pw-close{position:absolute;top:14px;right:14px;z-index:2;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.35);color:#cbd5d1;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .pw-crown{width:64px;height:64px;margin:0 auto 12px;border-radius:20px;display:flex;align-items:center;justify-content:center;color:#1a1303;background:linear-gradient(145deg,#fbe7a6,#d9ae4a 55%,#a97b1f);box-shadow:0 10px 30px -6px rgba(232,196,104,.65),inset 0 1px 0 rgba(255,255,255,.6)}
 .pw-kicker{font-size:11px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#e8c468}
-.pw-title{font-family:'Syne','DM Sans',sans-serif;font-weight:800;font-size:25px;line-height:1.15;margin-top:6px}
+.pw-title{font-family:'Sora','Syne',sans-serif;letter-spacing:-.022em;font-weight:800;font-size:25px;line-height:1.15;margin-top:6px}
 .pw-title em{font-style:normal;background:linear-gradient(90deg,#fbe7a6,#e8c468,#c9962f);-webkit-background-clip:text;background-clip:text;color:transparent}
 .pw-sub{font-size:13px;color:#a9b8b1;margin-top:8px;line-height:1.5}
 .pw-body{padding:18px 18px 28px}
@@ -66,11 +66,11 @@ const CSS = `
 .pw-pnote{font-size:12px;color:#8fa199;margin-top:2px}
 .pw-save{display:inline-block;margin-top:5px;font-size:11px;font-weight:800;color:#4ade80;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);border-radius:999px;padding:2px 8px}
 .pw-price{margin-left:auto;text-align:right;flex:none}
-.pw-amount{font-family:'Syne','DM Sans',sans-serif;font-weight:800;font-size:20px;white-space:nowrap}
+.pw-amount{font-family:'Sora','Syne',sans-serif;letter-spacing:-.022em;font-weight:800;font-size:20px;white-space:nowrap}
 .pw-per{font-size:11.5px;color:#8fa199;white-space:nowrap}
 .pw-badge{position:absolute;top:-9px;right:14px;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px;color:#1a1303;background:linear-gradient(90deg,#fbe7a6,#e8c468)}
 .pw-badge.green{background:linear-gradient(90deg,#86efac,#22c55e);color:#03130c}
-.pw-cta{width:100%;margin-top:18px;padding:15px;border:none;border-radius:999px;cursor:pointer;font-family:'Syne','DM Sans',sans-serif;font-weight:800;font-size:15.5px;color:#1a1303;background:linear-gradient(180deg,#fbe7a6,#e1b64f 60%,#c9962f);box-shadow:0 14px 30px -12px rgba(232,196,104,.9),inset 0 1px 0 rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;gap:8px}
+.pw-cta{width:100%;margin-top:18px;padding:15px;border:none;border-radius:999px;cursor:pointer;font-family:'Sora','Syne',sans-serif;letter-spacing:-.022em;font-weight:800;font-size:15.5px;color:#1a1303;background:linear-gradient(180deg,#fbe7a6,#e1b64f 60%,#c9962f);box-shadow:0 14px 30px -12px rgba(232,196,104,.9),inset 0 1px 0 rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;gap:8px}
 .pw-cta:disabled{opacity:.6;cursor:default}
 .pw-fine{font-size:11px;color:#71827a;text-align:center;line-height:1.6;margin-top:12px}
 .pw-trust{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:11.5px;color:#8fa199}

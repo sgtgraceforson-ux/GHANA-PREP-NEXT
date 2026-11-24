@@ -31,6 +31,7 @@ import { getTeacher } from "@/lib/teacher-auth";
 import { act, syncData, clearSynced } from "@/lib/sync";
 import { PremiumSheet, PLANS, PRICE_FROM } from "@/components/premium-sheet";
 import { VerifyCelebration } from "@/components/verify-celebration";
+import { Podium } from "@/components/podium";
 import { SchoolPicker } from "@/components/school-picker";
 
 // ── Your real business details ───────────────────────────────────
@@ -4397,11 +4398,7 @@ function LeaderboardModal({ currentUser, userData, onClose }) {
     try {
       const rows = await AUTH.fetchLeaderboard(p);
       // Tag the current user
-      const tagged = rows.map(r => ({
-        ...r,
-        isMe: r.name === (userData?.name || currentUser?.name) &&
-              true, // the server marks your own row
-      }));
+      const tagged = rows.map(r => ({ ...r, isMe: !!r.me })); // the server marks your own row
       setBoard(tagged);
       setLastFetched(new Date());
     } catch(e) {
@@ -4581,23 +4578,13 @@ function LeaderboardModal({ currentUser, userData, onClose }) {
 
           {!loading && !error && board.length > 0 && (<>
 
-            {/* ── Podium top 3 ─────────────────────────────── */}
-            {top3.length >= 2 && (
-              <div style={{ marginBottom:20 }}>
-                <p style={{ fontSize:10, fontWeight:700, color:"var(--muted)",
-                  textTransform:"uppercase", letterSpacing:"0.08em",
-                  textAlign:"center", marginBottom:14 }}><Ico n="award" /> Top Students</p>
-                <div style={{ display:"flex", alignItems:"flex-end",
-                  justifyContent:"center", gap:6 }}>
-                  {/* 2nd */}
-                  {top3[1] && <PodiumBlock user={top3[1]} height={64} color={RING[2]} glow={GLOW[2]} label="" delay="0.1s"/>}
-                  {/* 1st */}
-                  {top3[0] && <PodiumBlock user={top3[0]} height={90} color={RING[1]} glow={GLOW[1]} label="" delay="0s" big/>}
-                  {/* 3rd */}
-                  {top3[2] && <PodiumBlock user={top3[2]} height={50} color={RING[3]} glow={GLOW[3]} label="" delay="0.2s"/>}
-                </div>
-              </div>
-            )}
+            {/* ── Winners' podium: 2nd · 1st · 3rd ───────────── */}
+            <div style={{ marginBottom:14 }}>
+              <p style={{ fontSize:10, fontWeight:700, color:"var(--muted)",
+                textTransform:"uppercase", letterSpacing:"0.08em",
+                textAlign:"center", marginBottom:6 }}><Ico n="award" /> Top Students</p>
+              <Podium key={period} rows={top3.map(u => ({ name:u.name, school:u.school, score:u.score, avatarColor:u.avatarColor, isMe:u.isMe }))} />
+            </div>
 
             {/* My rank callout if outside top 3 */}
             {myRow && myRow.rank > 3 && (
@@ -4627,13 +4614,15 @@ function LeaderboardModal({ currentUser, userData, onClose }) {
               </div>
             )}
 
-            {/* Full list */}
-            <p style={{ fontSize:10, fontWeight:700, color:"var(--muted)",
-              textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>
-              All Rankings
-            </p>
+            {/* Everyone after the podium */}
+            {board.length > 3 && (
+              <p style={{ fontSize:10, fontWeight:700, color:"var(--muted)",
+                textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>
+                Rankings from 4th place
+              </p>
+            )}
 
-            {board.map((u,i) => {
+            {board.filter(u => u.rank > 3).map((u,i) => {
               const isTop = u.rank<=3;
               const col   = isTop ? RING[u.rank] : u.isMe ? "#22c55e" : null;
               const pulse = isTop ? u.rank : null;
@@ -5033,34 +5022,6 @@ function VerifyEmailScreen({ pending, onSuccess, onBack }) {
 ═══════════════════════════════════════════════════════════════ */
 function PaywallModal({ onClose, onPay }) {
   return <PremiumSheet onClose={onClose} onPaid={() => onPay()} />;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   PODIUM BLOCK  — one column of the leaderboard top-3 podium
-═══════════════════════════════════════════════════════════════ */
-function PodiumBlock({ user, height, color, glow, label, delay, big }) {
-  return (
-    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:6, flex: big ? 1.2 : 1 }}>
-      <div style={{ fontSize: big?28:22, animation:`crownBob ${big?2:2.5}s ${delay} ease-in-out infinite` }}>{label}</div>
-      <div style={{ width: big?48:38, height: big?48:38, borderRadius:"50%",
-        background:`radial-gradient(circle, ${glow} 0%, var(--surface3) 100%)`,
-        border:`2px solid ${color}`, display:"flex", alignItems:"center", justifyContent:"center",
-        fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize: big?18:14, color,
-        boxShadow:`0 0 20px ${glow}` }}>
-        {(user?.name || "?").charAt(0).toUpperCase()}
-      </div>
-      <p style={{ fontSize: big?12:10, fontWeight:700, color, textAlign:"center", maxWidth:70,
-        overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", fontFamily:"'Syne',sans-serif" }}>
-        {(user?.name || "").split(" ")[0]}
-      </p>
-      <p style={{ fontSize: big?14:11, fontWeight:800, color, fontFamily:"'Syne',sans-serif" }}>
-        {user?.score != null ? (user.score % 1 === 0 ? user.score : user.score.toFixed(1)) : 0}
-      </p>
-      <div style={{ width:"100%", height, borderRadius:"8px 8px 0 0",
-        background:`linear-gradient(180deg,${color}88,${color}22)`, border:`1px solid ${color}55`,
-        transformOrigin:"bottom", animation:`podiumRise 0.7s ${delay} cubic-bezier(.22,.68,0,1.2) both` }}/>
-    </div>
-  );
 }
 
 /* ═══════════════════════════════════════════════════════════════
